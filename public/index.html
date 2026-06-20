@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartFarming.AI - Detect, Explain & Cure</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="glass-bg"></div>
+    
+    <header>
+        <div class="logo">
+            <i class="fa-solid fa-leaf-list logo-icon"></i>
+            <h1>SmartFarming<span>.AI</span></h1>
+        </div>
+        <div class="header-actions">
+            <label class="secondary-btn" style="cursor: pointer;" title="Upload PDF/TXT/MD reference document">
+                <i class="fa-solid fa-file-arrow-up"></i> Upload Doc
+                <input type="file" id="doc-upload-input" accept=".txt,.md,.pdf" style="display: none;">
+            </label>
+            <button id="index-docs-btn" class="secondary-btn" title="Refresh local RAG database">
+                <i class="fa-solid fa-arrows-rotate"></i> Sync Database
+            </button>
+            <div class="language-selector">
+                <label for="lang-select"><i class="fa-solid fa-globe"></i> Language: </label>
+                <select id="lang-select">
+                    <option value="English">English</option>
+                    <option value="Hindi">हिन्दी (Hindi)</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-grid">
+        <!-- LEFT: Uploader & Diagnosis -->
+        <section class="left-panel">
+            <!-- Upload Card -->
+            <div class="card glass-card upload-card">
+                <h2><i class="fa-solid fa-cloud-arrow-up"></i> Upload Leaf Image</h2>
+                <p class="subtitle">Upload a photo of an infected leaf to analyze crop health</p>
+                
+                <div id="drop-zone" class="drop-zone">
+                    <input type="file" id="file-input" accept="image/*" hidden>
+                    <div class="drop-zone-prompt">
+                        <i class="fa-solid fa-images upload-icon"></i>
+                        <p>Drag & drop image here or <span>browse files</span></p>
+                        <span class="file-limits">Supports JPG, PNG, WEBP</span>
+                    </div>
+                    <div id="preview-container" class="preview-container hidden">
+                        <img id="image-preview" src="" alt="Selected leaf preview">
+                        <button id="remove-btn" class="remove-btn" type="button"><i class="fa-solid fa-circle-xmark"></i></button>
+                    </div>
+                </div>
+
+                <button id="analyze-btn" class="primary-btn disabled" disabled>
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Run Health Diagnostic
+                </button>
+            </div>
+
+            <!-- Diagnosis Card -->
+            <div id="diagnosis-card" class="card glass-card diagnosis-card hidden">
+                <h2><i class="fa-solid fa-stethoscope"></i> AI Diagnosis</h2>
+                <div class="divider"></div>
+                
+                <div id="safety-warning" class="safety-warning hidden">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <div>
+                        <span class="warning-title">Non-Plant / Anomaly Detected</span>
+                        <p id="safety-desc">This image does not resemble standard agricultural crops.</p>
+                    </div>
+                </div>
+
+                <div class="result-details">
+                    <div class="main-diagnosis">
+                        <span class="detail-label">Detected Status:</span>
+                        <h3 id="disease-name">Detecting...</h3>
+                    </div>
+                    
+                    <div class="confidence-wrapper">
+                        <div class="confidence-header">
+                            <span class="detail-label">Confidence:</span>
+                            <span id="confidence-percentage">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div id="confidence-bar" class="progress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="analysis-meta">
+                    <div>
+                        <span class="meta-label">Analysis Method:</span>
+                        <span id="view-used" class="meta-val">-</span>
+                    </div>
+                    <div>
+                        <span class="meta-label">Energy Score:</span>
+                        <span id="energy-score" class="meta-val">-</span>
+                    </div>
+                </div>
+
+                <div class="top3-wrapper">
+                    <h4>Top Match Candidates:</h4>
+                    <ul id="top3-list" class="top3-list">
+                        <!-- Filled by JS -->
+                    </ul>
+                </div>
+                
+                <div class="divider"></div>
+                <button id="print-btn" class="secondary-btn print-btn" style="width: 100%; justify-content: center; margin-top: 15px;">
+                    <i class="fa-solid fa-file-pdf"></i> Export PDF Diagnostic Report
+                </button>
+            </div>
+        </section>
+
+        <!-- RIGHT: Explainable AI & Cure Recommendation -->
+        <section class="right-panel">
+            <!-- Heatmap / Explainable AI Card -->
+            <div id="explain-card" class="card glass-card explain-card hidden">
+                <div class="explain-header">
+                    <h2><i class="fa-solid fa-eye-dropper"></i> Explainable AI (Grad-CAM)</h2>
+                    <span class="badge">Attention Heatmap</span>
+                </div>
+                <p class="subtitle">The heatmap highlights the exact regions on the leaf that led to the diagnosis.</p>
+                
+                <div class="viewer-container">
+                    <div class="heatmap-comparison">
+                        <!-- Original Image Background -->
+                        <img id="base-image" class="blend-image base" src="" alt="Base crop leaf">
+                        <!-- Blended Heatmap Overlay -->
+                        <img id="heatmap-image" class="blend-image overlay" src="" alt="Grad-CAM overlay" style="opacity: 0.5;">
+                    </div>
+                    
+                    <div class="slider-control">
+                        <span><i class="fa-regular fa-image"></i> Leaf</span>
+                        <input type="range" id="opacity-slider" min="0" max="100" value="50" class="styled-slider">
+                        <span>Heatmap <i class="fa-solid fa-fire"></i></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Treatment Recommendation (Cure) Card -->
+            <div id="treatment-card" class="card glass-card treatment-card hidden">
+                <h2><i class="fa-solid fa-kit-medical"></i> Treatment & Cure Protocol</h2>
+                <div class="divider"></div>
+
+                <!-- Treatment Tabs -->
+                <div class="tabs-header">
+                    <button class="tab-btn active" data-tab="tab-overview">Overview</button>
+                    <button class="tab-btn" data-tab="tab-chemical">Chemical Control</button>
+                    <button class="tab-btn" data-tab="tab-biological">Biological / Organic</button>
+                    <button class="tab-btn" data-tab="tab-preventative">Prevention & Culture</button>
+                </div>
+
+                <div class="tabs-content">
+                    <div id="tab-overview" class="tab-panel active">
+                        <p id="treatment-overview">No diagnosis analyzed yet.</p>
+                    </div>
+                    <div id="tab-chemical" class="tab-panel">
+                        <p id="treatment-chemical" class="pre-wrap">No chemical remedies generated.</p>
+                    </div>
+                    <div id="tab-biological" class="tab-panel">
+                        <p id="treatment-biological" class="pre-wrap">No organic remedies generated.</p>
+                    </div>
+                    <div id="tab-preventative" class="tab-panel">
+                        <p id="treatment-preventative" class="pre-wrap">No cultural controls generated.</p>
+                    </div>
+                </div>
+
+                <div class="advisor-footer">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <p id="advisor-disclaimer">Recommendations are generated using the indexed agricultural database and LLM guidance. Verify dosage locally before application.</p>
+                </div>
+            </div>
+            
+            <!-- Welcome placeholder when no analysis has been run -->
+            <div id="welcome-placeholder" class="welcome-placeholder card glass-card">
+                <i class="fa-solid fa-wheat-awn welcome-icon"></i>
+                <h2>Welcome to SmartFarming.AI Dashboard</h2>
+                <p>Upload an image of a plant leaf (such as Apple, Tomato, Potato, Grape, or Corn) and run the diagnostic tool to view real-time disease detection, neural network attention maps, and customized treatment recommendations.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- FLOATING CHAT DRAWER -->
+    <div id="chat-drawer" class="chat-drawer collapsed hidden">
+        <button id="chat-toggle" class="chat-toggle">
+            <i class="fa-solid fa-comments"></i> Ask AI Agronomist
+            <span id="chat-badge" class="chat-badge hidden">!</span>
+            <i class="fa-solid fa-chevron-up toggle-arrow"></i>
+        </button>
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-title-wrapper">
+                    <i class="fa-solid fa-user-doctor"></i>
+                    <div>
+                        <h4>AI Field Expert</h4>
+                        <p>Ask follow-up questions about this diagnosis</p>
+                    </div>
+                </div>
+                <button id="clear-chat" title="Clear conversation"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+            
+            <div id="chat-messages" class="chat-messages">
+                <div class="message bot">
+                    Hello! I'm your AI farming advisor. Once you run a crop diagnosis, you can ask me questions about organic spraying, dosage, recovery time, or crop safety here.
+                </div>
+            </div>
+            
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" placeholder="Type your query here..." disabled>
+                <button id="chat-send-btn" class="chat-send-btn" disabled><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+    
+    <!-- Global Loader -->
+    <div id="global-loader" class="global-loader hidden">
+        <div class="loader-content">
+            <div class="spinner"></div>
+            <p id="loader-text">Analyzing image using Neural Network...</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

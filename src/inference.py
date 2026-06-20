@@ -8,21 +8,38 @@ from src.consts import DEVICE, MODEL_DIR, IMAGE_SIZE
 from src.model import get_model
 
 class DiseasePredictor:
-    def __init__(self, model_weights_path="best_model.pth"):
+    def __init__(self, model_weights_path=None):
         self.device = DEVICE
         self.class_names = self._load_class_names()
         
         # Load model using the saved class size
         num_classes = len(self.class_names)
+        if num_classes == 0:
+            print("Warning: No class names found. Model will use default 38 classes.")
+            num_classes = 38 # Default for PlantVillage if classes missing
+            
         self.model = get_model(num_classes, self.device)
         
-        # Load weights
-        full_weights_path = os.path.join(MODEL_DIR, model_weights_path)
-        if os.path.exists(full_weights_path):
-            self.model.load_state_dict(torch.load(full_weights_path, map_location=self.device))
-            print(f"Successfully loaded model weights from {full_weights_path}")
+        # Determine weights path
+        if model_weights_path:
+            full_weights_path = model_weights_path
         else:
-            print(f"Warning: Model weights not found at {full_weights_path}. Predictions will be random.")
+            full_weights_path = os.path.join(MODEL_DIR, "best_model.pth")
+            
+        # Load weights
+        if os.path.exists(full_weights_path):
+            try:
+                self.model.load_state_dict(torch.load(full_weights_path, map_location=self.device))
+                print(f"Successfully loaded model weights from {full_weights_path}")
+                self.weights_loaded = True
+            except Exception as e:
+                print(f"Error loading weights: {e}")
+                self.weights_loaded = False
+        else:
+            print(f"CRITICAL WARNING: Model weights not found at {full_weights_path}.")
+            print("The AI will make RANDOM guesses until you provide a valid 'best_model.pth' file.")
+            print(f"Check if the file exists in: {MODEL_DIR}")
+            self.weights_loaded = False
             
         self.model.eval()
         
@@ -126,9 +143,14 @@ class DiseasePredictor:
                 prediction_label = best_top3[0]["disease"]
                 
                 # Dual-Layer Out-of-Distribution Rejection Threshold
-                # 1) Softmax Confidence < 50%
-                # 2) Energy Score > 0 (Overconfident Hallucination)
-                is_ood = highest_conf < 50.0 or energy_score > 0.0
+                # 1) Softmax Confidence < 40% (Main model is confused)
+                # 2) Energy Score > 12.0 (Model is overconfident on something it shouldn't know)
+                # We also provide a "Confidence Buffer": if the model is >90% sure, we trust it 
+                # unless the energy is extremely high (>15).
+                if highest_conf > 90.0:
+                    is_ood = energy_score > 15.0
+                else:
+                    is_ood = highest_conf < 40.0 or energy_score > 12.0
                 detected_object = None
                 
                 if is_ood:
@@ -155,10 +177,16 @@ class DiseasePredictor:
                         labels = urllib.request.urlopen(url).read().decode("utf-8").split("\n")
                         
                         detected_object = labels[mn_top_catid[0]].strip()
-                        prediction_label = f"Not A Plant (Detected: {detected_object})"
+                        
+                        # If weights aren't loaded, this is expected behavior (the main model is random)
+                        if not self.weights_loaded:
+                            prediction_label = f"Uncertain [Weights Missing] (Looks like: {detected_object})"
+                        else:
+                            prediction_label = f"Not A Specialized Plant (Safety Fallback: {detected_object})"
+                            
                     except Exception as e:
                         print("Fallback ImageNet Error:", e)
-                        prediction_label = "Unknown / Not A Recognizable Plant"
+                        prediction_label = "Unknown / Non-Plant Object"
                 
                 best_result = {
                     "disease": prediction_label,
@@ -191,10 +219,11 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Run inference on a single plant image")
     parser.add_argument("image_path", help="Path to the image to classify")
+    parser.add_argument("--weights", help="Path to specific model weights file")
     parser.add_argument("--gradcam", action="store_true", help="Generate Grad-CAM heatmap")
     args = parser.parse_args()
     
-    predictor = DiseasePredictor()
+    predictor = DiseasePredictor(model_weights_path=args.weights)
     result = predictor.predict(args.image_path, save_heatmap=args.gradcam)
     print(f"\nPrediction Results:")
     if result["is_ood"]:

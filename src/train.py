@@ -46,10 +46,14 @@ def train():
     # 2. Newly initialized classification head (fast learning rate to learn the new task)
     head_params = [p for name, p in model.named_parameters() if 'heads' in name and p.requires_grad]
 
-    optimizer = optim.Adam([
+    optimizer = optim.AdamW([
         {'params': base_params, 'lr': LEARNING_RATE},          # 2e-5
         {'params': head_params, 'lr': 1e-3}                    # 1e-3 for the new head
-    ])
+    ], weight_decay=0.01)
+
+    # Learning Rate Scheduler: Gradually reduces LR for better fine-tuning
+    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=NUM_EPOCHS)
+
     # Resume from checkpoint if exists
     checkpoint_path = os.path.join(MODEL_DIR, "best_model.pth")
     best_val_acc = 0.0
@@ -111,14 +115,18 @@ def train():
         val_acc = 100 * val_correct / val_total
         avg_val_loss = val_loss / len(val_loader)
 
+        # Step the scheduler
+        scheduler.step()
+
         print(f"Train Loss: {avg_train_loss:.4f} | Train Acc: {train_acc:.2f}%")
         print(f"Val Loss: {avg_val_loss:.4f} | Val Acc: {val_acc:.2f}%")
+        print(f"Current LR: {optimizer.param_groups[0]['lr']:.6f}")
 
         # Save Best Model
         if val_acc > best_val_acc:
             best_val_acc = val_acc
             torch.save(model.state_dict(), os.path.join(MODEL_DIR, "best_model.pth"))
-            print("--> Best model weights saved!")
+            print(f"--> [CRITICAL] New Best Acc ({val_acc:.2f}%) reached! Weights saved.")
 
 if __name__ == "__main__":
     train()
