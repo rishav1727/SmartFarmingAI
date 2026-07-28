@@ -58,7 +58,11 @@ class GradCAM:
         return cam
 
 def overlay_heatmap(img_path, heatmap, alpha=0.5, colormap=cv2.COLORMAP_JET):
-    img = cv2.imread(img_path)
+    pil_img = Image.open(img_path)
+    from PIL import ImageOps
+    pil_img = ImageOps.exif_transpose(pil_img).convert("RGB")
+    img = np.array(pil_img)
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
     img = cv2.resize(img, (224, 224))
     
     heatmap = np.uint8(255 * heatmap)

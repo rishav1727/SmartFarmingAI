@@ -46,6 +46,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const globalLoader = document.getElementById("global-loader");
     const loaderText = document.getElementById("loader-text");
     
+    // Camera Elements
+    const openCameraBtn = document.getElementById("open-camera-btn");
+    const cameraModal = document.getElementById("camera-modal");
+    const closeCameraBtn = document.getElementById("close-camera-btn");
+    const cameraVideo = document.getElementById("camera-video");
+    const snapBtn = document.getElementById("snap-btn");
+    const cameraCanvas = document.getElementById("camera-canvas");
+    let cameraStream = null;
+
     // State variables
     let selectedFile = null;
     let currentDiagnosis = null;
@@ -143,8 +152,69 @@ document.addEventListener("DOMContentLoaded", () => {
         previewContainer.classList.add("hidden");
         imagePreview.src = "";
         analyzeBtn.classList.add("disabled");
-        analyzeBtn.disabled = true;
-    });
+    // Camera Stream Handlers
+    const switchCameraBtn = document.getElementById("switch-camera-btn");
+    let currentFacingMode = "environment";
+
+    async function startCamera(facingMode = "environment") {
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => track.stop());
+        }
+        try {
+            cameraStream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: facingMode }
+            });
+            cameraVideo.srcObject = cameraStream;
+            cameraModal.classList.remove("hidden");
+        } catch (err) {
+            console.error("Camera access error:", err);
+            showToast("Could not access device camera. Please allow camera permissions.", "error");
+        }
+    }
+
+    if (openCameraBtn) {
+        openCameraBtn.addEventListener("click", () => startCamera(currentFacingMode));
+    }
+
+    if (switchCameraBtn) {
+        switchCameraBtn.addEventListener("click", () => {
+            currentFacingMode = (currentFacingMode === "environment") ? "user" : "environment";
+            startCamera(currentFacingMode);
+        });
+    }
+
+    function stopCamera() {
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => track.stop());
+            cameraStream = null;
+        }
+        cameraModal.classList.add("hidden");
+    }
+
+    if (closeCameraBtn) {
+        closeCameraBtn.addEventListener("click", stopCamera);
+    }
+
+    if (snapBtn) {
+        snapBtn.addEventListener("click", () => {
+            if (!cameraVideo.videoWidth) return;
+            
+            cameraCanvas.width = cameraVideo.videoWidth;
+            cameraCanvas.height = cameraVideo.videoHeight;
+            const ctx = cameraCanvas.getContext("2d");
+            ctx.drawImage(cameraVideo, 0, 0, cameraCanvas.width, cameraCanvas.height);
+            
+            cameraCanvas.toBlob((blob) => {
+                if (blob) {
+                    const cameraFile = new File([blob], `camera_leaf_${Date.now()}.jpg`, { type: "image/jpeg" });
+                    handleFileSelection(cameraFile);
+                    stopCamera();
+                    showToast("Photo captured! Running diagnostic...", "info");
+                    setTimeout(() => analyzeBtn.click(), 300);
+                }
+            }, "image/jpeg", 0.95);
+        });
+    }
 
     // 4. Run Diagnosis Pipeline
     analyzeBtn.addEventListener("click", async () => {
@@ -287,9 +357,78 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     const printBtn = document.getElementById("print-btn");
-    printBtn.addEventListener("click", () => {
-        window.print();
-    });
+    if (printBtn) {
+        printBtn.addEventListener("click", () => {
+            window.print();
+        });
+    }
+
+    // Text-To-Speech Voice Assistant (Read Advice Out Loud)
+    const readVoiceBtn = document.getElementById("read-voice-btn");
+    let isSpeaking = false;
+    if (readVoiceBtn) {
+        readVoiceBtn.addEventListener("click", () => {
+            if (!('speechSynthesis' in window)) {
+                showToast("Voice playback is not supported on this browser.", "error");
+                return;
+            }
+
+            if (isSpeaking) {
+                window.speechSynthesis.cancel();
+                isSpeaking = false;
+                readVoiceBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Read Out Loud';
+                return;
+            }
+
+            const activePanel = document.querySelector(".tab-panel.active");
+            const textToRead = activePanel ? activePanel.innerText : "";
+            if (!textToRead || textToRead.includes("No diagnosis")) {
+                showToast("Please run a crop diagnosis first.", "info");
+                return;
+            }
+
+            const utterance = new SpeechSynthesisUtterance(textToRead);
+            utterance.lang = langSelect.value.toLowerCase() === "hindi" ? "hi-IN" : "en-US";
+            utterance.rate = 0.95;
+
+            utterance.onend = () => {
+                isSpeaking = false;
+                readVoiceBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Read Out Loud';
+            };
+
+            utterance.onerror = () => {
+                isSpeaking = false;
+                readVoiceBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Read Out Loud';
+            };
+
+            window.speechSynthesis.speak(utterance);
+            isSpeaking = true;
+            readVoiceBtn.innerHTML = '<i class="fa-solid fa-square"></i> Stop Voice';
+            showToast(`Reading advice in ${langSelect.value}...`, "info");
+        });
+    }
+
+    // WhatsApp Report Share
+    const whatsappShareBtn = document.getElementById("whatsapp-share-btn");
+    if (whatsappShareBtn) {
+        whatsappShareBtn.addEventListener("click", () => {
+            if (!currentDiagnosis) {
+                showToast("Please run a crop diagnosis first.", "info");
+                return;
+            }
+
+            const text = `🌿 *SmartFarming AI Diagnosis Report*\n` +
+                         `===============================\n` +
+                         `*Detected:* ${diseaseName.innerText}\n` +
+                         `*Confidence:* ${confidencePercentage.innerText}\n\n` +
+                         `*Overview:* ${document.getElementById("treatment-overview").innerText.slice(0, 150)}...\n\n` +
+                         `*Chemical Control:* ${document.getElementById("treatment-chemical").innerText.slice(0, 150)}...\n\n` +
+                         `Generated via SmartFarming AI Field Assistant`;
+            
+            const shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+            window.open(shareUrl, "_blank");
+        });
+    }
 
     // 7. Tabs Functionality
     tabBtns.forEach(btn => {

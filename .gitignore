@@ -24,3 +24,11 @@ data/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Android Build Artifacts
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+

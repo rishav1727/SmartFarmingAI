@@ -255,6 +255,18 @@ async def index_documents():
     else:
         return JSONResponse(status_code=400, content={"status": "error", "message": "No documents found to index or indexing failed."})
 
+# Download Android APK Endpoint
+@app.get("/download/apk")
+async def download_apk():
+    apk_path = os.path.join(PUBLIC_DIR, "SmartFarmingAI.apk")
+    if os.path.exists(apk_path):
+        return FileResponse(
+            apk_path,
+            filename="SmartFarmingAI.apk",
+            media_type="application/vnd.android.package-archive"
+        )
+    raise HTTPException(status_code=404, detail="APK file not found on server.")
+
 # Serve Frontend
 @app.get("/")
 async def get_index():
@@ -262,6 +274,7 @@ async def get_index():
     if os.path.exists(index_path):
         return FileResponse(index_path)
     return {"message": "Welcome to SmartFarmingAI API. Frontend dashboard files are missing."}
+
 
 # Mount static files (uploads and other assets)
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
