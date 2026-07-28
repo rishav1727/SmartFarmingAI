@@ -656,8 +656,47 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (closeWhatsappBtn && whatsappModal) {
-        closeWhatsappBtn.addEventListener("click", () => {
-            whatsappModal.classList.add("hidden");
+    // Mobile Bottom Navigation Bar Handlers
+    const navHome = document.getElementById("nav-home");
+    const navCamera = document.getElementById("nav-camera");
+    const navDiagnosis = document.getElementById("nav-diagnosis");
+    const navWhatsapp = document.getElementById("nav-whatsapp");
+    const navItems = [navHome, navCamera, navDiagnosis, navWhatsapp];
+
+    function setActiveNav(target) {
+        navItems.forEach(item => item && item.classList.remove("active"));
+        if (target) target.classList.add("active");
+    }
+
+    if (navHome) {
+        navHome.addEventListener("click", () => {
+            setActiveNav(navHome);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+    }
+
+    if (navCamera) {
+        navCamera.addEventListener("click", () => {
+            setActiveNav(navCamera);
+            if (openCameraBtn) openCameraBtn.click();
+        });
+    }
+
+    if (navDiagnosis) {
+        navDiagnosis.addEventListener("click", () => {
+            setActiveNav(navDiagnosis);
+            if (diagnosisCard && !diagnosisCard.classList.contains("hidden")) {
+                diagnosisCard.scrollIntoView({ behavior: "smooth", block: "start" });
+            } else {
+                showToast("Please snap or upload a crop leaf photo first.", "info");
+            }
+        });
+    }
+
+    if (navWhatsapp) {
+        navWhatsapp.addEventListener("click", () => {
+            setActiveNav(navWhatsapp);
+            if (whatsappModal) whatsappModal.classList.remove("hidden");
         });
     }
 
