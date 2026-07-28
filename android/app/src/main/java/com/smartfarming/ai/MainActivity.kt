@@ -7,21 +7,28 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.webkit.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import java.io.File
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
     private var filePathCallback: ValueCallback<Array<Uri>>? = null
+    private var cameraPhotoPath: String? = null
     private val FILE_CHOOSER_RESULT_CODE = 1001
     private val PERMISSION_REQUEST_CODE = 2002
 
-    // Default server address set to laptop local Wi-Fi IP
     private val DEFAULT_SERVER_URL = "http://172.18.3.109:8000"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,23 +73,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == PERMISSION_REQUEST_CODE) {
-            var allGranted = true
-            for (result in grantResults) {
-                if (result != PackageManager.PERMISSION_GRANTED) {
-                    allGranted = false
-                    break
-                }
-            }
-            if (!allGranted) {
-                Toast.makeText(this, "Camera & Storage permissions are required for SmartFarming AI to analyze crop leaves.", Toast.LENGTH_LONG).show()
-            }
+    private fun createImageFile(): File? {
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val imageFileName = "JPEG_" + timeStamp + "_"
+        val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(imageFileName, ".jpg", storageDir).apply {
+            cameraPhotoPath = absolutePath
         }
     }
 
@@ -92,15 +88,12 @@ class MainActivity : AppCompatActivity() {
         webSettings.domStorageEnabled = true
         webSettings.allowFileAccess = true
         webSettings.allowContentAccess = true
-        webSettings.allowFileAccessFromFileURLs = true
-        webSettings.allowUniversalAccessFromFileURLs = true
         webSettings.mediaPlaybackRequiresUserGesture = false
         webSettings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
         webSettings.useWideViewPort = true
         webSettings.loadWithOverviewMode = true
         webSettings.databaseEnabled = true
 
-        // Interface for JavaScript to update server IP dynamically
         webView.addJavascriptInterface(object {
             @JavascriptInterface
             fun setServerIp(newIp: String) {
@@ -147,16 +140,42 @@ class MainActivity : AppCompatActivity() {
                 this@MainActivity.filePathCallback?.onReceiveValue(null)
                 this@MainActivity.filePathCallback = filePathCallback
 
-                val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                var takePictureIntent: Intent? = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                if (takePictureIntent?.resolveActivity(packageManager) != null) {
+                    var photoFile: File? = null
+                    try {
+                        photoFile = createImageFile()
+                    } catch (ex: IOException) {
+                        Toast.makeText(this@MainActivity, "Error creating image file", Toast.LENGTH_SHORT).show()
+                    }
+
+                    if (photoFile != null) {
+                        val photoURI = FileProvider.getUriForFile(
+                            this@MainActivity,
+                            "${applicationContext.packageName}.fileprovider",
+                            photoFile
+                        )
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
+                    } else {
+                        takePictureIntent = null
+                    }
+                }
+
                 val contentSelectionIntent = Intent(Intent.ACTION_GET_CONTENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)
                     type = "image/*"
                 }
 
+                val intentArray: Array<Intent> = if (takePictureIntent != null) {
+                    arrayOf(takePictureIntent)
+                } else {
+                    emptyArray()
+                }
+
                 val chooserIntent = Intent(Intent.ACTION_CHOOSER).apply {
                     putExtra(Intent.EXTRA_INTENT, contentSelectionIntent)
                     putExtra(Intent.EXTRA_TITLE, "Select Crop Leaf Image")
-                    putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(takePictureIntent))
+                    putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray)
                 }
 
                 startActivityForResult(chooserIntent, FILE_CHOOSER_RESULT_CODE)
@@ -217,12 +236,20 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == FILE_CHOOSER_RESULT_CODE) {
             if (filePathCallback == null) return
+
             var results: Array<Uri>? = null
+
             if (resultCode == RESULT_OK) {
-                if (data != null && data.data != null) {
+                if (data?.data != null) {
                     results = arrayOf(data.data!!)
+                } else if (cameraPhotoPath != null) {
+                    val file = File(cameraPhotoPath!!)
+                    if (file.exists()) {
+                        results = arrayOf(Uri.fromFile(file))
+                    }
                 }
             }
+
             filePathCallback?.onReceiveValue(results)
             filePathCallback = null
         }
