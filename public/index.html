@@ -24,6 +24,9 @@
             <h1>SmartFarming<span>.AI</span></h1>
         </div>
         <div class="header-actions">
+            <button id="open-whatsapp-modal-btn" class="whatsapp-btn" type="button" title="Connect to Twilio WhatsApp Bot">
+                <i class="fa-brands fa-whatsapp"></i> WhatsApp Bot
+            </button>
             <label class="secondary-btn" style="cursor: pointer;" title="Upload PDF/TXT/MD reference document">
                 <i class="fa-solid fa-file-arrow-up"></i> Upload Doc
                 <input type="file" id="doc-upload-input" accept=".txt,.md,.pdf" style="display: none;">
@@ -343,6 +346,37 @@
                 </button>
             </div>
             <canvas id="camera-canvas" hidden></canvas>
+        </div>
+    </div>
+
+    <!-- WHATSAPP CHATBOT MODAL -->
+    <div id="whatsapp-modal" class="camera-modal hidden">
+        <div class="camera-modal-content card glass-card" style="max-width: 480px;">
+            <div class="camera-header" style="border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+                <h3 style="color: #25D366; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-brands fa-whatsapp" style="font-size: 24px;"></i> SmartFarming WhatsApp Bot
+                </h3>
+                <button id="close-whatsapp-btn" class="remove-btn" type="button"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div style="text-align: center; padding: 12px 0;">
+                <div style="background: rgba(37, 211, 102, 0.1); border: 1px solid rgba(37, 211, 102, 0.3); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                    <span class="badge" style="background: #25D366; color: white; font-weight: bold; padding: 4px 12px; border-radius: 12px; font-size: 12px;">🟢 STATUS: LIVE & ONLINE</span>
+                    <h4 style="margin: 12px 0 6px 0; color: white;">Get Disease Diagnosis directly on WhatsApp</h4>
+                    <p style="font-size: 13px; color: #cbd5e1; line-height: 1.5; margin: 0;">
+                        Send any plant leaf photo to our official WhatsApp Bot number to receive real-time diagnosis, explainable Grad-CAM heatmaps, and treatment advice over WhatsApp messages!
+                    </p>
+                </div>
+
+                <div style="background: #0f172a; padding: 12px; border-radius: 10px; border: 1px solid var(--border-color); margin-bottom: 16px;">
+                    <span style="font-size: 12px; color: #94a3b8; display: block; margin-bottom: 4px;">Twilio Sandbox Webhook Endpoint:</span>
+                    <code style="color: #10b981; font-size: 13px;">POST /api/whatsapp</code>
+                </div>
+
+                <a id="launch-whatsapp-link" href="https://wa.me/14155238886?text=join%20smart-farming" target="_blank" class="primary-btn" style="text-decoration: none; justify-content: center; background: #25D366; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);">
+                    <i class="fa-brands fa-whatsapp" style="font-size: 20px;"></i> Open WhatsApp Bot App
+                </a>
+            </div>
         </div>
     </div>
 

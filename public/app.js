@@ -644,6 +644,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 • Organic: <strong>${neemMl}ml Neem Oil Spray</strong>
             `;
         });
+    // WhatsApp Modal Handlers
+    const openWhatsappModalBtn = document.getElementById("open-whatsapp-modal-btn");
+    const whatsappModal = document.getElementById("whatsapp-modal");
+    const closeWhatsappBtn = document.getElementById("close-whatsapp-btn");
+
+    if (openWhatsappModalBtn && whatsappModal) {
+        openWhatsappModalBtn.addEventListener("click", () => {
+            whatsappModal.classList.remove("hidden");
+        });
+    }
+
+    if (closeWhatsappBtn && whatsappModal) {
+        closeWhatsappBtn.addEventListener("click", () => {
+            whatsappModal.classList.add("hidden");
+        });
     }
 
     // Helper: Formatter for Disease Name
