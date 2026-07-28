@@ -46,7 +46,7 @@
 
     <!-- Plantix-Style Crop Selection Pills -->
     <div class="crop-pills-container glass-card">
-        <span class="crop-pills-label"><i class="fa-solid fa-wheat-field"></i> Select Crop Category:</span>
+        <span class="crop-pills-label"><i class="fa-solid fa-wheat-field"></i> Select Crop:</span>
         <div class="crop-pills">
             <button class="crop-pill active" data-crop="all"><i class="fa-solid fa-seedling"></i> All Crops</button>
             <button class="crop-pill" data-crop="apple">🍎 Apple</button>
@@ -54,16 +54,18 @@
             <button class="crop-pill" data-crop="tomato">🍅 Tomato</button>
             <button class="crop-pill" data-crop="grape">🍇 Grape</button>
             <button class="crop-pill" data-crop="corn">🌽 Corn</button>
+            <button class="crop-pill" data-crop="rice">🌾 Rice</button>
+            <button class="crop-pill" data-crop="wheat">🌾 Wheat</button>
         </div>
     </div>
 
-    <!-- 3-Step How-It-Works Banner -->
+    <!-- Plantix 3-Step How-It-Works Banner -->
     <div class="steps-banner glass-card">
         <div class="step-item">
             <div class="step-num">1</div>
             <div class="step-text">
-                <strong>Snap / Upload Leaf</strong>
-                <span>Take a close-up photo of infected plant leaf</span>
+                <strong>Snap Infected Leaf</strong>
+                <span>Take a close photo of crop leaf</span>
             </div>
         </div>
         <i class="fa-solid fa-chevron-right step-arrow"></i>
@@ -71,15 +73,15 @@
             <div class="step-num">2</div>
             <div class="step-text">
                 <strong>AI Heatmap Check</strong>
-                <span>Grad-CAM highlights diseased areas</span>
+                <span>Grad-CAM spots disease area</span>
             </div>
         </div>
         <i class="fa-solid fa-chevron-right step-arrow"></i>
         <div class="step-item">
             <div class="step-num">3</div>
             <div class="step-text">
-                <strong>Get Cure & Voice Advice</strong>
-                <span>Listen to treatment in Hindi/English</span>
+                <strong>3-Pillar Treatment</strong>
+                <span>Get Chemical, Organic & Voice advice</span>
             </div>
         </div>
     </div>
@@ -87,32 +89,31 @@
     <main class="dashboard-grid">
         <!-- LEFT: Uploader & Diagnosis -->
         <section class="left-panel">
-            <!-- Customer-Friendly Input Card -->
-            <div class="card glass-card upload-card">
-                <h2><i class="fa-solid fa-leaf"></i> Crop Leaf Health Check</h2>
-                <p class="subtitle">Select how you want to provide your plant leaf photo:</p>
-                
-                <!-- Native Camera Input (Guaranteed to open native camera on all Android devices) -->
+            <!-- Plantix Hero Camera Card -->
+            <div class="card glass-card upload-card plantix-hero">
+                <div class="plantix-banner-header">
+                    <i class="fa-solid fa-notes-medical plantix-icon"></i>
+                    <div>
+                        <h2>Plantix AI Crop Doctor</h2>
+                        <p class="subtitle">Diagnose plant diseases & get instant treatment protocol</p>
+                    </div>
+                </div>
+
+                <!-- Native Camera File Input -->
                 <input type="file" id="native-camera-input" accept="image/*" capture="environment" style="display: none;">
                 <!-- Gallery File Input -->
                 <input type="file" id="file-input" accept="image/*" style="display: none;">
 
-                <!-- 2 Big Friendly Action Cards -->
-                <div class="action-cards-grid">
-                    <button id="open-camera-btn" class="camera-action-card" type="button">
-                        <div class="card-icon-wrap"><i class="fa-solid fa-camera"></i></div>
-                        <div class="card-text">
-                            <strong>Take Photo</strong>
-                            <span>Launch Camera</span>
-                        </div>
+                <!-- Big Plantix Camera Scanner Card -->
+                <div class="plantix-camera-box">
+                    <button id="open-camera-btn" class="plantix-cam-btn" type="button">
+                        <div class="cam-pulse-ring"><i class="fa-solid fa-camera"></i></div>
+                        <strong>Take Photo of Diseased Leaf</strong>
+                        <span>Opens your phone HD camera automatically</span>
                     </button>
-
-                    <button id="browse-gallery-btn" class="gallery-action-card" type="button">
-                        <div class="card-icon-wrap"><i class="fa-solid fa-images"></i></div>
-                        <div class="card-text">
-                            <strong>Choose Photo</strong>
-                            <span>Open Gallery</span>
-                        </div>
+                    
+                    <button id="browse-gallery-btn" class="plantix-gallery-btn" type="button">
+                        <i class="fa-solid fa-images"></i> Choose Photo from Gallery
                     </button>
                 </div>
                 
