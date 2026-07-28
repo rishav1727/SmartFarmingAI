@@ -7,3 +7,10 @@ scikit-learn
 tqdm
 numpy
 matplotlib
+opencv-python
+fastapi
+uvicorn
+openai
+pypdf
+python-multipart
+requests

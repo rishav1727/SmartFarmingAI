@@ -62,7 +62,9 @@ class DiseasePredictor:
         if not os.path.exists(image_path):
             raise FileNotFoundError(f"Image not found: {image_path}")
             
-        image = Image.open(image_path).convert("RGB")
+        image = Image.open(image_path)
+        from PIL import ImageOps
+        image = ImageOps.exif_transpose(image).convert("RGB")
         
         # Define a comprehensive set of views (Multi-Scale & Localization)
         width, height = image.size
