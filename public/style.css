@@ -111,6 +111,104 @@ header {
     background: #22c35e;
 }
 
+/* Plantix Hero Camera Box */
+.plantix-hero {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(15, 23, 42, 0.85) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.plantix-banner-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.plantix-icon {
+    font-size: 32px;
+    color: var(--primary-color);
+    background: rgba(16, 185, 129, 0.2);
+    padding: 14px;
+    border-radius: 16px;
+}
+
+.plantix-camera-box {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.plantix-cam-btn {
+    background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+    border: none;
+    border-radius: 20px;
+    padding: 28px 20px;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: var(--font-stack);
+}
+
+.plantix-cam-btn:hover, .plantix-cam-btn:active {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(16, 185, 129, 0.55);
+}
+
+.cam-pulse-ring {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.1);
+    animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+    0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); }
+    70% { box-shadow: 0 0 0 14px rgba(255, 255, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+.plantix-cam-btn strong {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.plantix-cam-btn span {
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.plantix-gallery-btn {
+    background: rgba(30, 41, 59, 0.9);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 14px;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: var(--transition);
+}
+
+.plantix-gallery-btn:hover {
+    background: rgba(51, 65, 85, 0.9);
+    border-color: var(--primary-color);
+}
+
 /* 3-Step How-It-Works Banner */
 .steps-banner {
     max-width: 1400px;
