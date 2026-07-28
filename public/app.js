@@ -165,6 +165,12 @@ document.addEventListener("DOMContentLoaded", () => {
             previewContainer.classList.remove("hidden");
             analyzeBtn.classList.remove("disabled");
             analyzeBtn.disabled = false;
+
+            // Automatically run AI Diagnostic as soon as photo is taken
+            showToast("Photo captured! Running AI Health Diagnostic...", "info");
+            setTimeout(() => {
+                analyzeBtn.click();
+            }, 300);
         };
         reader.readAsDataURL(file);
     }
@@ -322,6 +328,9 @@ document.addEventListener("DOMContentLoaded", () => {
             chatInput.disabled = false;
             chatSendBtn.disabled = false;
             chatBadge.classList.remove("hidden");
+            
+            // Smooth scroll to diagnosis results card
+            diagnosisCard.scrollIntoView({ behavior: "smooth", block: "start" });
             
             showToast("Analysis complete. Treatment advice generated!");
             
