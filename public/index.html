@@ -41,34 +41,74 @@
         </div>
     </header>
 
+    <!-- 3-Step How-It-Works Banner -->
+    <div class="steps-banner glass-card">
+        <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-text">
+                <strong>Snap / Upload Leaf</strong>
+                <span>Take a close-up photo of infected plant leaf</span>
+            </div>
+        </div>
+        <i class="fa-solid fa-chevron-right step-arrow"></i>
+        <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-text">
+                <strong>AI Heatmap Check</strong>
+                <span>Grad-CAM highlights diseased areas</span>
+            </div>
+        </div>
+        <i class="fa-solid fa-chevron-right step-arrow"></i>
+        <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-text">
+                <strong>Get Cure & Voice Advice</strong>
+                <span>Listen to treatment in Hindi/English</span>
+            </div>
+        </div>
+    </div>
+
     <main class="dashboard-grid">
         <!-- LEFT: Uploader & Diagnosis -->
         <section class="left-panel">
-            <!-- Upload Card -->
+            <!-- Customer-Friendly Input Card -->
             <div class="card glass-card upload-card">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h2><i class="fa-solid fa-cloud-arrow-up"></i> Upload Leaf Image</h2>
-                    <button id="open-camera-btn" class="secondary-btn" type="button" title="Capture photo using camera">
-                        <i class="fa-solid fa-camera"></i> Open Camera
+                <h2><i class="fa-solid fa-leaf"></i> Crop Leaf Health Check</h2>
+                <p class="subtitle">Select how you want to provide your plant leaf photo:</p>
+                
+                <!-- Native Camera Input (Guaranteed to open native camera on all Android devices) -->
+                <input type="file" id="native-camera-input" accept="image/*" capture="environment" style="display: none;">
+                <!-- Gallery File Input -->
+                <input type="file" id="file-input" accept="image/*" style="display: none;">
+
+                <!-- 2 Big Friendly Action Cards -->
+                <div class="action-cards-grid">
+                    <button id="open-camera-btn" class="camera-action-card" type="button">
+                        <div class="card-icon-wrap"><i class="fa-solid fa-camera"></i></div>
+                        <div class="card-text">
+                            <strong>Take Photo</strong>
+                            <span>Launch Camera</span>
+                        </div>
+                    </button>
+
+                    <button id="browse-gallery-btn" class="gallery-action-card" type="button">
+                        <div class="card-icon-wrap"><i class="fa-solid fa-images"></i></div>
+                        <div class="card-text">
+                            <strong>Choose Photo</strong>
+                            <span>Open Gallery</span>
+                        </div>
                     </button>
                 </div>
-                <p class="subtitle">Upload or snap a clear photo of an infected leaf to analyze crop health</p>
                 
-                <div id="drop-zone" class="drop-zone">
-                    <input type="file" id="file-input" accept="image/*" capture="environment" hidden>
-                    <div class="drop-zone-prompt">
-                        <i class="fa-solid fa-images upload-icon"></i>
-                        <p>Drag & drop image here or <span>browse files</span></p>
-                        <span class="file-limits">Supports JPG, PNG, WEBP & Live Camera Snap</span>
-                    </div>
-                    <div id="preview-container" class="preview-container hidden">
+                <div id="drop-zone" class="drop-zone hidden" style="margin-top: 16px;">
+                    <div id="preview-container" class="preview-container">
                         <img id="image-preview" src="" alt="Selected leaf preview">
                         <button id="remove-btn" class="remove-btn" type="button"><i class="fa-solid fa-circle-xmark"></i></button>
                     </div>
                 </div>
 
-                <button id="analyze-btn" class="primary-btn disabled" disabled>
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> Run Health Diagnostic
+                <button id="analyze-btn" class="primary-btn disabled" disabled style="margin-top: 16px; width: 100%;">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Run AI Health Diagnostic
                 </button>
             </div>
 
