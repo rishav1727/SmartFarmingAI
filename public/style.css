@@ -1298,6 +1298,98 @@ header {
     box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3);
 }
 
+/* Plantix-Style Crop Selector Pills */
+.crop-pills-container {
+    max-width: 1400px;
+    margin: 16px auto 0 auto;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(15, 23, 42, 0.7);
+    border-radius: 14px;
+    border: 1px solid var(--border-color);
+    overflow-x: auto;
+}
+
+.crop-pills-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.crop-pills {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+}
+
+.crop-pill {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: var(--transition);
+}
+
+.crop-pill:hover, .crop-pill.active {
+    background: var(--primary-color);
+    color: #ffffff;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 10px var(--primary-glow);
+}
+
+/* Dosage Calculator Widget */
+.dosage-calculator-card {
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px dashed rgba(16, 185, 129, 0.3);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 20px;
+}
+
+.dosage-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+.dosage-body label {
+    font-size: 12px;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.dosage-body select {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #0f172a;
+    color: #ffffff;
+    border: 1px solid var(--border-color);
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.dosage-result {
+    font-size: 13px;
+    color: var(--text-main);
+    background: rgba(30, 41, 59, 0.8);
+    padding: 10px;
+    border-radius: 8px;
+}
+
 .camera-actions {
     display: flex;
     justify-content: center;

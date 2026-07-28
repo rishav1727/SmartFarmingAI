@@ -41,6 +41,19 @@
         </div>
     </header>
 
+    <!-- Plantix-Style Crop Selection Pills -->
+    <div class="crop-pills-container glass-card">
+        <span class="crop-pills-label"><i class="fa-solid fa-wheat-field"></i> Select Crop Category:</span>
+        <div class="crop-pills">
+            <button class="crop-pill active" data-crop="all"><i class="fa-solid fa-seedling"></i> All Crops</button>
+            <button class="crop-pill" data-crop="apple">🍎 Apple</button>
+            <button class="crop-pill" data-crop="potato">🥔 Potato</button>
+            <button class="crop-pill" data-crop="tomato">🍅 Tomato</button>
+            <button class="crop-pill" data-crop="grape">🍇 Grape</button>
+            <button class="crop-pill" data-crop="corn">🌽 Corn</button>
+        </div>
+    </div>
+
     <!-- 3-Step How-It-Works Banner -->
     <div class="steps-banner glass-card">
         <div class="step-item">
@@ -240,6 +253,26 @@
                     </div>
                     <div id="tab-preventative" class="tab-panel">
                         <p id="treatment-preventative" class="pre-wrap">No cultural controls generated.</p>
+                    </div>
+                </div>
+
+                <!-- Plantix-Style Spray Dosage & Field Calculator Widget -->
+                <div class="dosage-calculator-card">
+                    <div class="dosage-header">
+                        <i class="fa-solid fa-calculator"></i>
+                        <span>Field Spray Dosage Calculator</span>
+                    </div>
+                    <div class="dosage-body">
+                        <label>Select Field Area:</label>
+                        <select id="field-area-select">
+                            <option value="1">1 Acre (0.4 Hectare)</option>
+                            <option value="2">2 Acres (0.8 Hectare)</option>
+                            <option value="5">5 Acres (2.0 Hectares)</option>
+                            <option value="0.5">0.5 Acre (2 Bigha)</option>
+                        </select>
+                        <div id="dosage-result" class="dosage-result">
+                            <i class="fa-solid fa-flask"></i> Estimated Mixture: <strong>200 Grams Copper Fungicide in 200 Liters Water</strong>
+                        </div>
                     </div>
                 </div>
 

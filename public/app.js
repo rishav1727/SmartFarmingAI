@@ -614,6 +614,38 @@ document.addEventListener("DOMContentLoaded", () => {
         showToast("Conversation cleared.", "info");
     });
 
+    // Plantix-Style Crop Pills Filter
+    const cropPills = document.querySelectorAll(".crop-pill");
+    cropPills.forEach(pill => {
+        pill.addEventListener("click", () => {
+            cropPills.forEach(p => p.classList.remove("active"));
+            pill.classList.add("active");
+            const cropType = pill.getAttribute("data-crop");
+            if (cropType !== "all") {
+                showToast(`Filter set to ${pill.innerText}. Take a photo of your ${cropType} leaf!`, "info");
+            }
+        });
+    });
+
+    // Plantix-Style Field Dosage Calculator
+    const fieldAreaSelect = document.getElementById("field-area-select");
+    const dosageResult = document.getElementById("dosage-result");
+
+    if (fieldAreaSelect && dosageResult) {
+        fieldAreaSelect.addEventListener("change", () => {
+            const acres = parseFloat(fieldAreaSelect.value);
+            const waterLiters = Math.round(acres * 200);
+            const copperGrams = Math.round(acres * 200);
+            const neemMl = Math.round(acres * 1000);
+
+            dosageResult.innerHTML = `
+                <i class="fa-solid fa-flask"></i> Estimated Dosage for <strong>${acres} Acre(s)</strong>:<br>
+                • Chemical: <strong>${copperGrams}g Copper Oxychloride in ${waterLiters}L Water</strong><br>
+                • Organic: <strong>${neemMl}ml Neem Oil Spray</strong>
+            `;
+        });
+    }
+
     // Helper: Formatter for Disease Name
     function formatDiseaseName(rawName) {
         if (!rawName) return "";
