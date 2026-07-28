@@ -94,11 +94,34 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 3. Drop Zone & File Selection
-    dropZone.addEventListener("click", (e) => {
-        if (e.target !== removeBtn && !removeBtn.contains(e.target)) {
+    const nativeCameraInput = document.getElementById("native-camera-input");
+    const browseGalleryBtn = document.getElementById("browse-gallery-btn");
+
+    if (openCameraBtn && nativeCameraInput) {
+        openCameraBtn.addEventListener("click", () => {
+            nativeCameraInput.click();
+        });
+        nativeCameraInput.addEventListener("change", (e) => {
+            if (e.target.files && e.target.files[0]) {
+                handleFileSelection(e.target.files[0]);
+                showToast("Photo captured successfully!", "info");
+            }
+        });
+    }
+
+    if (browseGalleryBtn && fileInput) {
+        browseGalleryBtn.addEventListener("click", () => {
             fileInput.click();
-        }
-    });
+        });
+    }
+
+    if (dropZone) {
+        dropZone.addEventListener("click", (e) => {
+            if (e.target !== removeBtn && !removeBtn.contains(e.target)) {
+                fileInput.click();
+            }
+        });
+    }
 
     fileInput.addEventListener("change", (e) => {
         handleFileSelection(e.target.files[0]);
@@ -138,6 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const reader = new FileReader();
         reader.onload = (e) => {
             imagePreview.src = e.target.result;
+            dropZone.classList.remove("hidden");
             previewContainer.classList.remove("hidden");
             analyzeBtn.classList.remove("disabled");
             analyzeBtn.disabled = false;
@@ -149,10 +173,13 @@ document.addEventListener("DOMContentLoaded", () => {
         e.stopPropagation();
         selectedFile = null;
         fileInput.value = "";
+        if (nativeCameraInput) nativeCameraInput.value = "";
+        dropZone.classList.add("hidden");
         previewContainer.classList.add("hidden");
         imagePreview.src = "";
         analyzeBtn.classList.add("disabled");
-    // Camera Stream Handlers
+        analyzeBtn.disabled = true;
+    });// Camera Stream Handlers
     const switchCameraBtn = document.getElementById("switch-camera-btn");
     let currentFacingMode = "environment";
 
