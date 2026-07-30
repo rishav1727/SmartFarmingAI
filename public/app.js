@@ -945,9 +945,303 @@ function applyLanguageUI(selectedLang) {
     // Helper: Formatter for Disease Name
     function formatDiseaseName(rawName) {
         if (!rawName) return "";
-        // Replace '___' with ': ' and underscores with spaces
         let formatted = rawName.replace("___", ": ").replace(/_/g, " ");
-        // Capitalize first letters
         return formatted;
     }
+
+    // ==========================================
+    // 6. VOICE ASSISTANT & READ OUT LOUD MODULE
+    // ==========================================
+    const readVoiceBtn = document.getElementById("read-voice-btn");
+    const micBtn = document.getElementById("mic-btn");
+    let synth = window.speechSynthesis;
+    let currentUtterance = null;
+    let activeVoiceButton = null;
+
+    const LANG_CODE_MAP = {
+        Hindi: "hi-IN",
+        Bengali: "bn-IN",
+        Telugu: "te-IN",
+        Marathi: "mr-IN",
+        Tamil: "ta-IN",
+        Gujarati: "gu-IN",
+        English: "en-US"
+    };
+
+    const STOP_TEXT_MAP = {
+        Hindi: '<i class="fa-solid fa-square-stop"></i> सुनना रोकें',
+        Bengali: '<i class="fa-solid fa-square-stop"></i> থামান',
+        Telugu: '<i class="fa-solid fa-square-stop"></i> ఆపండి',
+        Marathi: '<i class="fa-solid fa-square-stop"></i> थांबवा',
+        Tamil: '<i class="fa-solid fa-square-stop"></i> நிறுத்து',
+        Gujarati: '<i class="fa-solid fa-square-stop"></i> બંધ કરો',
+        English: '<i class="fa-solid fa-square-stop"></i> Stop Reading'
+    };
+
+    function stopSpeech() {
+        if (synth && (synth.speaking || synth.pending)) {
+            synth.cancel();
+        }
+        if (activeVoiceButton) {
+            activeVoiceButton.classList.remove("speaking-pulse");
+            if (activeVoiceButton === readVoiceBtn) {
+                const selectedLang = langSelect ? langSelect.value : "English";
+                const tr = UI_TRANSLATIONS[selectedLang] || UI_TRANSLATIONS["English"];
+                readVoiceBtn.innerHTML = (tr && tr.voiceBtn) ? tr.voiceBtn : '<i class="fa-solid fa-volume-high"></i> Read Out Loud';
+            } else {
+                activeVoiceButton.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+            }
+            activeVoiceButton = null;
+        }
+    }
+
+    function speakText(rawText, targetBtn = readVoiceBtn) {
+        if (!("speechSynthesis" in window)) {
+            showToast("Speech synthesis is not supported in this browser.", "error");
+            return;
+        }
+
+        // Toggle stop if already speaking with this button
+        if (synth.speaking && activeVoiceButton === targetBtn) {
+            stopSpeech();
+            showToast("Voice playback stopped.", "info");
+            return;
+        }
+
+        // Stop any active speech first
+        stopSpeech();
+
+        // Clean HTML tags and formatting from text
+        let cleanText = rawText.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+
+        if (!cleanText || cleanText.includes("No diagnosis analyzed yet")) {
+            showToast("Please analyze a plant leaf photo first to generate treatment advice to read out loud.", "info");
+            return;
+        }
+
+        const selectedLang = langSelect ? langSelect.value : "English";
+        const langCode = LANG_CODE_MAP[selectedLang] || "en-US";
+
+        currentUtterance = new SpeechSynthesisUtterance(cleanText);
+        currentUtterance.lang = langCode;
+        currentUtterance.rate = 0.92; // Slightly slower for clear rural accent delivery
+        currentUtterance.pitch = 1.0;
+
+        // Try selecting matching accent/language voice from browser system voices
+        const availableVoices = synth.getVoices();
+        if (availableVoices && availableVoices.length > 0) {
+            const matchedVoice = availableVoices.find(v => 
+                v.lang.toLowerCase().startsWith(langCode.split('-')[0].toLowerCase()) || 
+                v.lang.toLowerCase() === langCode.toLowerCase()
+            );
+            if (matchedVoice) {
+                currentUtterance.voice = matchedVoice;
+            }
+        }
+
+        activeVoiceButton = targetBtn;
+
+        currentUtterance.onstart = () => {
+            if (activeVoiceButton) {
+                activeVoiceButton.classList.add("speaking-pulse");
+                if (activeVoiceButton === readVoiceBtn) {
+                    const stopHtml = STOP_TEXT_MAP[selectedLang] || STOP_TEXT_MAP["English"];
+                    activeVoiceButton.innerHTML = stopHtml;
+                } else {
+                    activeVoiceButton.innerHTML = '<i class="fa-solid fa-volume-xmark"></i>';
+                }
+            }
+            showToast(`Reading advice out loud in ${selectedLang}...`, "info");
+        };
+
+        currentUtterance.onend = () => {
+            stopSpeech();
+        };
+
+        currentUtterance.onerror = (e) => {
+            console.error("Speech Synthesis Error:", e);
+            stopSpeech();
+            showToast("Speech output encountered an error.", "error");
+        };
+
+        synth.speak(currentUtterance);
+    }
+
+    if (readVoiceBtn) {
+        readVoiceBtn.addEventListener("click", () => {
+            // Find active tab content or overall treatment description
+            const activeTabPanel = document.querySelector(".tab-panel.active");
+            let textToSpeak = "";
+
+            if (diseaseName && diseaseName.innerText) {
+                textToSpeak += `Crop Diagnosis: ${diseaseName.innerText}. `;
+            }
+
+            if (activeTabPanel && activeTabPanel.innerText) {
+                const activeTabBtn = document.querySelector(".tab-btn.active");
+                const tabTitle = activeTabBtn ? activeTabBtn.innerText : "Treatment";
+                textToSpeak += `${tabTitle}: ${activeTabPanel.innerText}`;
+            } else {
+                const overviewEl = document.getElementById("treatment-overview");
+                textToSpeak += overviewEl ? overviewEl.innerText : "";
+            }
+
+            speakText(textToSpeak, readVoiceBtn);
+        });
+    }
+
+    // Ensure system voices are loaded (necessary for Chrome/Edge)
+    if (synth && typeof synth.onvoiceschanged !== "undefined") {
+        synth.onvoiceschanged = () => {
+            // Voices refreshed in background
+        };
+    }
+
+    // Microphone Voice Input (Speech Recognition)
+    if (micBtn) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            const recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            micBtn.addEventListener("click", () => {
+                const selectedLang = langSelect ? langSelect.value : "English";
+                recognition.lang = LANG_CODE_MAP[selectedLang] || "en-US";
+                
+                try {
+                    recognition.start();
+                    micBtn.classList.add("listening-mic");
+                    showToast(`Listening... Speak your question in ${selectedLang}`, "info");
+                } catch (err) {
+                    recognition.stop();
+                    micBtn.classList.remove("listening-mic");
+                }
+            });
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                if (chatInput) {
+                    chatInput.value = transcript;
+                    showToast(`Captured: "${transcript}"`, "success");
+                }
+                micBtn.classList.remove("listening-mic");
+            };
+
+            recognition.onerror = (event) => {
+                console.error("Speech Recognition error:", event.error);
+                micBtn.classList.remove("listening-mic");
+                showToast("Voice input error or permission denied.", "error");
+            };
+
+            recognition.onend = () => {
+                micBtn.classList.remove("listening-mic");
+            };
+        } else {
+            micBtn.style.display = "none"; // Hide if speech recognition not supported in browser
+        }
+    }
+
+    // ==========================================
+    // 7. CHAT ASSISTANT & INTERACTION HANDLERS
+    // ==========================================
+    if (chatToggle && chatDrawer) {
+        chatToggle.addEventListener("click", () => {
+            chatDrawer.classList.toggle("collapsed");
+            chatBadge.classList.add("hidden");
+        });
+    }
+
+    function appendChatMessage(sender, text) {
+        if (!chatMessages) return;
+        const msgDiv = document.createElement("div");
+        msgDiv.className = `message ${sender}`;
+
+        const textSpan = document.createElement("span");
+        textSpan.innerHTML = text.replace(/\n/g, "<br>");
+        msgDiv.appendChild(textSpan);
+
+        if (sender === "bot") {
+            const voiceBtn = document.createElement("button");
+            voiceBtn.className = "chat-voice-btn";
+            voiceBtn.setAttribute("title", "Read message out loud");
+            voiceBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+            voiceBtn.addEventListener("click", () => {
+                speakText(text, voiceBtn);
+            });
+            msgDiv.appendChild(voiceBtn);
+        }
+
+        chatMessages.appendChild(msgDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    async function handleSendChatMessage() {
+        if (!chatInput) return;
+        const text = chatInput.value.trim();
+        if (!text) return;
+
+        appendChatMessage("user", text);
+        chatInput.value = "";
+
+        if (!currentDiagnosis) {
+            appendChatMessage("bot", "Please run a crop leaf diagnosis first so I can assist you with precise recommendations.");
+            return;
+        }
+
+        appendChatMessage("bot", '<i class="fa-solid fa-spinner fa-spin"></i> Consulting Kisan AI Agronomist...');
+        const tempBotMsg = chatMessages.lastElementChild;
+
+        try {
+            const response = await fetch("/api/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    disease: currentDiagnosis.disease,
+                    history: chatHistory,
+                    message: text,
+                    language: langSelect ? langSelect.value : "English"
+                })
+            });
+
+            if (!response.ok) throw new Error("Server error during chat query");
+
+            const data = await response.json();
+            if (tempBotMsg) tempBotMsg.remove();
+
+            appendChatMessage("bot", data.reply);
+            chatHistory.push({ sender: "user", text: text });
+            chatHistory.push({ sender: "bot", text: data.reply });
+
+        } catch (err) {
+            console.error("Chat error:", err);
+            if (tempBotMsg) tempBotMsg.remove();
+            appendChatMessage("bot", "Sorry, I could not fetch a response at this moment. Please check your server connection.");
+        }
+    }
+
+    if (chatSendBtn) {
+        chatSendBtn.addEventListener("click", handleSendChatMessage);
+    }
+
+    if (chatInput) {
+        chatInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") handleSendChatMessage();
+        });
+    }
+
+    if (clearChat) {
+        clearChat.addEventListener("click", () => {
+            chatHistory = [];
+            if (chatMessages) {
+                chatMessages.innerHTML = `
+                    <div class="message bot">
+                        Hello! I'm your AI farming advisor. Once you run a crop diagnosis, you can ask me questions about organic spraying, dosage, recovery time, or crop safety here.
+                    </div>
+                `;
+            }
+            showToast("Chat conversation cleared.", "info");
+        });
+    }
 });
+

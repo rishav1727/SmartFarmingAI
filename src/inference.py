@@ -66,12 +66,26 @@ class DiseasePredictor:
         return []
 
     def predict(self, image_path, save_heatmap=False, target_crop=None):
+        try:
+            return self._predict_internal(image_path, save_heatmap=save_heatmap, target_crop=target_crop)
+        except Exception as e:
+            if "CUDA" in str(e) or "cuda" in str(e):
+                print(f"CUDA Exception caught during inference ({e}). Falling back to CPU execution.")
+                self.device = torch.device("cpu")
+                self.model = self.model.to(self.device)
+                if hasattr(self, "mobilenet_classifier") and self.mobilenet_classifier:
+                    self.mobilenet_classifier = self.mobilenet_classifier.to(self.device)
+                return self._predict_internal(image_path, save_heatmap=save_heatmap, target_crop=target_crop)
+            raise e
+
+    def _predict_internal(self, image_path, save_heatmap=False, target_crop=None):
         if not os.path.exists(image_path):
             raise FileNotFoundError(f"Image not found: {image_path}")
             
         image = Image.open(image_path)
         from PIL import ImageOps
         image = ImageOps.exif_transpose(image).convert("RGB")
+
         
         # Target crop index filtering for high-precision targeted inference
         crop_indices = []
@@ -178,50 +192,62 @@ class DiseasePredictor:
                 
                 prediction_label = best_top3[0]["disease"]
                 
-                # Dual-Layer Out-of-Distribution Rejection Threshold
-                # 1) Softmax Confidence < 40% (Main model is confused)
-                # 2) Energy Score > 25.0 (Model is overconfident on something outside domain)
-                # If model is confident (>70%) on a trained plant disease class, we trust it.
-                if highest_conf > 70.0:
-                    is_ood = False
-                else:
-                    is_ood = highest_conf < 40.0 or energy_score > 25.0
+                # Dual-Layer Out-of-Distribution & Non-Plant Rejection System
                 detected_object = None
+                is_non_plant = False
                 
-                if is_ood:
-                    # Initialize ImageNet fallback dynamically to save memory mostly
+                try:
                     import torchvision.models as models
                     import urllib.request
+                    import torchvision.transforms.functional as TF
                     
-                    try:
-                        # Lightweight General Image Identifier
-                        mobilenet = models.mobilenet_v3_small(weights=models.MobileNet_V3_Small_Weights.IMAGENET1K_V1).to(winning_tensor.device)
-                        mobilenet.eval()
-                        
-                        # Use the same pre-processed target window but resize it to 224
-                        import torchvision.transforms.functional as TF
-                        imagenet_tensor = TF.resize(winning_tensor, [224, 224])
-                        
-                        with torch.no_grad():
-                            mn_out = mobilenet(imagenet_tensor)
-                            mn_prob = torch.nn.functional.softmax(mn_out[0], dim=0)
-                            mn_top_prob, mn_top_catid = torch.topk(mn_prob, 1)
-                            
-                        # Load labels
+                    if not hasattr(self, "mobilenet_classifier") or self.mobilenet_classifier is None:
+                        self.mobilenet_classifier = models.mobilenet_v3_small(weights=models.MobileNet_V3_Small_Weights.IMAGENET1K_V1).to(winning_tensor.device)
+                        self.mobilenet_classifier.eval()
+                    
+                    if not hasattr(self, "imagenet_classes") or not self.imagenet_classes:
                         url = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"
-                        labels = urllib.request.urlopen(url).read().decode("utf-8").split("\n")
+                        self.imagenet_classes = urllib.request.urlopen(url, timeout=4).read().decode("utf-8").split("\n")
+                    
+                    imagenet_tensor = TF.resize(winning_tensor, [224, 224])
+                    with torch.no_grad():
+                        mn_out = self.mobilenet_classifier(imagenet_tensor)
+                        mn_prob = torch.nn.functional.softmax(mn_out[0], dim=0)
+                        mn_top_prob, mn_top_catid = torch.topk(mn_prob, 1)
                         
-                        detected_object = labels[mn_top_catid[0]].strip()
+                    detected_object = self.imagenet_classes[mn_top_catid[0]].strip()
+                    
+                    # Comprehensive non-plant ImageNet category indicators
+                    non_plant_keywords = [
+                        "guy", "groom", "person", "man", "woman", "wig", "neck-brace", "t-shirt", "sweatshirt",
+                        "jersey", "suit", "coat", "jacket", "shirt", "jeans", "pants", "shorts", "shoe",
+                        "sunglasses", "glasses", "beard", "face", "hair", "head", "hand", "finger", "arm",
+                        "earphone", "cellular telephone", "laptop", "computer", "desk", "chair", "couch",
+                        "table", "bed", "room", "wall", "window", "door", "car", "bus", "truck", "dog", "cat",
+                        "bird", "bottle", "cup", "can", "clock", "television", "microphone", "seat belt", "brassiere",
+                        "mask", "stretcher", "plunger", "volleyball", "basketball", "accordion", "studio couch", "quilt",
+                        "pillow", "wardrobe", "lampshade", "radio", "monitor", "projector", "toilet", "washbasin"
+                    ]
+                    
+                    detected_lower = detected_object.lower()
+                    if any(term in detected_lower for term in non_plant_keywords):
+                        is_non_plant = True
                         
-                        # If weights aren't loaded, this is expected behavior (the main model is random)
-                        if not self.weights_loaded:
-                            prediction_label = f"Uncertain [Weights Missing] (Looks like: {detected_object})"
-                        else:
-                            prediction_label = f"Not A Specialized Plant (Safety Fallback: {detected_object})"
-                            
-                    except Exception as e:
-                        print("Fallback ImageNet Error:", e)
-                        prediction_label = "Unknown / Non-Plant Object"
+                except Exception as e:
+                    print("General object pre-screener error:", e)
+
+                # Determine overall Out-of-Distribution status
+                # 1) Non-plant object detected by general MobileNet classifier
+                # 2) Energy Score > 22.0 (Model uncertainty threshold)
+                # 3) Softmax Confidence < 55.0%
+                is_ood = is_non_plant or energy_score > 22.0 or highest_conf < 55.0
+
+                if is_ood:
+                    if detected_object:
+                        prediction_label = f"Not A Specialized Plant (Safety Fallback: {detected_object})"
+                    else:
+                        prediction_label = "Not A Specialized Plant (Non-Plant Image Detected)"
+
                 
                 best_result = {
                     "disease": prediction_label,
