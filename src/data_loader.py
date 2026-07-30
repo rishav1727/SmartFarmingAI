@@ -3,7 +3,7 @@ from torchvision import transforms
 from datasets import load_dataset
 from torch.utils.data import DataLoader, Dataset
 from PIL import Image
-from src.consts import HF_DATASET_NAME, IMAGE_SIZE, BATCH_SIZE
+from src.consts import HF_DATASET_NAME, IMAGE_SIZE, BATCH_SIZE, DEVICE
 
 class PlantDataset(Dataset):
     def __init__(self, hf_dataset, transform=None):
@@ -72,8 +72,9 @@ def get_dataloaders():
         train_dataset = PlantDataset(train_data, transform=transform)
         val_dataset = PlantDataset(val_data, transform=val_transform)
 
-        train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, pin_memory=True)
-        val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, pin_memory=True)
+        is_cuda = (DEVICE == "cuda")
+        train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=2, pin_memory=is_cuda)
+        val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=2, pin_memory=is_cuda)
 
         return train_loader, val_loader, class_names
 

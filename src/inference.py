@@ -146,13 +146,12 @@ class DiseasePredictor:
                 
                 # Dual-Layer Out-of-Distribution Rejection Threshold
                 # 1) Softmax Confidence < 40% (Main model is confused)
-                # 2) Energy Score > 12.0 (Model is overconfident on something it shouldn't know)
-                # We also provide a "Confidence Buffer": if the model is >90% sure, we trust it 
-                # unless the energy is extremely high (>15).
-                if highest_conf > 90.0:
-                    is_ood = energy_score > 15.0
+                # 2) Energy Score > 25.0 (Model is overconfident on something outside domain)
+                # If model is confident (>70%) on a trained plant disease class, we trust it.
+                if highest_conf > 70.0:
+                    is_ood = False
                 else:
-                    is_ood = highest_conf < 40.0 or energy_score > 12.0
+                    is_ood = highest_conf < 40.0 or energy_score > 25.0
                 detected_object = None
                 
                 if is_ood:
@@ -203,7 +202,6 @@ class DiseasePredictor:
 
         if save_heatmap:
             from src.visualize import GradCAM, overlay_heatmap
-            import cv2
             
             target_layer = self.model.vit.encoder.layers[-1]
             cam_engine = GradCAM(self.model, target_layer)
@@ -212,7 +210,7 @@ class DiseasePredictor:
             vis_img = overlay_heatmap(image_path, heatmap)
             
             output_path = f"heatmap_{os.path.basename(image_path)}"
-            cv2.imwrite(output_path, cv2.cvtColor(vis_img, cv2.COLOR_RGB2BGR))
+            vis_img.save(output_path, "JPEG")
             best_result["heatmap_path"] = output_path
             
         return best_result
