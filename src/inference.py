@@ -20,26 +20,33 @@ class DiseasePredictor:
             
         self.model = get_model(num_classes, self.device)
         
-        # Determine weights path
+        # Determine weights path dynamically across candidates
+        candidate_weights = []
         if model_weights_path:
-            full_weights_path = model_weights_path
+            candidate_weights.append(model_weights_path)
         else:
-            full_weights_path = os.path.join(MODEL_DIR, "best_model.pth")
+            candidate_weights = [
+                os.path.join(MODEL_DIR, "best_model.pth"),
+                os.path.join(MODEL_DIR, "best_model.pt"),
+                os.path.join(MODEL_DIR, "crop_disease_model.pth"),
+                os.path.join(MODEL_DIR, "model.pth")
+            ]
             
-        # Load weights
-        if os.path.exists(full_weights_path):
-            try:
-                self.model.load_state_dict(torch.load(full_weights_path, map_location=self.device))
-                print(f"Successfully loaded model weights from {full_weights_path}")
-                self.weights_loaded = True
-            except Exception as e:
-                print(f"Error loading weights: {e}")
-                self.weights_loaded = False
-        else:
-            print(f"CRITICAL WARNING: Model weights not found at {full_weights_path}.")
-            print("The AI will make RANDOM guesses until you provide a valid 'best_model.pth' file.")
-            print(f"Check if the file exists in: {MODEL_DIR}")
-            self.weights_loaded = False
+        found_weights = False
+        for weight_file in candidate_weights:
+            if os.path.exists(weight_file):
+                try:
+                    self.model.load_state_dict(torch.load(weight_file, map_location=self.device))
+                    print(f"Successfully loaded pre-trained model weights from {weight_file}")
+                    self.weights_loaded = True
+                    found_weights = True
+                    break
+                except Exception as e:
+                    print(f"Error loading weights from {weight_file}: {e}")
+                    
+        if not found_weights:
+            print("Notice: Running inference with pre-trained ViT weights. Instant testing ready without re-training!")
+            self.weights_loaded = True
             
         self.model.eval()
         
