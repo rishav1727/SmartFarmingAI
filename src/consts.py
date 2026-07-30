@@ -7,9 +7,9 @@ DATA_DIR = os.path.join(BASE_DIR, "data")
 MODEL_DIR = os.path.join(BASE_DIR, "saved_models")
 
 # Training parameters
-BATCH_SIZE = 16
+BATCH_SIZE = 8
 LEARNING_RATE = 2e-5  # Lowered for stable fine-tuning
-NUM_EPOCHS = 3       # Task specific: 3 epochs as requested
+NUM_EPOCHS = 7       # Task specific: 3 epochs as requested
 IMAGE_SIZE = 224      # Standard for ViT/ResNet
 
 # Hardware configuration

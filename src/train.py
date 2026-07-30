@@ -54,6 +54,10 @@ def train():
     # Learning Rate Scheduler: Gradually reduces LR for better fine-tuning
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=NUM_EPOCHS)
 
+    # Initialize AMP GradScaler (enabled only if CUDA)
+    scaler = torch.cuda.amp.GradScaler(enabled=(DEVICE == "cuda"))
+    accumulation_steps = 2
+
     # Resume from checkpoint if exists
     checkpoint_path = os.path.join(MODEL_DIR, "best_model.pth")
     best_val_acc = 0.0
@@ -78,14 +82,22 @@ def train():
         train_correct = 0
         train_total = 0
 
-        for images, labels in tqdm(train_loader, desc="Training"):
+        optimizer.zero_grad()
+
+        for step, (images, labels) in enumerate(tqdm(train_loader, desc="Training")):
             images, labels = images.to(DEVICE), labels.to(DEVICE)
             
-            optimizer.zero_grad()
-            outputs = model(images)
-            loss = criterion(outputs, labels)
-            loss.backward()
-            optimizer.step()
+            with torch.cuda.amp.autocast(enabled=(DEVICE == "cuda")):
+                outputs = model(images)
+                loss = criterion(outputs, labels)
+                accum_loss = loss / accumulation_steps
+
+            scaler.scale(accum_loss).backward()
+
+            if (step + 1) % accumulation_steps == 0 or (step + 1) == len(train_loader):
+                scaler.step(optimizer)
+                scaler.update()
+                optimizer.zero_grad()
 
             train_loss += loss.item()
             _, predicted = torch.max(outputs.data, 1)
@@ -104,8 +116,9 @@ def train():
         with torch.no_grad():
             for images, labels in tqdm(val_loader, desc="Validating"):
                 images, labels = images.to(DEVICE), labels.to(DEVICE)
-                outputs = model(images)
-                loss = criterion(outputs, labels)
+                with torch.cuda.amp.autocast(enabled=(DEVICE == "cuda")):
+                    outputs = model(images)
+                    loss = criterion(outputs, labels)
 
                 val_loss += loss.item()
                 _, predicted = torch.max(outputs.data, 1)
@@ -121,6 +134,13 @@ def train():
         print(f"Train Loss: {avg_train_loss:.4f} | Train Acc: {train_acc:.2f}%")
         print(f"Val Loss: {avg_val_loss:.4f} | Val Acc: {val_acc:.2f}%")
         print(f"Current LR: {optimizer.param_groups[0]['lr']:.6f}")
+
+        # GPU Memory Management & Monitoring
+        if DEVICE == "cuda":
+            torch.cuda.empty_cache()
+            allocated_bytes = torch.cuda.memory_allocated()
+            allocated_mb = allocated_bytes / (1024 ** 2)
+            print(f"GPU Memory Allocated: {allocated_mb:.2f} MB ({allocated_bytes} bytes)")
 
         # Save Best Model
         if val_acc > best_val_acc:

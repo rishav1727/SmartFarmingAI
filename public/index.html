@@ -38,7 +38,27 @@
                 <label for="lang-select"><i class="fa-solid fa-globe"></i> Language: </label>
                 <select id="lang-select">
                     <option value="English">English</option>
-                    <option value="Hindi">हिन्दी (Hindi)</option>
+                    <option value="Hindi">Hindi - हिन्दी</option>
+                    <option value="Bengali">Bengali - বাংলা</option>
+                    <option value="Telugu">Telugu - తెలుగు</option>
+                    <option value="Marathi">Marathi - मराठी</option>
+                    <option value="Tamil">Tamil - தமிழ்</option>
+                    <option value="Gujarati">Gujarati - ગુજરાતી</option>
+                    <option value="Urdu">Urdu - اردو</option>
+                    <option value="Kannada">Kannada - ಕನ್ನಡ</option>
+                    <option value="Odia">Odia - ଓଡ଼ିଆ</option>
+                    <option value="Malayalam">Malayalam - മലയാളം</option>
+                    <option value="Punjabi">Punjabi - ਪੰਜਾਬੀ</option>
+                    <option value="Assamese">Assamese - অসমীয়া</option>
+                    <option value="Maithili">Maithili - मैथिली</option>
+                    <option value="Santali">Santali - ᱥᱟᱱᱛᱟᱲᱤ</option>
+                    <option value="Kashmiri">Kashmiri - कश्मीरी</option>
+                    <option value="Nepali">Nepali - नेपाली</option>
+                    <option value="Konkani">Konkani - കൊങ്കണി</option>
+                    <option value="Manipuri">Manipuri - ꯃꯏꯇꯩꯂꯣꯟ</option>
+                    <option value="Dogri">Dogri - डोगरी</option>
+                    <option value="Bodo">Bodo - बोडो</option>
+                    <option value="Sanskrit">Sanskrit - संस्कृतम्</option>
                 </select>
             </div>
         </div>
@@ -46,16 +66,16 @@
 
     <!-- Plantix-Style Crop Selection Pills -->
     <div class="crop-pills-container glass-card">
-        <span class="crop-pills-label"><i class="fa-solid fa-wheat-field"></i> Select Crop:</span>
+        <span class="crop-pills-label" data-i18n="selectCropLabel"><i class="fa-solid fa-wheat-field"></i> Select Crop:</span>
         <div class="crop-pills">
-            <button class="crop-pill active" data-crop="all"><i class="fa-solid fa-seedling"></i> All Crops</button>
-            <button class="crop-pill" data-crop="apple">🍎 Apple</button>
-            <button class="crop-pill" data-crop="potato">🥔 Potato</button>
-            <button class="crop-pill" data-crop="tomato">🍅 Tomato</button>
-            <button class="crop-pill" data-crop="grape">🍇 Grape</button>
-            <button class="crop-pill" data-crop="corn">🌽 Corn</button>
-            <button class="crop-pill" data-crop="rice">🌾 Rice</button>
-            <button class="crop-pill" data-crop="wheat">🌾 Wheat</button>
+            <button class="crop-pill active" data-crop="all" data-i18n="cropAll"><i class="fa-solid fa-seedling"></i> All Crops</button>
+            <button class="crop-pill" data-crop="apple" data-i18n="cropApple">🍎 Apple</button>
+            <button class="crop-pill" data-crop="potato" data-i18n="cropPotato">🥔 Potato</button>
+            <button class="crop-pill" data-crop="tomato" data-i18n="cropTomato">🍅 Tomato</button>
+            <button class="crop-pill" data-crop="grape" data-i18n="cropGrape">🍇 Grape</button>
+            <button class="crop-pill" data-crop="corn" data-i18n="cropCorn">🌽 Corn</button>
+            <button class="crop-pill" data-crop="rice" data-i18n="cropRice">🌾 Rice</button>
+            <button class="crop-pill" data-crop="wheat" data-i18n="cropWheat">🌾 Wheat</button>
         </div>
     </div>
 
@@ -64,24 +84,24 @@
         <div class="step-item">
             <div class="step-num">1</div>
             <div class="step-text">
-                <strong>Snap Infected Leaf</strong>
-                <span>Take a close photo of crop leaf</span>
+                <strong data-i18n="step1Title">Snap Infected Leaf</strong>
+                <span data-i18n="step1Sub">Take a close photo of crop leaf</span>
             </div>
         </div>
         <i class="fa-solid fa-chevron-right step-arrow"></i>
         <div class="step-item">
             <div class="step-num">2</div>
             <div class="step-text">
-                <strong>AI Heatmap Check</strong>
-                <span>Grad-CAM spots disease area</span>
+                <strong data-i18n="step2Title">AI Heatmap Check</strong>
+                <span data-i18n="step2Sub">Grad-CAM spots disease area</span>
             </div>
         </div>
         <i class="fa-solid fa-chevron-right step-arrow"></i>
         <div class="step-item">
             <div class="step-num">3</div>
             <div class="step-text">
-                <strong>3-Pillar Treatment</strong>
-                <span>Get Chemical, Organic & Voice advice</span>
+                <strong data-i18n="step3Title">3-Pillar Treatment</strong>
+                <span data-i18n="step3Sub">Get Chemical, Organic & Voice advice</span>
             </div>
         </div>
     </div>
@@ -94,8 +114,8 @@
                 <div class="plantix-banner-header">
                     <i class="fa-solid fa-notes-medical plantix-icon"></i>
                     <div>
-                        <h2>Plantix AI Crop Doctor</h2>
-                        <p class="subtitle">Diagnose plant diseases & get instant treatment protocol</p>
+                        <h2 data-i18n="plantixTitle">Plantix AI Crop Doctor</h2>
+                        <p class="subtitle" data-i18n="plantixSub">Diagnose plant diseases & get instant treatment protocol</p>
                     </div>
                 </div>
 
@@ -106,20 +126,43 @@
 
                 <!-- Big Plantix Camera Scanner Card -->
                 <div class="plantix-camera-box">
-                    <button id="open-camera-btn" class="plantix-cam-btn" type="button">
+                    <label for="native-camera-input" id="open-camera-btn" class="plantix-cam-btn" style="cursor: pointer;">
                         <div class="cam-pulse-ring"><i class="fa-solid fa-camera"></i></div>
-                        <strong>Take Photo of Diseased Leaf</strong>
-                        <span>Opens your phone HD camera automatically</span>
-                    </button>
+                        <strong data-i18n="cameraBtnText">Take Photo of Diseased Leaf</strong>
+                        <span data-i18n="cameraBtnSub">Opens your phone HD camera automatically</span>
+                    </label>
                     
-                    <button id="browse-gallery-btn" class="plantix-gallery-btn" type="button">
+                    <label for="file-input" id="browse-gallery-btn" class="plantix-gallery-btn" style="cursor: pointer;">
                         <i class="fa-solid fa-images"></i> Choose Photo from Gallery
-                    </button>
+                    </label>
+                </div>
+
+                <!-- 1-Click Quick Test Samples -->
+                <div class="quick-samples-wrapper" style="margin-top: 16px;">
+                    <span class="samples-title" data-i18n="samplesTitle"><i class="fa-solid fa-vial"></i> Or Try 1-Click Quick Test Samples:</span>
+                    <div class="samples-grid">
+                        <button class="sample-chip-btn" data-crop="apple" data-url="/samples/apple_scab.jpg" type="button" data-i18n="sampleApple">
+                            🍎 Apple Scab
+                        </button>
+                        <button class="sample-chip-btn" data-crop="potato" data-url="/samples/potato_blight.jpg" type="button" data-i18n="samplePotato">
+                            🥔 Potato Blight
+                        </button>
+                        <button class="sample-chip-btn" data-crop="tomato" data-url="/samples/tomato_mold.jpg" type="button" data-i18n="sampleTomato">
+                            🍅 Tomato Mold
+                        </button>
+                        <button class="sample-chip-btn" data-crop="corn" data-url="/samples/corn_rust.jpg" type="button" data-i18n="sampleCorn">
+                            🌽 Corn Rust
+                        </button>
+                    </div>
                 </div>
                 
                 <div id="drop-zone" class="drop-zone hidden" style="margin-top: 16px;">
                     <div id="preview-container" class="preview-container">
                         <img id="image-preview" src="" alt="Selected leaf preview">
+                        <div id="scan-laser" class="scan-laser hidden"></div>
+                        <div id="scan-status-badge" class="scan-status-badge hidden">
+                            <i class="fa-solid fa-compass-drafting fa-spin"></i> <span id="scan-status-text">Scanning Neural Features...</span>
+                        </div>
                         <button id="remove-btn" class="remove-btn" type="button"><i class="fa-solid fa-circle-xmark"></i></button>
                     </div>
                 </div>
@@ -191,10 +234,10 @@
                 
                 <div class="divider"></div>
                 <div class="action-buttons-row" style="display: flex; gap: 10px;">
-                    <button id="whatsapp-share-btn" class="secondary-btn" style="flex: 1; justify-content: center; background: #25D366; color: white;">
+                    <button id="whatsapp-share-btn" class="secondary-btn" style="flex: 1; justify-content: center; background: #25D366; color: white;" data-i18n="whatsappBtn">
                         <i class="fa-brands fa-whatsapp"></i> Share Report
                     </button>
-                    <button id="print-btn" class="secondary-btn print-btn" style="flex: 1; justify-content: center;">
+                    <button id="print-btn" class="secondary-btn print-btn" style="flex: 1; justify-content: center;" data-i18n="printBtn">
                         <i class="fa-solid fa-file-pdf"></i> Export PDF Report
                     </button>
                 </div>

@@ -255,6 +255,18 @@ async def index_documents():
     else:
         return JSONResponse(status_code=400, content={"status": "error", "message": "No documents found to index or indexing failed."})
 
+@app.get("/api/samples")
+async def get_samples():
+    samples_dir = os.path.join(PUBLIC_DIR, "samples")
+    os.makedirs(samples_dir, exist_ok=True)
+    sample_files = [
+        {"id": "apple", "name": "Apple Scab Sample", "crop": "Apple", "url": "/samples/apple_scab.jpg"},
+        {"id": "potato", "name": "Potato Late Blight Sample", "crop": "Potato", "url": "/samples/potato_blight.jpg"},
+        {"id": "tomato", "name": "Tomato Leaf Mold Sample", "crop": "Tomato", "url": "/samples/tomato_mold.jpg"},
+        {"id": "corn", "name": "Corn Common Rust Sample", "crop": "Corn", "url": "/samples/corn_rust.jpg"},
+    ]
+    return {"samples": sample_files}
+
 # Download Android APK Endpoint
 @app.get("/download/apk")
 async def download_apk():

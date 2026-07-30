@@ -337,20 +337,38 @@ header {
 }
 
 .language-selector select {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(15, 23, 42, 0.8);
     border: 1px solid var(--border-color);
-    color: var(--text-main);
-    padding: 6px 12px;
+    color: #ffffff;
+    padding: 8px 14px;
     border-radius: 8px;
     font-family: var(--font-stack);
+    font-size: 14px;
+    font-weight: 500;
     outline: none;
     cursor: pointer;
     transition: var(--transition);
 }
 
 .language-selector select:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(16, 185, 129, 0.15);
     border-color: var(--primary-color);
+}
+
+/* Ensure dropdown option popup has high contrast dark background and white text */
+select option {
+    background-color: #0f172a !important;
+    color: #ffffff !important;
+    padding: 10px !important;
+    font-size: 14px !important;
+}
+
+select option:hover,
+select option:focus,
+select option:active,
+select option:checked {
+    background-color: #10b981 !important;
+    color: #ffffff !important;
 }
 
 /* Main Dashboard Grid */
@@ -850,6 +868,16 @@ header {
     display: block;
 }
 
+.tab-panel strong, .tab-panel b {
+    color: #10b981;
+    font-weight: 700;
+    background: rgba(16, 185, 129, 0.15);
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: inline-block;
+    margin: 2px 0;
+}
+
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -1227,7 +1255,7 @@ header {
     }
     
     .glass-bg, header, .upload-card, .slider-control, .tabs-header, .advisor-footer, 
-    #chat-drawer, #toast-container, .global-loader, #print-btn, .divider, .safety-warning {
+    #chat-drawer, #toast-container, .global-loader, #print-btn, #whatsapp-share-btn, #whatsapp-modal, .mobile-bottom-nav, .divider, .safety-warning {
         display: none !important;
     }
     
@@ -1712,6 +1740,110 @@ header {
     .mobile-bottom-nav {
         display: flex;
     }
+}
+
+/* Quick Test Sample Chips */
+.quick-samples-wrapper {
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px dashed rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    padding: 14px;
+}
+
+.samples-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.samples-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.sample-chip-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-family: var(--font-stack);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: center;
+}
+
+.sample-chip-btn:hover {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: var(--primary-color);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px var(--primary-glow);
+}
+
+/* Live Laser Scanner Animation */
+.preview-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.scan-laser {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, #10b981, #34d399, #10b981, transparent);
+    box-shadow: 0 0 15px #10b981, 0 0 30px #10b981, 0 0 45px #34d399;
+    z-index: 10;
+    animation: scanAnimation 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes scanAnimation {
+    0% {
+        top: 0%;
+        opacity: 0.8;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        top: 96%;
+        opacity: 0.8;
+    }
+}
+
+.scan-status-badge {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid var(--primary-color);
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+    backdrop-filter: blur(8px);
+    color: #ffffff;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 11;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.scan-status-badge i {
+    color: var(--primary-color);
 }
 
 

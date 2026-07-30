@@ -175,6 +175,25 @@ document.addEventListener("DOMContentLoaded", () => {
         reader.readAsDataURL(file);
     }
 
+    // Sample Chip Buttons 1-Click Test Handler
+    const sampleBtns = document.querySelectorAll(".sample-chip-btn");
+    sampleBtns.forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const url = btn.getAttribute("data-url");
+            try {
+                setLoader(true, "Fetching sample image...");
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const file = new File([blob], url.split('/').pop(), { type: "image/jpeg" });
+                setLoader(false);
+                handleFileSelection(file);
+            } catch (err) {
+                setLoader(false);
+                showToast("Failed to load sample image: " + err.message, "error");
+            }
+        });
+    });
+
     removeBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         selectedFile = null;
@@ -364,11 +383,19 @@ document.addEventListener("DOMContentLoaded", () => {
             
             const advice = await response.json();
             
-            // Update Tab panels
-            document.getElementById("treatment-overview").innerText = advice.overview || "Overview not available.";
-            document.getElementById("treatment-chemical").innerText = advice.chemical || "Chemical control recommendations not available.";
-            document.getElementById("treatment-biological").innerText = advice.biological || "Biological/organic control recommendations not available.";
-            document.getElementById("treatment-preventative").innerText = advice.preventative || "Preventative/cultural recommendations not available.";
+            function formatAdviceHTML(text) {
+                if (!text) return "";
+                let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                    .replace(/__(.*?)__/g, '<strong>$1</strong>');
+                formatted = formatted.replace(/\n/g, '<br>');
+                return formatted;
+            }
+            
+            // Update Tab panels with bold HTML support
+            document.getElementById("treatment-overview").innerHTML = formatAdviceHTML(advice.overview) || "Overview not available.";
+            document.getElementById("treatment-chemical").innerHTML = formatAdviceHTML(advice.chemical) || "Chemical control recommendations not available.";
+            document.getElementById("treatment-biological").innerHTML = formatAdviceHTML(advice.biological) || "Biological/organic control recommendations not available.";
+            document.getElementById("treatment-preventative").innerHTML = formatAdviceHTML(advice.preventative) || "Preventative/cultural recommendations not available.";
             
         } catch (err) {
             console.error("Advice Error:", err);
@@ -376,258 +403,403 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Language selector change listener
+    // Dynamic Client-side UI i18n Translation Dictionary
+    const UI_TRANSLATIONS = {
+        Hindi: {
+            logoSub: "प्लांटिक्स-स्टाइल फसल रोग निदान और कृषि परामर्श",
+            selectCropLabel: "<i class=\"fa-solid fa-wheat-field\"></i> फसल चुनें:",
+            cropAll: "<i class=\"fa-solid fa-seedling\"></i> सभी फसलें",
+            cropApple: "🍎 सेब (Apple)",
+            cropPotato: "🥔 आलू (Potato)",
+            cropTomato: "🍅 टमाटर (Tomato)",
+            cropGrape: "🍇 अंगूर (Grape)",
+            cropCorn: "🌽 मक्का (Corn)",
+            cropRice: "🌾 चावल (Rice)",
+            cropWheat: "🌾 गेहूं (Wheat)",
+            sampleApple: "🍎 सेब रोग (Apple Scab)",
+            samplePotato: "🥔 आलू झुलसा (Potato Blight)",
+            sampleTomato: "🍅 टमाटर फफूंद (Tomato Mold)",
+            sampleCorn: "🌽 मक्का रस्ट (Corn Rust)",
+            step1Title: "पत्ते की फोटो लें",
+            step1Sub: "बीमार पत्ते की साफ़ तस्वीर खींचें",
+            step2Title: "एआई हीटमैप जांच",
+            step2Sub: "Grad-CAM संक्रमित हिस्सा पहचानेगा",
+            step3Title: "3-चरण उपचार उपाय",
+            step3Sub: "जैविक, रासायनिक व वॉयस सलाह पाएँ",
+            plantixTitle: "प्लांटिक्स एआई क्रॉप डॉक्टर",
+            plantixSub: "पौधों के रोगों का तुरंत निदान और सटीक उपचार पाएं",
+            cameraBtnText: "बीमार पत्ते की फोटो खींचें",
+            cameraBtnSub: "फोन का एचडी कैमरा अपने आप खुलेगा",
+            galleryBtnText: "<i class=\"fa-solid fa-images\"></i> गैलरी से फोटो चुनें",
+            samplesTitle: "<i class=\"fa-solid fa-vial\"></i> या 1-क्लिक क्विक टेस्ट सैंपल आज़माएं:",
+            dropInstructions: "यहाँ पत्ते की फोटो खींचकर लाएं या चुनें",
+            dropFormats: "JPG, PNG, WEBP सपोर्टेड (अधिकतम 10MB)",
+            analyzeBtn: "<i class=\"fa-solid fa-stethoscope\"></i> एआई रोग निदान चलाएं",
+            oodTitle: "गैर-फसल फोटो की पहचान",
+            oodDesc: "यह तस्वीर कृषि फसल के पत्ते से मेल नहीं खाती।",
+            diagTitle: "<i class=\"fa-solid fa-square-poll-vertical\"></i> फसल निदान रिपोर्ट",
+            confLabel: "सटीकता दर",
+            tabOverview: "<i class=\"fa-solid fa-file-medical\"></i> मुख्य विवरण",
+            tabChemical: "<i class=\"fa-solid fa-vial-circle-check\"></i> रासायनिक रोकथाम",
+            tabBiological: "<i class=\"fa-solid fa-seedling\"></i> जैविक / ऑर्गेनिक उपचार",
+            tabPreventative: "<i class=\"fa-solid fa-shield-halved\"></i> बचाव के उपाय",
+            dosageTitle: "खेत छिड़काव मात्रा कैलकुलेटर",
+            fieldAreaLabel: "खेत का क्षेत्रफल:",
+            voiceBtn: "<i class=\"fa-solid fa-volume-high\"></i> बोलकर सुनें",
+            whatsappBtn: "<i class=\"fa-brands fa-whatsapp\"></i> व्हाट्सएप पर शेयर करें",
+            printBtn: "<i class=\"fa-solid fa-print\"></i> रिपोर्ट प्रिंट करें",
+            heatmapTitle: "<i class=\"fa-solid fa-bullseye\"></i> एआई डिटेक्शन हीटमैप (Grad-CAM)",
+            heatmapSub: "संक्रमित पत्तों का विश्लेषण (ViT विज़न)",
+            opacityLabel: "हीटमैप पारदर्शिता:",
+            chatTitle: "<i class=\"fa-solid fa-robot\"></i> किसान एआई चैट सलाहकार",
+            chatSub: "दवा, छिड़काव, मिट्टी या सुरक्षा पर सवाल पूछें",
+            chatPlaceholder: "अपना सवाल यहाँ लिखें...",
+            sendBtn: "<i class=\"fa-solid fa-paper-plane\"></i> भेजें",
+            navHome: "होम",
+            navCamera: "कैमरा",
+            navDiagnosis: "रिपोर्ट",
+            navWhatsapp: "व्हाट्सएप",
+            disclaimer: "एआई और कृषि विशेषज्ञों द्वारा सत्यापित सिफारिशें। छिड़काव से पहले local डोज चेक करें।"
+        },
+        Bengali: {
+            logoSub: "প্ল্যান্টিক্স-স্টাইল ফসল রোগ নির্ণয় ও পরামর্শ",
+            selectCropLabel: "<i class=\"fa-solid fa-wheat-field\"></i> ফসল বাছুন:",
+            cropAll: "<i class=\"fa-solid fa-seedling\"></i> সব ফসল",
+            cropApple: "🍎 আপেল",
+            cropPotato: "🥔 আলু",
+            cropTomato: "🍅 টমেটো",
+            cropGrape: "🍇 আঙুর",
+            cropCorn: "🌽 ভুট্টা",
+            cropRice: "🌾 ধান",
+            cropWheat: "🌾 গম",
+            sampleApple: "🍎 আপেল স্কেব",
+            samplePotato: "🥔 আলু মরক",
+            sampleTomato: "🍅 টমেটো মোল্ড",
+            sampleCorn: "🌽 ভুট্টা রাস্ট",
+            step1Title: "পাতার ছবি তুলুন",
+            step1Sub: "আক্রান্ত পাতার স্পষ্ট ছবি তুলুন",
+            step2Title: "এআই হিটম্যাপ পরীক্ষা",
+            step2Sub: "Grad-CAM আক্রান্ত অংশ সনাক্ত করবে",
+            step3Title: "৩-ধাপের চিকিৎসা",
+            step3Sub: "জৈব, রাসায়নিক ও ভয়েস পরামর্শ পান",
+            plantixTitle: "প্ল্যান্টিক্স এআই ক্রপ ডাক্তার",
+            plantixSub: "গাছের রোগ নির্ণয় ও তাৎক্ষণিক সঠিক চিকিৎসা",
+            cameraBtnText: "আক্রান্ত পাতার ছবি তুলুন",
+            cameraBtnSub: "ফোনের ক্যামেরা স্বয়ংক্ৰিয়ভাবে খুলবে",
+            galleryBtnText: "<i class=\"fa-solid fa-images\"></i> গ্যালারি থেকে ছবি বাছুন",
+            samplesTitle: "<i class=\"fa-solid fa-vial\"></i> বা ১-ক্লিক কুইক টেস্ট স্যাম্পল পরীক্ষা করুন:",
+            dropInstructions: "এখানে পাতার ছবি এনে রাখুন বা ক্লিক করুন",
+            dropFormats: "JPG, PNG, WEBP সমর্থিত",
+            analyzeBtn: "<i class=\"fa-solid fa-stethoscope\"></i> এআই রোগ পরীক্ষা করুন",
+            diagTitle: "<i class=\"fa-solid fa-square-poll-vertical\"></i> ফসল নির্ণয় রিপোর্ট",
+            tabOverview: "<i class=\"fa-solid fa-file-medical\"></i> বিবরণ",
+            tabChemical: "<i class=\"fa-solid fa-vial-circle-check\"></i> রাসায়নিক প্রতিরোধ",
+            tabBiological: "<i class=\"fa-solid fa-seedling\"></i> জৈব চিকিৎসা",
+            tabPreventative: "<i class=\"fa-solid fa-shield-halved\"></i> প্রতিরোধমূলক ব্যবস্থা",
+            dosageTitle: "কীটনাশক মাত্রা ক্যালকুলেটর",
+            fieldAreaLabel: "জমির পরিমাণ:",
+            voiceBtn: "<i class=\"fa-solid fa-volume-high\"></i> শুনে নিন",
+            whatsappBtn: "<i class=\"fa-brands fa-whatsapp\"></i> হোয়াটসঅ্যাপে শেয়ার করুন",
+            printBtn: "<i class=\"fa-solid fa-print\"></i> প্রিন্ট রিপোর্ট",
+            chatTitle: "<i class=\"fa-solid fa-robot\"></i> কিষাণ এআই চ্যাট সহায়ক",
+            chatPlaceholder: "আপনার প্রশ্ন এখানে লিখুন...",
+            navHome: "হোম",
+            navCamera: "ক্যামেরা",
+            navDiagnosis: "রিপোর্ট",
+            navWhatsapp: "হোয়াটসঅ্যাপ"
+        },
+        Telugu: {
+            logoSub: "ప్లాంటిక్స్-స్టైల్ పంట వ్యాధి నిర్ధారణ & వ్యవసాయ సలహా",
+            selectCropLabel: "<i class=\"fa-solid fa-wheat-field\"></i> పంటను ఎంచుకోండి:",
+            cropAll: "<i class=\"fa-solid fa-seedling\"></i> అన్ని పంటలు",
+            cropApple: "🍎 యాపిల్",
+            cropPotato: "🥔 బంగాళాదుంప",
+            cropTomato: "🍅 టమాటా",
+            cropGrape: "🍇 ద్రాక్ష",
+            cropCorn: "🌽 జొన్న/మొక్కజొన్న",
+            cropRice: "🌾 వరి",
+            cropWheat: "🌾 గోధుమ",
+            sampleApple: "🍎 యాపిల్ స్కాబ్",
+            samplePotato: "🥔 ఆలు లేట్ బ్లైట్",
+            sampleTomato: "🍅 టమాటా లీఫ్ మోల్డ్",
+            sampleCorn: "🌽 మొక్కజొన్న రస్ట్",
+            step1Title: "ఆకు ఫోటో తీయండి",
+            step1Sub: "వ్యాధి సోకిన ఆకు ఫోటోను తీయండి",
+            step2Title: "AI హీట్‌మ్యాప్ తనిఖీ",
+            step2Sub: "Grad-CAM వ్యాధి ప్రభావాన్ని గుర్తిస్తుంది",
+            step3Title: "3-అంచెల చికిత్స",
+            step3Sub: "రసాయన, సేంద్రీయ మరియు వాయిస్ సలహా",
+            plantixTitle: "ప్లాంటిక్స్ AI క్రాప్ డాక్టర్",
+            plantixSub: "పంట రోగ నిర్ధారణ మరియు తక్షణ నివారణ చర్యలు",
+            cameraBtnText: "ఆకు ఫోటో తీయండి",
+            cameraBtnSub: "మీ ఫోన్ కెమెరా స్వయంచాలకంగా తెరుచుకుంటుంది",
+            galleryBtnText: "<i class=\"fa-solid fa-images\"></i> గ్యాలరీ నుండి ఎంచుకోండి",
+            samplesTitle: "<i class=\"fa-solid fa-vial\"></i> లేదా 1-క్లిక్ టెస్ట్ శాంపిల్స్ చూడండి:",
+            analyzeBtn: "<i class=\"fa-solid fa-stethoscope\"></i> AI వ్యాధి నిర్ధారణ చేయండి",
+            diagTitle: "<i class=\"fa-solid fa-square-poll-vertical\"></i> పంట రోగ నివేదిక",
+            tabOverview: "<i class=\"fa-solid fa-file-medical\"></i> అవలోకనం",
+            tabChemical: "<i class=\"fa-solid fa-vial-circle-check\"></i> రసాయన నివారణ",
+            tabBiological: "<i class=\"fa-solid fa-seedling\"></i> సేంద్రీయ నివారణ",
+            tabPreventative: "<i class=\"fa-solid fa-shield-halved\"></i> ముందస్తు జాగ్రత్తలు",
+            dosageTitle: "మందుల మోతాదు క్యాలిక్యులేటర్",
+            voiceBtn: "<i class=\"fa-solid fa-volume-high\"></i> వినండి",
+            whatsappBtn: "<i class=\"fa-brands fa-whatsapp\"></i> వాట్సాప్‌లో షేర్ చేయండి",
+            chatTitle: "<i class=\"fa-solid fa-robot\"></i> కిసాన్ AI చాట్ అసిస్టెంట్",
+            chatPlaceholder: "మీ ప్రశ్నను ఇక్కడ టైప్ చేయండి...",
+            navHome: "హోమ్",
+            navCamera: "కెమెరా",
+            navDiagnosis: "రిపోర్ట్",
+            navWhatsapp: "వాట్సాప్"
+        },
+        Marathi: {
+            logoSub: "प्लँटिक्स-स्टाईल पीक रोग निदान आणि कृषी सल्ला",
+            selectCropLabel: "<i class=\"fa-solid fa-wheat-field\"></i> पीक निवडा:",
+            cropAll: "<i class=\"fa-solid fa-seedling\"></i> सर्व पिके",
+            cropApple: "🍎 सफरचंद",
+            cropPotato: "🥔 बटाटा",
+            cropTomato: "🍅 टोमॅटो",
+            cropGrape: "🍇 द्राक्षे",
+            cropCorn: "🌽 मका",
+            cropRice: "🌾 भात",
+            cropWheat: "🌾 गवत/गहू",
+            sampleApple: "🍎 सफरचंद स्कॅब",
+            samplePotato: "🥔 बटाटा करपा",
+            sampleTomato: "🍅 टोमॅटो बुरशी",
+            sampleCorn: "🌽 मका तांबेरा",
+            step1Title: "पानाचा फोटो घ्या",
+            step1Sub: "रोगट पानाचा स्पष्ट फोटो काढा",
+            step2Title: "AI हीटमॅप तपासणी",
+            step2Sub: "Grad-CAM प्रभावित भाग शोधेल",
+            step3Title: "3-टप्प्यांची औषधोपचार",
+            step3Sub: "जैविक, रासायनिक व व्हॉइस सल्ला मिळवा",
+            plantixTitle: "प्लँटिक्स AI पीक डॉक्टर",
+            plantixSub: "पिकांच्या रोगांचे अचूक निदान व झटपट उपचार",
+            cameraBtnText: "पानाचा फोटो काढा",
+            cameraBtnSub: "तुमचा मोबाईल कॅमेरा आपोआप उघडेल",
+            galleryBtnText: "<i class=\"fa-solid fa-images\"></i> गॅलरीतून निवडा",
+            samplesTitle: "<i class=\"fa-solid fa-vial\"></i> किंवा 1-क्लिक टेस्ट सॅम्पल तपासा:",
+            analyzeBtn: "<i class=\"fa-solid fa-stethoscope\"></i> AI रोग तपासणी सुरू करा",
+            diagTitle: "<i class=\"fa-solid fa-square-poll-vertical\"></i> पीक रोग निदान अहवाल",
+            tabOverview: "<i class=\"fa-solid fa-file-medical\"></i> माहिती",
+            tabChemical: "<i class=\"fa-solid fa-vial-circle-check\"></i> रासायनिक नियंत्रण",
+            tabBiological: "<i class=\"fa-solid fa-seedling\"></i> जैविक नियंत्रण",
+            tabPreventative: "<i class=\"fa-solid fa-shield-halved\"></i> प्रतिबंधात्मक उपाय",
+            dosageTitle: "फवारणी प्रमाण कॅल्क्युलेटर",
+            voiceBtn: "<i class=\"fa-solid fa-volume-high\"></i> ऐका",
+            whatsappBtn: "<i class=\"fa-brands fa-whatsapp\"></i> व्हॉट्सॲपवर शेअर करा",
+            chatTitle: "<i class=\"fa-solid fa-robot\"></i> बळीराजा AI चॅट मदतनीस",
+            chatPlaceholder: "तुमचा प्रश्न येथे टाका...",
+            navHome: "होम",
+            navCamera: "कॅमेरा",
+            navDiagnosis: "अहवाल",
+            navWhatsapp: "व्हॉट्सॲप"
+        },
+        Tamil: {
+            logoSub: "பிளாண்டிக்ஸ் பாணி பயிர் நோய் கண்டறிதல் & விவசாய ஆலோசனை",
+            selectCropLabel: "<i class=\"fa-solid fa-wheat-field\"></i> பயிரைத் தேர்ந்தெடுக்கவும்:",
+            cropAll: "<i class=\"fa-solid fa-seedling\"></i> அனைத்து பயிர்களும்",
+            cropApple: "🍎 ஆப்பிள்",
+            cropPotato: "🥔 உருளைக்கிழங்கு",
+            cropTomato: "🍅 தக்காளி",
+            cropGrape: "🍇 திராட்சை",
+            cropCorn: "🌽 சோளம்",
+            cropRice: "🌾 நெல்",
+            cropWheat: "🌾 கோதுமை",
+            sampleApple: "🍎 ஆப்பிள் ஸ்கேப்",
+            samplePotato: "🥔 உருளை பிளைட்",
+            sampleTomato: "🍅 தக்காளி மோல்டு",
+            sampleCorn: "🌽 சோள ரஸ்ட்",
+            step1Title: "இலை படம் எடுக்கவும்",
+            step1Sub: "பாதிக்கப்பட்ட இலையின் படத்தை எடுக்கவும்",
+            step2Title: "AI ஹீட்மேப் சோதனை",
+            step2Sub: "Grad-CAM நோய் பகுதியைக் கண்டறியும்",
+            step3Title: "3-படி சிகிச்சை",
+            step3Sub: "ரசாயன, இயற்கை மற்றும் குரல் ஆலோசனை",
+            plantixTitle: "பிளாண்டிக்ஸ் AI பயிர் டாக்டர்",
+            plantixSub: "பயிர் நோய் கண்டறிதல் மற்றும் உடனடி சிகிச்சை",
+            cameraBtnText: "இலையை படம் எடுக்கவும்",
+            cameraBtnSub: "மொபைல் கேமரா தானாகவே திறக்கும்",
+            galleryBtnText: "<i class=\"fa-solid fa-images\"></i> கேலரியிலிருந்து தேர்வு செய்க",
+            samplesTitle: "<i class=\"fa-solid fa-vial\"></i> அல்லது 1-கிளிக் சோதனை மாதிரிகள்:",
+            analyzeBtn: "<i class=\"fa-solid fa-stethoscope\"></i> AI நோய் பரிசோதனை செய்",
+            diagTitle: "<i class=\"fa-solid fa-square-poll-vertical\"></i> பயிர் நோய் அறிக்கை",
+            tabOverview: "<i class=\"fa-solid fa-file-medical\"></i> கண்ணோட்டம்",
+            tabChemical: "<i class=\"fa-solid fa-vial-circle-check\"></i> ரசாயன கட்டுப்பாடு",
+            tabBiological: "<i class=\"fa-solid fa-seedling\"></i> இயற்கை சிகிச்சை",
+            tabPreventative: "<i class=\"fa-solid fa-shield-halved\"></i> தடுப்பு முறைகள்",
+            dosageTitle: "மருந்து அளவு கணக்கீட்டாளர்",
+            voiceBtn: "<i class=\"fa-solid fa-volume-high\"></i> கேட்கவும்",
+            whatsappBtn: "<i class=\"fa-brands fa-whatsapp\"></i> வாட்ஸ்அப்பில் பகிரவும்",
+            chatTitle: "<i class=\"fa-solid fa-robot\"></i> கிசான் AI சாட் உதவியாளர்",
+            chatPlaceholder: "உங்கள் கேள்வியை உள்ளிடவும்...",
+            navHome: "முகப்பு",
+            navCamera: "கேமரா",
+            navDiagnosis: "அறிக்கை",
+            navWhatsapp: "வாட்ஸ்அப்"
+        },
+        Gujarati: {
+            logoSub: "પ્લાન્ટિક્સ-સ્ટાઈલ પાક રોગ નિદાન અને કૃષિ માર્ગદર્શન",
+            selectCropLabel: "<i class=\"fa-solid fa-wheat-field\"></i> પાક પસંદ કરો:",
+            cropAll: "<i class=\"fa-solid fa-seedling\"></i> તમામ પાક",
+            cropApple: "🍎 સફરજન",
+            cropPotato: "🥔 બટાકા",
+            cropTomato: "🍅 ટામેટા",
+            cropGrape: "🍇 દ્રાક્ષ",
+            cropCorn: "🌽 મકાઈ",
+            cropRice: "🌾 ડાંગર/ચોખા",
+            cropWheat: "🌾 ઘઉં",
+            sampleApple: "🍎 સફરજન સ્કેબ",
+            samplePotato: "🥔 બટાકાનો સુકારો",
+            sampleTomato: "🍅 ટામેટા મોલ્ડ",
+            sampleCorn: "🌽 મકાઈ ગેરુ",
+            step1Title: "પાનનો ફોટો લો",
+            step1Sub: "બગડેલા પાનનો સ્પષ્ટ ફોટો પાડો",
+            step2Title: "AI હીટમેપ ચકાસણી",
+            step2Sub: "Grad-CAM અસરગ્રસ્ત ભાગ શોધશે",
+            step3Title: "3-તબક્કાવાર સારવાર",
+            step3Sub: "જૈવિક, રાસાયણિક અને વૉઇસ સલાહ",
+            plantixTitle: "પ્લાન્ટિક્સ AI ક્રોપ ડૉક્ટર",
+            plantixSub: "છોડના રોગોનું ત્વરિત નિદાન અને ચોક્કસ ઉપચાર",
+            cameraBtnText: "પાનનો ફોટો પાડો",
+            cameraBtnSub: "તમારો મોબાઈલ કેમેરા આપમેળે ખુલશે",
+            galleryBtnText: "<i class=\"fa-solid fa-images\"></i> ગેલેરીમાંથી પસંદ કરો",
+            samplesTitle: "<i class=\"fa-solid fa-vial\"></i> અથવા 1-ક્લિક ટેસ્ટ સેમ્પલ ચકાસો:",
+            analyzeBtn: "<i class=\"fa-solid fa-stethoscope\"></i> AI રોગ નિદાન શરૂ કરો",
+            diagTitle: "<i class=\"fa-solid fa-square-poll-vertical\"></i> પાક નિદાન અહેવાલ",
+            tabOverview: "<i class=\"fa-solid fa-file-medical\"></i> વિગત",
+            tabChemical: "<i class=\"fa-solid fa-vial-circle-check\"></i> રાસાયણિક નિયંત્રણ",
+            tabBiological: "<i class=\"fa-solid fa-seedling\"></i> જૈવિક ઉપચાર",
+            tabPreventative: "<i class=\"fa-solid fa-shield-halved\"></i> રક્ષણાત્મક પગલાં",
+            dosageTitle: "દવા છંટકાવ પ્રમાણ કેલ્ક્યુલેટર",
+            voiceBtn: "<i class=\"fa-solid fa-volume-high\"></i> સાંભળો",
+            whatsappBtn: "<i class=\"fa-brands fa-whatsapp\"></i> વોટ્સએપ પર શેર કરો",
+            chatTitle: "<i class=\"fa-solid fa-robot\"></i> ખેડૂત AI ચેટ મદદનીશ",
+            chatPlaceholder: "તમારો પ્રશ્ન અહીં લખો...",
+            navHome: "હોમ",
+            navCamera: "કેમેરા",
+            navDiagnosis: "અહેવાલ",
+            navWhatsapp: "વોટ્સએપ"
+        },
+        English: {
+            logoSub: "Plantix-Style Plant Disease Diagnosis & Agricultural Advisory",
+            selectCropLabel: "<i class=\"fa-solid fa-wheat-field\"></i> Select Crop:",
+            cropAll: "<i class=\"fa-solid fa-seedling\"></i> All Crops",
+            cropApple: "🍎 Apple",
+            cropPotato: "🥔 Potato",
+            cropTomato: "🍅 Tomato",
+            cropGrape: "🍇 Grape",
+            cropCorn: "🌽 Corn",
+            cropRice: "🌾 Rice",
+            cropWheat: "🌾 Wheat",
+            sampleApple: "🍎 Apple Scab",
+            samplePotato: "🥔 Potato Blight",
+            sampleTomato: "🍅 Tomato Mold",
+            sampleCorn: "🌽 Corn Rust",
+            step1Title: "Snap Infected Leaf",
+            step1Sub: "Take a close photo of crop leaf",
+            step2Title: "AI Heatmap Check",
+            step2Sub: "Grad-CAM spots disease area",
+            step3Title: "3-Pillar Treatment",
+            step3Sub: "Get Chemical, Organic & Voice advice",
+            plantixTitle: "Plantix AI Crop Doctor",
+            plantixSub: "Diagnose plant diseases & get instant treatment protocol",
+            cameraBtnText: "Take Photo of Diseased Leaf",
+            cameraBtnSub: "Opens your phone HD camera automatically",
+            galleryBtnText: "<i class=\"fa-solid fa-images\"></i> Choose Photo from Gallery",
+            samplesTitle: "<i class=\"fa-solid fa-vial\"></i> Or Try 1-Click Quick Test Samples:",
+            dropInstructions: "Drag & drop leaf photo here or click to browse",
+            dropFormats: "Supports JPG, PNG, WEBP up to 10MB",
+            analyzeBtn: "<i class=\"fa-solid fa-stethoscope\"></i> Run AI Crop Diagnosis",
+            oodTitle: "Non-Crop Image Detected",
+            oodDesc: "This image does not resemble standard agricultural crops.",
+            diagTitle: "<i class=\"fa-solid fa-square-poll-vertical\"></i> Diagnostic Report",
+            confLabel: "Confidence",
+            tabOverview: "<i class=\"fa-solid fa-file-medical\"></i> Overview",
+            tabChemical: "<i class=\"fa-solid fa-vial-circle-check\"></i> Chemical Control",
+            tabBiological: "<i class=\"fa-solid fa-seedling\"></i> Biological / Organic",
+            tabPreventative: "<i class=\"fa-solid fa-shield-halved\"></i> Preventative Checks",
+            dosageTitle: "Field Spray Dosage Calculator",
+            fieldAreaLabel: "Field Area:",
+            voiceBtn: "<i class=\"fa-solid fa-volume-high\"></i> Read Out Loud",
+            whatsappBtn: "<i class=\"fa-brands fa-whatsapp\"></i> Share Report on WhatsApp",
+            printBtn: "<i class=\"fa-solid fa-print\"></i> Print / Save PDF",
+            heatmapTitle: "<i class=\"fa-solid fa-bullseye\"></i> AI Detection Heatmap (Grad-CAM)",
+            heatmapSub: "Highlights infected leaf spots analyzed by ViT",
+            opacityLabel: "Heatmap Blend Opacity:",
+            chatTitle: "<i class=\"fa-solid fa-robot\"></i> Kisan AI Chat Assistant",
+            chatSub: "Ask questions about sprays, soil, or recovery",
+            chatPlaceholder: "Type your query here...",
+            sendBtn: "<i class=\"fa-solid fa-paper-plane\"></i> Send",
+            navHome: "Home",
+            navCamera: "Camera",
+            navDiagnosis: "Diagnosis",
+            navWhatsapp: "WhatsApp",
+            disclaimer: "Recommendations are generated using indexed agricultural databases and AI guidance. Verify dosage locally."
+        }
+    };
+
+function applyLanguageUI(selectedLang) {
+        const tr = UI_TRANSLATIONS[selectedLang] || UI_TRANSLATIONS["Hindi"] || UI_TRANSLATIONS["English"];
+        if (!tr) return;
+
+        document.querySelectorAll("[data-i18n]").forEach(el => {
+            const key = el.getAttribute("data-i18n");
+            if (tr[key]) {
+                if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
+                    el.placeholder = tr[key];
+                } else {
+                    el.innerHTML = tr[key];
+                }
+            }
+        });
+
+        const logoSub = document.querySelector(".logo p");
+        if (logoSub && tr.logoSub) logoSub.innerText = tr.logoSub;
+
+        if (chatInput && tr.chatPlaceholder) chatInput.placeholder = tr.chatPlaceholder;
+        showToast(`Website auto-translated to ${selectedLang}`, "info");
+    }
+
+    // Language Selector Change Event
     langSelect.addEventListener("change", async () => {
+        const selectedLang = langSelect.value;
+        applyLanguageUI(selectedLang);
+
         if (currentDiagnosis) {
-            setLoader(true, `Translating guidelines to ${langSelect.value}...`);
+            setLoader(true, `Updating diagnostic advisory to ${selectedLang}...`);
             await fetchAdvice();
             setLoader(false);
-            showToast(`Advice language updated to ${langSelect.value}`);
+            showToast(`Diagnosis updated in ${selectedLang}!`, "success");
         }
     });
 
-    // 6. Blending Opacity Slider
-    opacitySlider.addEventListener("input", (e) => {
-        const val = e.target.value;
-        heatmapImage.style.opacity = val / 100;
-    });
-
-    const printBtn = document.getElementById("print-btn");
-    if (printBtn) {
-        printBtn.addEventListener("click", () => {
-            window.print();
-        });
-    }
-
-    // Text-To-Speech Voice Assistant (Read Advice Out Loud)
-    const readVoiceBtn = document.getElementById("read-voice-btn");
-    let isSpeaking = false;
-    if (readVoiceBtn) {
-        readVoiceBtn.addEventListener("click", () => {
-            if (!('speechSynthesis' in window)) {
-                showToast("Voice playback is not supported on this browser.", "error");
-                return;
-            }
-
-            if (isSpeaking) {
-                window.speechSynthesis.cancel();
-                isSpeaking = false;
-                readVoiceBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Read Out Loud';
-                return;
-            }
-
-            const activePanel = document.querySelector(".tab-panel.active");
-            const textToRead = activePanel ? activePanel.innerText : "";
-            if (!textToRead || textToRead.includes("No diagnosis")) {
-                showToast("Please run a crop diagnosis first.", "info");
-                return;
-            }
-
-            const utterance = new SpeechSynthesisUtterance(textToRead);
-            utterance.lang = langSelect.value.toLowerCase() === "hindi" ? "hi-IN" : "en-US";
-            utterance.rate = 0.95;
-
-            utterance.onend = () => {
-                isSpeaking = false;
-                readVoiceBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Read Out Loud';
-            };
-
-            utterance.onerror = () => {
-                isSpeaking = false;
-                readVoiceBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Read Out Loud';
-            };
-
-            window.speechSynthesis.speak(utterance);
-            isSpeaking = true;
-            readVoiceBtn.innerHTML = '<i class="fa-solid fa-square"></i> Stop Voice';
-            showToast(`Reading advice in ${langSelect.value}...`, "info");
-        });
-    }
-
-    // WhatsApp Report Share
-    const whatsappShareBtn = document.getElementById("whatsapp-share-btn");
-    if (whatsappShareBtn) {
-        whatsappShareBtn.addEventListener("click", () => {
-            if (!currentDiagnosis) {
-                showToast("Please run a crop diagnosis first.", "info");
-                return;
-            }
-
-            const text = `🌿 *SmartFarming AI Diagnosis Report*\n` +
-                         `===============================\n` +
-                         `*Detected:* ${diseaseName.innerText}\n` +
-                         `*Confidence:* ${confidencePercentage.innerText}\n\n` +
-                         `*Overview:* ${document.getElementById("treatment-overview").innerText.slice(0, 150)}...\n\n` +
-                         `*Chemical Control:* ${document.getElementById("treatment-chemical").innerText.slice(0, 150)}...\n\n` +
-                         `Generated via SmartFarming AI Field Assistant`;
-            
-            const shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-            window.open(shareUrl, "_blank");
-        });
-    }
-
-    // 7. Tabs Functionality
-    tabBtns.forEach(btn => {
-        btn.addEventListener("click", () => {
-            tabBtns.forEach(b => b.classList.remove("active"));
-            tabPanels.forEach(p => p.classList.remove("active"));
-            
-            btn.classList.add("active");
-            const targetPanel = document.getElementById(btn.getAttribute("data-tab"));
-            targetPanel.classList.add("active");
-        });
-    });
-
-    // 8. Sync Documents / RAG
-    indexDocsBtn.addEventListener("click", async () => {
-        setLoader(true, "Syncing local database and compiling RAG embeddings...");
-        try {
-            const response = await fetch("/api/index-docs", { method: "POST" });
-            const result = await response.json();
-            
-            if (response.ok) {
-                showToast(result.message);
-            } else {
-                showToast(result.message || "No documents found to sync.", "info");
-            }
-        } catch (err) {
-            console.error("RAG Sync Error:", err);
-            showToast("Failed to sync local database.", "error");
-        } finally {
-            setLoader(false);
-        }
-    });
-
-    // 9. Upload Document to RAG
-    const docUploadInput = document.getElementById("doc-upload-input");
-    docUploadInput.addEventListener("change", async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        
-        setLoader(true, `Uploading and indexing '${file.name}' into RAG...`);
-        
-        const formData = new FormData();
-        formData.append("file", file);
-        
-        try {
-            const response = await fetch("/api/documents/upload", {
-                method: "POST",
-                body: formData
-            });
-            const result = await response.json();
-            
-            if (response.ok) {
-                showToast(result.message, "success");
-            } else {
-                showToast(result.detail || "Failed to upload reference document.", "error");
-            }
-        } catch (err) {
-            console.error("Document Upload Error:", err);
-            showToast("Network error uploading document.", "error");
-        } finally {
-            docUploadInput.value = "";
-            setLoader(false);
-        }
-    });
-
-    // 9. Floating Chatbot Interaction
-    chatToggle.addEventListener("click", () => {
-        chatDrawer.classList.toggle("collapsed");
-        chatBadge.classList.add("hidden");
-    });
-
-    chatSendBtn.addEventListener("click", () => {
-        sendChatMessage();
-    });
-
-    chatInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-            sendChatMessage();
-        }
-    });
-
-    async function sendChatMessage() {
-        const text = chatInput.value.trim();
-        if (!text || !currentDiagnosis) return;
-        
-        // Add User Message
-        appendMessage("user", text);
-        chatInput.value = "";
-        
-        // Disable input while bot replies
-        chatInput.disabled = true;
-        chatSendBtn.disabled = true;
-        
-        // Add Loading bubble
-        const botMsgDiv = document.createElement("div");
-        botMsgDiv.className = "message bot typing";
-        botMsgDiv.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Thinking...';
-        chatMessages.appendChild(botMsgDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-        
-        try {
-            const response = await fetch("/api/chat", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    disease: currentDiagnosis.disease,
-                    history: chatHistory,
-                    message: text,
-                    language: langSelect.value
-                })
-            });
-            
-            botMsgDiv.remove();
-            
-            if (!response.ok) {
-                throw new Error("Chat error");
-            }
-            
-            const data = await response.json();
-            appendMessage("bot", data.reply);
-            
-        } catch (err) {
-            botMsgDiv.remove();
-            console.error("Chat Error:", err);
-            appendMessage("bot", "Sorry, I am having trouble connecting right now. Please try again.");
-        } finally {
-            chatInput.disabled = false;
-            chatSendBtn.disabled = false;
-            chatInput.focus();
-        }
-    }
-
-    function appendMessage(sender, text) {
-        const msgDiv = document.createElement("div");
-        msgDiv.className = `message ${sender}`;
-        msgDiv.innerText = text;
-        chatMessages.appendChild(msgDiv);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-        
-        // Save to state history
-        chatHistory.push({ sender, text });
-    }
-
-    clearChat.addEventListener("click", () => {
-        chatMessages.innerHTML = "";
-        chatHistory = [];
-        showToast("Conversation cleared.", "info");
-    });
-
-    // Plantix-Style Crop Pills Filter
+    // Crop Selection Pills Logic
+    let selectedCrop = "all";
     const cropPills = document.querySelectorAll(".crop-pill");
+
     cropPills.forEach(pill => {
         pill.addEventListener("click", () => {
             cropPills.forEach(p => p.classList.remove("active"));
             pill.classList.add("active");
-            const cropType = pill.getAttribute("data-crop");
-            if (cropType !== "all") {
-                showToast(`Filter set to ${pill.innerText}. Take a photo of your ${cropType} leaf!`, "info");
-            }
+            selectedCrop = pill.getAttribute("data-crop") || "all";
+
+            // Filter sample chips
+            sampleBtns.forEach(sample => {
+                const sampleCrop = sample.getAttribute("data-crop");
+                if (selectedCrop === "all" || sampleCrop === selectedCrop) {
+                    sample.style.display = "inline-flex";
+                    sample.classList.add("pulse-highlight");
+                    setTimeout(() => sample.classList.remove("pulse-highlight"), 1000);
+                } else {
+                    sample.style.display = "none";
+                }
+            });
+
+            showToast(`Crop filter active: ${pill.innerText.trim()}`, "success");
         });
     });
 
-    // Plantix-Style Field Dosage Calculator
+// Plantix-Style Field Dosage Calculator
     const fieldAreaSelect = document.getElementById("field-area-select");
     const dosageResult = document.getElementById("dosage-result");
 
@@ -640,10 +812,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
             dosageResult.innerHTML = `
                 <i class="fa-solid fa-flask"></i> Estimated Dosage for <strong>${acres} Acre(s)</strong>:<br>
-                • Chemical: <strong>${copperGrams}g Copper Oxychloride in ${waterLiters}L Water</strong><br>
-                • Organic: <strong>${neemMl}ml Neem Oil Spray</strong>
+                🧪 Chemical: <strong>${copperGrams}g Copper Oxychloride in ${waterLiters}L Water</strong><br>
+                🌿 Organic: <strong>${neemMl}ml Neem Oil Spray</strong>
             `;
         });
+    }
+
     // WhatsApp Modal Handlers
     const openWhatsappModalBtn = document.getElementById("open-whatsapp-modal-btn");
     const whatsappModal = document.getElementById("whatsapp-modal");
@@ -656,6 +830,43 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (closeWhatsappBtn && whatsappModal) {
+        closeWhatsappBtn.addEventListener("click", () => {
+            whatsappModal.classList.add("hidden");
+        });
+    }
+
+    // PDF Export Report Handler
+    const printBtn = document.getElementById("print-btn");
+    if (printBtn) {
+        printBtn.addEventListener("click", () => {
+            window.print();
+        });
+    }
+
+    // Share Diagnosis Report Handler (WhatsApp)
+    const whatsappShareBtn = document.getElementById("whatsapp-share-btn");
+    if (whatsappShareBtn) {
+        whatsappShareBtn.addEventListener("click", () => {
+            const diseaseEl = document.getElementById("disease-name");
+            const confEl = document.getElementById("confidence-text");
+            const diseaseTitle = diseaseEl ? diseaseEl.textContent.trim() : "Crop Diagnosis";
+            const confidence = confEl ? confEl.textContent.trim() : "";
+            const shareText = `🌾 *SmartFarming AI Diagnosis Report*\n\n📌 *Disease / Condition:* ${diseaseTitle}\n📊 *Confidence:* ${confidence}\n\nGenerated via SmartFarming AI Crop Doctor.`;
+            const encodedText = encodeURIComponent(shareText);
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'SmartFarming AI Diagnosis Report',
+                    text: shareText
+                }).catch(() => {
+                    window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
+                });
+            } else {
+                window.open(`https://api.whatsapp.com/send?text=${encodedText}`, '_blank');
+            }
+        });
+    }
+
     // Mobile Bottom Navigation Bar Handlers
     const navHome = document.getElementById("nav-home");
     const navCamera = document.getElementById("nav-camera");
