@@ -276,6 +276,9 @@ document.addEventListener("DOMContentLoaded", () => {
         
         const formData = new FormData();
         formData.append("file", selectedFile);
+        if (selectedCrop && selectedCrop !== "all") {
+            formData.append("crop", selectedCrop);
+        }
         
         try {
             // Step 1: Detect & Explain (FastAPI endpoint runs inference & Grad-CAM)
@@ -773,15 +776,43 @@ function applyLanguageUI(selectedLang) {
         }
     });
 
-    // Crop Selection Pills Logic
+    // Crop Selection Pills & Plant Search Logic
     let selectedCrop = "all";
+    const cropSearchInput = document.getElementById("crop-search-input");
+    const cropFilterBadge = document.getElementById("crop-filter-badge");
     const cropPills = document.querySelectorAll(".crop-pill");
+
+    function updateCropBadge(cropText) {
+        if (!cropFilterBadge) return;
+        if (!selectedCrop || selectedCrop === "all") {
+            cropFilterBadge.innerHTML = `<i class="fa-solid fa-bullseye"></i> Mode: <strong>All Plants (Global Mode)</strong>`;
+        } else {
+            cropFilterBadge.innerHTML = `<i class="fa-solid fa-bullseye"></i> Target Filter: <strong>${cropText} (Crop-Specific Precision Mode Active)</strong>`;
+        }
+    }
+
+    if (cropSearchInput) {
+        cropSearchInput.addEventListener("input", (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            cropPills.forEach(pill => {
+                const text = pill.innerText.toLowerCase();
+                const cropVal = pill.getAttribute("data-crop") || "";
+                if (cropVal === "all" || text.includes(query) || cropVal.includes(query)) {
+                    pill.style.display = "inline-flex";
+                } else {
+                    pill.style.display = "none";
+                }
+            });
+        });
+    }
 
     cropPills.forEach(pill => {
         pill.addEventListener("click", () => {
             cropPills.forEach(p => p.classList.remove("active"));
             pill.classList.add("active");
             selectedCrop = pill.getAttribute("data-crop") || "all";
+            const pillText = pill.innerText.trim();
+            updateCropBadge(pillText);
 
             // Filter sample chips
             sampleBtns.forEach(sample => {
@@ -795,7 +826,7 @@ function applyLanguageUI(selectedLang) {
                 }
             });
 
-            showToast(`Crop filter active: ${pill.innerText.trim()}`, "success");
+            showToast(`Crop filter active: ${pillText}`, "success");
         });
     });
 

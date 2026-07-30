@@ -64,18 +64,38 @@
         </div>
     </header>
 
-    <!-- Plantix-Style Crop Selection Pills -->
+    <!-- Plantix-Style Crop Selection Pills & Search -->
     <div class="crop-pills-container glass-card">
-        <span class="crop-pills-label" data-i18n="selectCropLabel"><i class="fa-solid fa-wheat-field"></i> Select Crop:</span>
-        <div class="crop-pills">
-            <button class="crop-pill active" data-crop="all" data-i18n="cropAll"><i class="fa-solid fa-seedling"></i> All Crops</button>
-            <button class="crop-pill" data-crop="apple" data-i18n="cropApple">🍎 Apple</button>
-            <button class="crop-pill" data-crop="potato" data-i18n="cropPotato">🥔 Potato</button>
-            <button class="crop-pill" data-crop="tomato" data-i18n="cropTomato">🍅 Tomato</button>
-            <button class="crop-pill" data-crop="grape" data-i18n="cropGrape">🍇 Grape</button>
-            <button class="crop-pill" data-crop="corn" data-i18n="cropCorn">🌽 Corn</button>
-            <button class="crop-pill" data-crop="rice" data-i18n="cropRice">🌾 Rice</button>
-            <button class="crop-pill" data-crop="wheat" data-i18n="cropWheat">🌾 Wheat</button>
+        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+            <div class="crop-search-wrapper" style="position: relative; width: 100%;">
+                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #10b981;"></i>
+                <input type="text" id="crop-search-input" placeholder="🔍 Search plant (e.g. Apple, Potato, Tomato, Pepper, Grape, Corn, Peach, Strawberry)..." style="width: 100%; padding: 10px 14px 10px 38px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.4); background: rgba(15, 23, 42, 0.7); color: #ffffff; font-size: 14px; outline: none;">
+            </div>
+            
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                <span class="crop-pills-label" data-i18n="selectCropLabel"><i class="fa-solid fa-wheat-field"></i> Target Crop / Plant:</span>
+                <div id="crop-filter-badge" class="crop-filter-badge" style="font-size: 13px; color: #10b981; background: rgba(16, 185, 129, 0.15); padding: 4px 10px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-bullseye"></i> Mode: <strong>All Plants (Global Mode)</strong>
+                </div>
+            </div>
+
+            <div id="crop-pills-list" class="crop-pills">
+                <button class="crop-pill active" data-crop="all" data-i18n="cropAll"><i class="fa-solid fa-seedling"></i> All Crops</button>
+                <button class="crop-pill" data-crop="apple" data-i18n="cropApple">🍎 Apple</button>
+                <button class="crop-pill" data-crop="potato" data-i18n="cropPotato">🥔 Potato</button>
+                <button class="crop-pill" data-crop="tomato" data-i18n="cropTomato">🍅 Tomato</button>
+                <button class="crop-pill" data-crop="grape" data-i18n="cropGrape">🍇 Grape</button>
+                <button class="crop-pill" data-crop="corn" data-i18n="cropCorn">🌽 Corn</button>
+                <button class="crop-pill" data-crop="pepper">🫑 Pepper</button>
+                <button class="crop-pill" data-crop="strawberry">🍓 Strawberry</button>
+                <button class="crop-pill" data-crop="cherry">🍒 Cherry</button>
+                <button class="crop-pill" data-crop="peach">🍑 Peach</button>
+                <button class="crop-pill" data-crop="orange">🍊 Orange / Citrus</button>
+                <button class="crop-pill" data-crop="soybean">🫘 Soybean</button>
+                <button class="crop-pill" data-crop="squash">🎃 Squash</button>
+                <button class="crop-pill" data-crop="rice" data-i18n="cropRice">🌾 Rice</button>
+                <button class="crop-pill" data-crop="wheat" data-i18n="cropWheat">🌾 Wheat</button>
+            </div>
         </div>
     </div>
 

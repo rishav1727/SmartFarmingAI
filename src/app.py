@@ -53,7 +53,7 @@ class ChatRequest(BaseModel):
     language: str = "English"
 
 @app.post("/api/predict")
-async def predict(file: UploadFile = File(...)):
+async def predict(file: UploadFile = File(...), crop: Optional[str] = Form(None)):
     # Generate unique filename to avoid conflict
     file_ext = os.path.splitext(file.filename)[1]
     unique_id = str(uuid.uuid4())
@@ -70,7 +70,7 @@ async def predict(file: UploadFile = File(...)):
     # Run prediction and Grad-CAM
     try:
         # DiseasePredictor will save the heatmap to f"heatmap_{os.path.basename(temp_filepath)}" in the CWD
-        result = predictor.predict(temp_filepath, save_heatmap=True)
+        result = predictor.predict(temp_filepath, save_heatmap=True, target_crop=crop)
         
         # Move generated heatmap to upload directory
         raw_heatmap_name = f"heatmap_{temp_filename}"

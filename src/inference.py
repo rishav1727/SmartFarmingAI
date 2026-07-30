@@ -58,7 +58,7 @@ class DiseasePredictor:
                 return json.load(f)
         return []
 
-    def predict(self, image_path, save_heatmap=False):
+    def predict(self, image_path, save_heatmap=False, target_crop=None):
         if not os.path.exists(image_path):
             raise FileNotFoundError(f"Image not found: {image_path}")
             
@@ -66,6 +66,26 @@ class DiseasePredictor:
         from PIL import ImageOps
         image = ImageOps.exif_transpose(image).convert("RGB")
         
+        # Target crop index filtering for high-precision targeted inference
+        crop_indices = []
+        if target_crop and target_crop.lower() not in ["all", "none", ""]:
+            clean_crop = target_crop.lower().strip()
+            aliases = {
+                "corn": ["corn"],
+                "pepper": ["pepper"],
+                "cherry": ["cherry"],
+                "orange": ["orange"],
+                "citrus": ["orange"],
+                "squash": ["squash"],
+                "soybean": ["soybean"]
+            }
+            search_terms = aliases.get(clean_crop, [clean_crop])
+            
+            for idx, cname in enumerate(self.class_names):
+                cname_lower = cname.lower().replace("_", " ")
+                if any(term in cname_lower for term in search_terms):
+                    crop_indices.append(idx)
+
         # Define a comprehensive set of views (Multi-Scale & Localization)
         width, height = image.size
         
@@ -120,16 +140,23 @@ class DiseasePredictor:
             
             outputs = self.model(img_tensor)
             logits = outputs[0]
-            probabilities = torch.nn.functional.softmax(logits, dim=0)
+            
+            if crop_indices:
+                masked_logits = logits.clone()
+                mask = torch.ones_like(logits, dtype=torch.bool)
+                mask[crop_indices] = False
+                masked_logits[mask] = -1e9
+                probabilities = torch.nn.functional.softmax(masked_logits, dim=0)
+            else:
+                probabilities = torch.nn.functional.softmax(logits, dim=0)
             
             # Mathematical Protection: Energy-Based Out-Of-Distribution (OOD) Detection
-            # Softmax forces everything to 100%, causing the model to guess "Tomato" for a Cats.
-            # To fix the "Cat hallucination" issue, we calculate the Helmholtz Free Energy of the logits.
             temperature = 1.0
             energy_score = -temperature * torch.logsumexp(logits / temperature, dim=0).item()
             
-            # Fetch top 3 instead of just top 1
-            top3_probs, top3_catids = torch.topk(probabilities, 3)
+            # Fetch top 3 predictions
+            k = min(3, len(crop_indices)) if crop_indices else 3
+            top3_probs, top3_catids = torch.topk(probabilities, k)
             conf = top3_probs[0].item() * 100
             
             if conf > highest_conf:

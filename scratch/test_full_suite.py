@@ -39,14 +39,14 @@ def run_tests():
     else:
         flags.append(f"WARNING: /api/index-docs failed with status {res.status_code}")
         
-    # 4. Test Predict Endpoint with test_sample.jpg
+    # 4. Test Predict Endpoint with test_sample.jpg & Crop-Specific Filter Mode
     test_img_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "test_sample.jpg")
     if os.path.exists(test_img_path):
         with open(test_img_path, "rb") as f:
-            res = client.post("/api/predict", files={"file": ("test_sample.jpg", f, "image/jpeg")})
+            res = client.post("/api/predict", files={"file": ("test_sample.jpg", f, "image/jpeg")}, data={"crop": "tomato"})
         if res.status_code == 200:
             data = res.json()
-            print(f"[OK] AI Prediction Endpoint (POST /api/predict) -> Disease: {data.get('disease')}, Conf: {data.get('confidence')}%")
+            print(f"[OK] AI Prediction Endpoint with Crop Filter Mode (POST /api/predict [crop=tomato]) -> Disease: {data.get('disease')}, Conf: {data.get('confidence')}%")
             if not data.get("heatmap_url"):
                 flags.append("WARNING: Grad-CAM heatmap_url was not returned in prediction")
         else:
