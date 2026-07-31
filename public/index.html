@@ -65,7 +65,7 @@
     </header>
 
     <!-- Plantix-Style Crop Selection Pills & Search -->
-    <div class="crop-pills-container glass-card">
+    <div class="crop-pills-container glass-card" style="padding: 14px 20px; margin: 16px 40px 0;">
         <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
             <div class="crop-search-wrapper" style="position: relative; width: 100%;">
                 <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #10b981;"></i>
@@ -100,28 +100,28 @@
     </div>
 
     <!-- Plantix 3-Step How-It-Works Banner -->
-    <div class="steps-banner glass-card">
-        <div class="step-item">
+    <div class="steps-banner glass-card" style="display:flex; flex-direction:row; align-items:center; justify-content:space-around; gap:20px; padding:18px 32px; margin:16px 40px 0; overflow-x:auto;">
+        <div class="step-item" style="display:flex; flex-direction:row; align-items:center; gap:14px; flex-shrink:0;">
             <div class="step-num">1</div>
-            <div class="step-text">
-                <strong data-i18n="step1Title">Snap Infected Leaf</strong>
-                <span data-i18n="step1Sub">Take a close photo of crop leaf</span>
+            <div class="step-text" style="display:flex; flex-direction:column;">
+                <strong data-i18n="step1Title" style="font-size:14px; font-weight:700; color:#f8fafc;">Snap Infected Leaf</strong>
+                <span data-i18n="step1Sub" style="font-size:12px; color:#94a3b8;">Take a close photo of crop leaf</span>
             </div>
         </div>
-        <i class="fa-solid fa-chevron-right step-arrow"></i>
-        <div class="step-item">
+        <i class="fa-solid fa-chevron-right step-arrow" style="color:#10b981; font-size:18px; flex-shrink:0;"></i>
+        <div class="step-item" style="display:flex; flex-direction:row; align-items:center; gap:14px; flex-shrink:0;">
             <div class="step-num">2</div>
-            <div class="step-text">
-                <strong data-i18n="step2Title">AI Heatmap Check</strong>
-                <span data-i18n="step2Sub">Grad-CAM spots disease area</span>
+            <div class="step-text" style="display:flex; flex-direction:column;">
+                <strong data-i18n="step2Title" style="font-size:14px; font-weight:700; color:#f8fafc;">AI Heatmap Check</strong>
+                <span data-i18n="step2Sub" style="font-size:12px; color:#94a3b8;">Grad-CAM spots disease area</span>
             </div>
         </div>
-        <i class="fa-solid fa-chevron-right step-arrow"></i>
-        <div class="step-item">
+        <i class="fa-solid fa-chevron-right step-arrow" style="color:#10b981; font-size:18px; flex-shrink:0;"></i>
+        <div class="step-item" style="display:flex; flex-direction:row; align-items:center; gap:14px; flex-shrink:0;">
             <div class="step-num">3</div>
-            <div class="step-text">
-                <strong data-i18n="step3Title">3-Pillar Treatment</strong>
-                <span data-i18n="step3Sub">Get Chemical, Organic & Voice advice</span>
+            <div class="step-text" style="display:flex; flex-direction:column;">
+                <strong data-i18n="step3Title" style="font-size:14px; font-weight:700; color:#f8fafc;">3-Pillar Treatment</strong>
+                <span data-i18n="step3Sub" style="font-size:12px; color:#94a3b8;">Get Chemical, Organic &amp; Voice advice</span>
             </div>
         </div>
     </div>
@@ -146,15 +146,32 @@
 
                 <!-- Big Plantix Camera Scanner Card -->
                 <div class="plantix-camera-box">
-                    <label for="native-camera-input" id="open-camera-btn" class="plantix-cam-btn" style="cursor: pointer;">
+                    <button type="button" id="open-camera-btn" class="plantix-cam-btn">
                         <div class="cam-pulse-ring"><i class="fa-solid fa-camera"></i></div>
-                        <strong data-i18n="cameraBtnText">Take Photo of Diseased Leaf</strong>
-                        <span data-i18n="cameraBtnSub">Opens your phone HD camera automatically</span>
-                    </label>
+                        <strong data-i18n="cameraBtnText">Take Live Photo / Open Camera</strong>
+                        <span data-i18n="cameraBtnSub">Launches real-time camera scanner stream</span>
+                    </button>
                     
-                    <label for="file-input" id="browse-gallery-btn" class="plantix-gallery-btn" style="cursor: pointer;">
-                        <i class="fa-solid fa-images"></i> Choose Photo from Gallery
-                    </label>
+                    <button type="button" id="browse-gallery-btn" class="plantix-gallery-btn">
+                        <i class="fa-solid fa-images"></i> Choose Photo from Gallery / Device
+                    </button>
+                </div>
+
+                <!-- Always-Visible Drag & Drop Zone -->
+                <div id="drop-zone" class="drop-zone" style="margin-top: 16px;">
+                    <div id="drop-zone-prompt" class="drop-zone-prompt">
+                        <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                        <p data-i18n="dropZoneText"><strong>Drag & Drop your leaf image here</strong> or <span>click to browse files</span></p>
+                        <span class="file-limits">Supports JPG, PNG, WEBP files (Max 10MB)</span>
+                    </div>
+                    <div id="preview-container" class="preview-container hidden">
+                        <img id="image-preview" src="" alt="Selected leaf preview">
+                        <div id="scan-laser" class="scan-laser hidden"></div>
+                        <div id="scan-status-badge" class="scan-status-badge hidden">
+                            <i class="fa-solid fa-compass-drafting fa-spin"></i> <span id="scan-status-text">Scanning Neural Features...</span>
+                        </div>
+                        <button id="remove-btn" class="remove-btn" type="button"><i class="fa-solid fa-circle-xmark"></i></button>
+                    </div>
                 </div>
 
                 <!-- 1-Click Quick Test Samples -->
@@ -173,17 +190,6 @@
                         <button class="sample-chip-btn" data-crop="corn" data-url="/samples/corn_rust.jpg" type="button" data-i18n="sampleCorn">
                             🌽 Corn Rust
                         </button>
-                    </div>
-                </div>
-                
-                <div id="drop-zone" class="drop-zone hidden" style="margin-top: 16px;">
-                    <div id="preview-container" class="preview-container">
-                        <img id="image-preview" src="" alt="Selected leaf preview">
-                        <div id="scan-laser" class="scan-laser hidden"></div>
-                        <div id="scan-status-badge" class="scan-status-badge hidden">
-                            <i class="fa-solid fa-compass-drafting fa-spin"></i> <span id="scan-status-text">Scanning Neural Features...</span>
-                        </div>
-                        <button id="remove-btn" class="remove-btn" type="button"><i class="fa-solid fa-circle-xmark"></i></button>
                     </div>
                 </div>
 

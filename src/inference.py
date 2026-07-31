@@ -209,38 +209,61 @@ class DiseasePredictor:
                         url = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"
                         self.imagenet_classes = urllib.request.urlopen(url, timeout=4).read().decode("utf-8").split("\n")
                     
+                    # Get TOP-5 MobileNet predictions for better coverage
                     imagenet_tensor = TF.resize(winning_tensor, [224, 224])
                     with torch.no_grad():
                         mn_out = self.mobilenet_classifier(imagenet_tensor)
                         mn_prob = torch.nn.functional.softmax(mn_out[0], dim=0)
-                        mn_top_prob, mn_top_catid = torch.topk(mn_prob, 1)
-                        
-                    detected_object = self.imagenet_classes[mn_top_catid[0]].strip()
+                        mn_top_prob, mn_top_catids = torch.topk(mn_prob, 5)
+
+                    # Collect all top-5 labels
+                    top5_labels = []
+                    for cid in mn_top_catids:
+                        lbl = self.imagenet_classes[cid].strip().lower() if cid < len(self.imagenet_classes) else ""
+                        top5_labels.append(lbl)
                     
-                    # Comprehensive non-plant ImageNet category indicators
-                    non_plant_keywords = [
-                        "guy", "groom", "person", "man", "woman", "wig", "neck-brace", "t-shirt", "sweatshirt",
-                        "jersey", "suit", "coat", "jacket", "shirt", "jeans", "pants", "shorts", "shoe",
-                        "sunglasses", "glasses", "beard", "face", "hair", "head", "hand", "finger", "arm",
-                        "earphone", "cellular telephone", "laptop", "computer", "desk", "chair", "couch",
-                        "table", "bed", "room", "wall", "window", "door", "car", "bus", "truck", "dog", "cat",
-                        "bird", "bottle", "cup", "can", "clock", "television", "microphone", "seat belt", "brassiere",
-                        "mask", "stretcher", "plunger", "volleyball", "basketball", "accordion", "studio couch", "quilt",
-                        "pillow", "wardrobe", "lampshade", "radio", "monitor", "projector", "toilet", "washbasin"
+                    detected_object = self.imagenet_classes[mn_top_catids[0]].strip()
+                    
+                    # ===== PLANT WHITELIST (Top-5 scan) =====
+                    # If ANY of the top-5 MobileNet predictions match a known plant/food,
+                    # we treat the image as a plant and SKIP non-plant rejection.
+                    plant_safelist_keywords = [
+                        "cabbage", "broccoli", "cauliflower", "artichoke", "spinach", "lettuce",
+                        "cucumber", "zucchini", "pumpkin", "squash", "acorn", "butternut",
+                        "mushroom", "fig", "pineapple", "banana", "strawberry", "orange", "lemon",
+                        "lime", "apple", "grape", "cherry", "peach", "pear", "mango", "papaya",
+                        "corn", "maize", "wheat", "rice", "potato", "yam",
+                        "tomato", "pepper", "chili", "eggplant", "avocado", "coconut",
+                        "plant", "leaf", "flower", "blossom", "herb", "fern", "moss",
+                        "tree", "shrub", "vine", "grass", "seed", "root", "stem", "petal",
+                        "vegetable", "fruit", "crop", "foliage", "daisy", "tulip", "rose",
+                        "sunflower", "clover", "algae", "seaweed", "bamboo", "cactus", "succulent",
+                        "kale", "celery", "carrot", "radish", "beet", "turnip", "onion", "garlic",
+                        "soybean", "bean", "pea", "lentil", "chickpea", "rapeseed", "hay"
                     ]
                     
-                    detected_lower = detected_object.lower()
-                    if any(term in detected_lower for term in non_plant_keywords):
+                    # Check if ANY top-5 label contains a plant keyword
+                    is_plant_confirmed = any(
+                        any(p in lbl for p in plant_safelist_keywords)
+                        for lbl in top5_labels
+                    )
+                    
+                    # ===== NON-PLANT WHITELIST CHECK =====
+                    # If NO top-5 prediction matched a plant keyword → non-plant
+                    if not is_plant_confirmed:
                         is_non_plant = True
+                    
+                    print(f"[OOD] Top-5 MobileNet: {top5_labels}")
+                    print(f"[OOD] Plant confirmed: {is_plant_confirmed}, is_non_plant: {is_non_plant}")
                         
                 except Exception as e:
                     print("General object pre-screener error:", e)
 
                 # Determine overall Out-of-Distribution status
-                # 1) Non-plant object detected by general MobileNet classifier
-                # 2) Energy Score > 22.0 (Model uncertainty threshold)
-                # 3) Softmax Confidence < 55.0%
-                is_ood = is_non_plant or energy_score > 22.0 or highest_conf < 55.0
+                # Priority 1: MobileNet whitelist (most reliable — catches humans, animals, objects)
+                # Priority 2: Energy score > 23 (model uncertainty)
+                # Priority 3: Confidence < 52% (disease model unsure)
+                is_ood = is_non_plant or energy_score > 23.0 or highest_conf < 52.0
 
                 if is_ood:
                     if detected_object:
