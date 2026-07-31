@@ -96,11 +96,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // 3. Drop Zone & File Selection
     const nativeCameraInput = document.getElementById("native-camera-input");
     const browseGalleryBtn = document.getElementById("browse-gallery-btn");
+    const dropZonePrompt = document.getElementById("drop-zone-prompt");
 
-    if (openCameraBtn && nativeCameraInput) {
-        openCameraBtn.addEventListener("click", () => {
-            nativeCameraInput.click();
-        });
+    if (nativeCameraInput) {
         nativeCameraInput.addEventListener("change", (e) => {
             if (e.target.files && e.target.files[0]) {
                 handleFileSelection(e.target.files[0]);
@@ -110,7 +108,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (browseGalleryBtn && fileInput) {
-        browseGalleryBtn.addEventListener("click", () => {
+        browseGalleryBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
             fileInput.click();
         });
     }
@@ -118,34 +117,42 @@ document.addEventListener("DOMContentLoaded", () => {
     if (dropZone) {
         dropZone.addEventListener("click", (e) => {
             if (e.target !== removeBtn && !removeBtn.contains(e.target)) {
-                fileInput.click();
+                if (fileInput) fileInput.click();
             }
         });
     }
 
-    fileInput.addEventListener("change", (e) => {
-        handleFileSelection(e.target.files[0]);
-    });
+    if (fileInput) {
+        fileInput.addEventListener("change", (e) => {
+            if (e.target.files && e.target.files[0]) {
+                handleFileSelection(e.target.files[0]);
+            }
+        });
+    }
 
     // Drag-and-drop events
-    ["dragenter", "dragover"].forEach(eventName => {
-        dropZone.addEventListener(eventName, (e) => {
-            e.preventDefault();
-            dropZone.classList.add("hover");
-        }, false);
-    });
+    if (dropZone) {
+        ["dragenter", "dragover"].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.add("hover");
+            }, false);
+        });
 
-    ["dragleave", "drop"].forEach(eventName => {
-        dropZone.addEventListener(eventName, (e) => {
-            e.preventDefault();
-            dropZone.classList.remove("hover");
-        }, false);
-    });
+        ["dragleave", "drop"].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.remove("hover");
+            }, false);
+        });
 
-    dropZone.addEventListener("drop", (e) => {
-        const dt = e.dataTransfer;
-        handleFileSelection(dt.files[0]);
-    });
+        dropZone.addEventListener("drop", (e) => {
+            const dt = e.dataTransfer;
+            if (dt && dt.files && dt.files[0]) {
+                handleFileSelection(dt.files[0]);
+            }
+        });
+    }
 
     function handleFileSelection(file) {
         if (!file) return;
@@ -161,13 +168,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const reader = new FileReader();
         reader.onload = (e) => {
             imagePreview.src = e.target.result;
-            dropZone.classList.remove("hidden");
-            previewContainer.classList.remove("hidden");
+            if (dropZonePrompt) dropZonePrompt.classList.add("hidden");
+            if (previewContainer) previewContainer.classList.remove("hidden");
             analyzeBtn.classList.remove("disabled");
             analyzeBtn.disabled = false;
 
             // Automatically run AI Diagnostic as soon as photo is taken
-            showToast("Photo captured! Running AI Health Diagnostic...", "info");
+            showToast("Photo loaded! Running AI Health Diagnostic...", "info");
             setTimeout(() => {
                 analyzeBtn.click();
             }, 300);
@@ -178,7 +185,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Sample Chip Buttons 1-Click Test Handler
     const sampleBtns = document.querySelectorAll(".sample-chip-btn");
     sampleBtns.forEach(btn => {
-        btn.addEventListener("click", async () => {
+        btn.addEventListener("click", async (e) => {
+            e.stopPropagation();
             const url = btn.getAttribute("data-url");
             try {
                 setLoader(true, "Fetching sample image...");
@@ -194,17 +202,21 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    removeBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        selectedFile = null;
-        fileInput.value = "";
-        if (nativeCameraInput) nativeCameraInput.value = "";
-        dropZone.classList.add("hidden");
-        previewContainer.classList.add("hidden");
-        imagePreview.src = "";
-        analyzeBtn.classList.add("disabled");
-        analyzeBtn.disabled = true;
-    });// Camera Stream Handlers
+    if (removeBtn) {
+        removeBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            selectedFile = null;
+            if (fileInput) fileInput.value = "";
+            if (nativeCameraInput) nativeCameraInput.value = "";
+            if (dropZonePrompt) dropZonePrompt.classList.remove("hidden");
+            if (previewContainer) previewContainer.classList.add("hidden");
+            imagePreview.src = "";
+            analyzeBtn.classList.add("disabled");
+            analyzeBtn.disabled = true;
+        });
+    }
+
+    // Camera Stream Handlers
     const switchCameraBtn = document.getElementById("switch-camera-btn");
     let currentFacingMode = "environment";
 
@@ -220,12 +232,22 @@ document.addEventListener("DOMContentLoaded", () => {
             cameraModal.classList.remove("hidden");
         } catch (err) {
             console.error("Camera access error:", err);
-            showToast("Could not access device camera. Please allow camera permissions.", "error");
+            // Fallback to native camera input or file picker if getUserMedia fails
+            if (nativeCameraInput) {
+                nativeCameraInput.click();
+            } else if (fileInput) {
+                fileInput.click();
+            } else {
+                showToast("Could not access device camera. Please allow camera permissions.", "error");
+            }
         }
     }
 
     if (openCameraBtn) {
-        openCameraBtn.addEventListener("click", () => startCamera(currentFacingMode));
+        openCameraBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            startCamera(currentFacingMode);
+        });
     }
 
     if (switchCameraBtn) {
@@ -305,12 +327,22 @@ document.addEventListener("DOMContentLoaded", () => {
             // Handle OOD safety fallbacks
             if (result.is_ood) {
                 safetyWarning.classList.remove("hidden");
-                if (result.detected_object) {
-                    safetyDesc.innerText = `This image looks like: '${result.detected_object}'. The AI system is trained strictly on plant crop diseases.`;
+                const obj = result.detected_object ? result.detected_object : "";
+                const plantFoods = ["cabbage", "broccoli", "cauliflower", "lettuce", "spinach", "kale",
+                    "tomato", "potato", "pepper", "corn", "wheat", "rice", "apple", "grape", "strawberry",
+                    "peach", "cherry", "orange", "banana", "mango", "leaf", "plant", "flower", "vegetable",
+                    "fruit", "crop", "herb", "tree", "mushroom", "onion", "garlic", "carrot", "bean", "pea"];
+                const objLower = obj.toLowerCase();
+                const looksLikePlant = plantFoods.some(p => objLower.includes(p));
+                
+                if (looksLikePlant && obj) {
+                    safetyDesc.innerText = `Detected: '${obj}'. This appears to be a plant/food item but doesn't match our 38 trained disease categories. Try selecting the specific crop above and re-upload.`;
+                } else if (obj) {
+                    safetyDesc.innerText = `This image looks like: '${obj}'. Please upload a clear, close-up photo of a plant leaf with visible disease symptoms.`;
                 } else {
-                    safetyDesc.innerText = "This image is highly anomalous and does not contain recognizable plant foliage.";
+                    safetyDesc.innerText = "Image quality or content could not be confirmed as a plant leaf. Please upload a clear, close-up photo showing disease symptoms on a leaf.";
                 }
-                showToast("Out-of-Distribution anomaly blocked for safety.", "info");
+                showToast("Please upload a clear plant leaf image for best results.", "info");
             } else {
                 safetyWarning.classList.add("hidden");
             }
