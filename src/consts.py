@@ -15,14 +15,14 @@ IMAGE_SIZE = 224      # Standard for ViT/ResNet
 # Hardware configuration
 # Safe hardware check: verify CUDA can actually allocate tensors before setting DEVICE = "cuda"
 def get_safe_device():
-    try:
-        if torch.cuda.is_available():
-            # Test tensor allocation to catch asynchronous CUDA driver errors
-            test_t = torch.zeros(1, device="cuda")
-            del test_t
-            return "cuda"
-    except Exception as e:
-        print(f"Notice: CUDA check failed ({e}). Defaulting inference hardware to CPU.")
+    if os.environ.get("USE_CUDA", "0") == "1":
+        try:
+            if torch.cuda.is_available():
+                test_t = torch.zeros(1, device="cuda")
+                del test_t
+                return "cuda"
+        except Exception as e:
+            print(f"Notice: CUDA check failed ({e}). Defaulting inference hardware to CPU.")
     return "cpu"
 
 DEVICE = get_safe_device()

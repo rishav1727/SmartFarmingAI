@@ -93,6 +93,19 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // 2b. Safe JSON parser — prevents "Unexpected token '<'" when server returns HTML error page
+    async function safeJson(response) {
+        const text = await response.text();
+        try {
+            return JSON.parse(text);
+        } catch {
+            if (text.trim().startsWith("<")) {
+                throw new Error("Backend server is offline. Please start it: python -m uvicorn src.app:app --port 8000 --reload");
+            }
+            throw new Error("Invalid server response: " + text.slice(0, 120));
+        }
+    }
+
     // 3. Drop Zone & File Selection
     const nativeCameraInput = document.getElementById("native-camera-input");
     const browseGalleryBtn = document.getElementById("browse-gallery-btn");
@@ -310,11 +323,17 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || "Server inference error");
+                const contentType = response.headers.get("content-type") || "";
+                if (contentType.includes("application/json")) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || "Server inference error");
+                } else {
+                    // HTML 404/500 page returned — backend is likely not running
+                    throw new Error("AI backend server is not running. Please start the Python server with: python -m uvicorn src.app:app --port 8000");
+                }
             }
             
-            const result = await response.json();
+            const result = await safeJson(response);
             currentDiagnosis = result;
             
             // Render basic details
@@ -352,6 +371,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (result.heatmap_url) {
                 heatmapImage.src = result.heatmap_url;
                 explainCard.classList.remove("hidden");
+                triggerHeatmapScanAnimation();
             } else {
                 explainCard.classList.add("hidden");
             }
@@ -413,10 +433,10 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             
             if (!response.ok) {
-                throw new Error("Failed to fetch advice");
+                throw new Error("Treatment advice server error. Ensure the Python backend is running.");
             }
             
-            const advice = await response.json();
+            const advice = await safeJson(response);
             
             function formatAdviceHTML(text) {
                 if (!text) return "";
@@ -436,6 +456,120 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Advice Error:", err);
             showToast("Failed to fetch custom treatment advice.", "error");
         }
+    }
+
+    // ==========================================
+    // 5b. HEATMAP ANIMATION & CONTROLS MODULE
+    // ==========================================
+    const heatmapAutoBtn = document.getElementById("heatmap-auto-btn");
+    const heatmapFreezeBtn = document.getElementById("heatmap-freeze-btn");
+    const heatmapRescanBtn = document.getElementById("heatmap-rescan-btn");
+    const aiScanBeam = document.getElementById("ai-scan-beam");
+    const heatmapScanLabel = document.getElementById("heatmap-scan-label");
+    const heatmapScanText = document.getElementById("heatmap-scan-text");
+    const hotspotMarkers = document.getElementById("hotspot-markers");
+    const heatmapComparison = document.getElementById("heatmap-comparison");
+
+    if (opacitySlider && heatmapImage) {
+        opacitySlider.addEventListener("input", (e) => {
+            if (heatmapImage.classList.contains("auto-pulsing")) {
+                heatmapImage.classList.remove("auto-pulsing");
+                if (heatmapAutoBtn) heatmapAutoBtn.classList.remove("active");
+                if (heatmapFreezeBtn) heatmapFreezeBtn.classList.add("active");
+            }
+            heatmapImage.style.opacity = e.target.value / 100;
+        });
+    }
+
+    function setHeatmapMode(mode) {
+        if (!heatmapImage) return;
+        if (mode === "auto") {
+            heatmapImage.classList.add("auto-pulsing");
+            if (heatmapAutoBtn) heatmapAutoBtn.classList.add("active");
+            if (heatmapFreezeBtn) heatmapFreezeBtn.classList.remove("active");
+        } else if (mode === "freeze") {
+            heatmapImage.classList.remove("auto-pulsing");
+            if (opacitySlider) heatmapImage.style.opacity = opacitySlider.value / 100;
+            if (heatmapAutoBtn) heatmapAutoBtn.classList.remove("active");
+            if (heatmapFreezeBtn) heatmapFreezeBtn.classList.add("active");
+        }
+    }
+
+    if (heatmapAutoBtn) {
+        heatmapAutoBtn.addEventListener("click", () => setHeatmapMode("auto"));
+    }
+    if (heatmapFreezeBtn) {
+        heatmapFreezeBtn.addEventListener("click", () => setHeatmapMode("freeze"));
+    }
+    if (heatmapRescanBtn) {
+        heatmapRescanBtn.addEventListener("click", () => triggerHeatmapScanAnimation());
+    }
+
+    function triggerHeatmapScanAnimation() {
+        if (!aiScanBeam || !heatmapScanLabel) return;
+
+        // Reset beam & markers
+        aiScanBeam.classList.remove("scanning");
+        heatmapScanLabel.classList.remove("visible");
+        if (heatmapImage) heatmapImage.classList.remove("auto-pulsing");
+        if (hotspotMarkers) hotspotMarkers.innerHTML = "";
+
+        // Trigger scan beam
+        void aiScanBeam.offsetWidth; // reflow trigger
+        aiScanBeam.classList.add("scanning");
+        heatmapScanLabel.classList.add("visible");
+        if (heatmapScanText) heatmapScanText.innerText = "Vision Transformer Scanning Leaf...";
+
+        // Step 1: Status text update mid-scan
+        setTimeout(() => {
+            if (heatmapScanText) heatmapScanText.innerText = "Computing Grad-CAM Attention Map...";
+        }, 1000);
+
+        // Step 2: Scan completes — flash overlay & spawn hotspot pulse targets
+        setTimeout(() => {
+            if (heatmapScanText) heatmapScanText.innerText = "Infection Hotspots Identified!";
+            
+            // Add flash effect
+            if (heatmapComparison) {
+                const flash = document.createElement("div");
+                flash.className = "heatmap-flash";
+                heatmapComparison.appendChild(flash);
+                setTimeout(() => flash.remove(), 600);
+            }
+
+            // Inject 3 disease hotspot targets
+            if (hotspotMarkers) {
+                const spots = [
+                    { top: "35%", left: "48%" },
+                    { top: "52%", left: "62%" },
+                    { top: "68%", left: "38%" }
+                ];
+                spots.forEach((pos, idx) => {
+                    setTimeout(() => {
+                        const spot = document.createElement("div");
+                        spot.className = "hotspot visible";
+                        spot.style.top = pos.top;
+                        spot.style.left = pos.left;
+                        spot.innerHTML = `
+                            <div class="hotspot-ring"></div>
+                            <div class="hotspot-ring"></div>
+                            <div class="hotspot-ring"></div>
+                            <div class="hotspot-core"></div>
+                        `;
+                        hotspotMarkers.appendChild(spot);
+                    }, idx * 250);
+                });
+            }
+
+            // Start auto pulse mode
+            setHeatmapMode("auto");
+
+        }, 2200);
+
+        // Step 3: Hide scan status badge
+        setTimeout(() => {
+            heatmapScanLabel.classList.remove("visible");
+        }, 4500);
     }
 
     // Dynamic Client-side UI i18n Translation Dictionary
@@ -911,7 +1045,7 @@ function applyLanguageUI(selectedLang) {
     if (whatsappShareBtn) {
         whatsappShareBtn.addEventListener("click", () => {
             const diseaseEl = document.getElementById("disease-name");
-            const confEl = document.getElementById("confidence-text");
+            const confEl = document.getElementById("confidence-percentage");
             const diseaseTitle = diseaseEl ? diseaseEl.textContent.trim() : "Crop Diagnosis";
             const confidence = confEl ? confEl.textContent.trim() : "";
             const shareText = `🌾 *SmartFarming AI Diagnosis Report*\n\n📌 *Disease / Condition:* ${diseaseTitle}\n📊 *Confidence:* ${confidence}\n\nGenerated via SmartFarming AI Crop Doctor.`;
@@ -1238,7 +1372,7 @@ function applyLanguageUI(selectedLang) {
 
             if (!response.ok) throw new Error("Server error during chat query");
 
-            const data = await response.json();
+            const data = await safeJson(response);
             if (tempBotMsg) tempBotMsg.remove();
 
             appendChatMessage("bot", data.reply);
