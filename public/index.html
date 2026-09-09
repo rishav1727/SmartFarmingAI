@@ -11,16 +11,21 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="glass-bg"></div>
+    <div class="glass-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
     
     <header>
         <div class="logo">
-            <i class="fa-solid fa-leaf-list logo-icon"></i>
+            <div class="logo-icon-wrap">
+                <i class="fa-solid fa-leaf logo-icon"></i>
+            </div>
             <h1>SmartFarming<span>.AI</span></h1>
         </div>
         <div class="header-actions">
@@ -65,7 +70,7 @@
     </header>
 
     <!-- Plantix-Style Crop Selection Pills & Search -->
-    <div class="crop-pills-container glass-card" style="padding: 14px 20px; margin: 16px 40px 0;">
+    <div class="crop-pills-container glass-card">
         <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
             <div class="crop-search-wrapper" style="position: relative; width: 100%;">
                 <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #10b981;"></i>
@@ -99,29 +104,62 @@
         </div>
     </div>
 
+
     <!-- Plantix 3-Step How-It-Works Banner -->
-    <div class="steps-banner glass-card" style="display:flex; flex-direction:row; align-items:center; justify-content:space-around; gap:20px; padding:18px 32px; margin:16px 40px 0; overflow-x:auto;">
-        <div class="step-item" style="display:flex; flex-direction:row; align-items:center; gap:14px; flex-shrink:0;">
+    <div class="steps-banner glass-card">
+        <div class="step-item">
             <div class="step-num">1</div>
-            <div class="step-text" style="display:flex; flex-direction:column;">
-                <strong data-i18n="step1Title" style="font-size:14px; font-weight:700; color:#f8fafc;">Snap Infected Leaf</strong>
-                <span data-i18n="step1Sub" style="font-size:12px; color:#94a3b8;">Take a close photo of crop leaf</span>
+            <div class="step-text">
+                <strong data-i18n="step1Title">Snap Infected Leaf</strong>
+                <span data-i18n="step1Sub">Take a close photo of crop leaf</span>
             </div>
         </div>
-        <i class="fa-solid fa-chevron-right step-arrow" style="color:#10b981; font-size:18px; flex-shrink:0;"></i>
-        <div class="step-item" style="display:flex; flex-direction:row; align-items:center; gap:14px; flex-shrink:0;">
+        <i class="fa-solid fa-chevron-right step-arrow"></i>
+        <div class="step-item">
             <div class="step-num">2</div>
-            <div class="step-text" style="display:flex; flex-direction:column;">
-                <strong data-i18n="step2Title" style="font-size:14px; font-weight:700; color:#f8fafc;">AI Heatmap Check</strong>
-                <span data-i18n="step2Sub" style="font-size:12px; color:#94a3b8;">Grad-CAM spots disease area</span>
+            <div class="step-text">
+                <strong data-i18n="step2Title">AI Heatmap Check</strong>
+                <span data-i18n="step2Sub">Grad-CAM spots disease area</span>
             </div>
         </div>
-        <i class="fa-solid fa-chevron-right step-arrow" style="color:#10b981; font-size:18px; flex-shrink:0;"></i>
-        <div class="step-item" style="display:flex; flex-direction:row; align-items:center; gap:14px; flex-shrink:0;">
+        <i class="fa-solid fa-chevron-right step-arrow"></i>
+        <div class="step-item">
             <div class="step-num">3</div>
-            <div class="step-text" style="display:flex; flex-direction:column;">
-                <strong data-i18n="step3Title" style="font-size:14px; font-weight:700; color:#f8fafc;">3-Pillar Treatment</strong>
-                <span data-i18n="step3Sub" style="font-size:12px; color:#94a3b8;">Get Chemical, Organic &amp; Voice advice</span>
+            <div class="step-text">
+                <strong data-i18n="step3Title">3-Pillar Treatment</strong>
+                <span data-i18n="step3Sub">Get Chemical, Organic &amp; Voice advice</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Strip -->
+    <div class="stats-strip glass-card">
+        <div class="stat-item">
+            <div class="stat-icon"><i class="fa-solid fa-virus"></i></div>
+            <div class="stat-text">
+                <strong>38+</strong>
+                <span>Diseases Detected</span>
+            </div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon"><i class="fa-solid fa-seedling"></i></div>
+            <div class="stat-text">
+                <strong>14</strong>
+                <span>Crops Supported</span>
+            </div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon"><i class="fa-solid fa-chart-simple"></i></div>
+            <div class="stat-text">
+                <strong>98.2%</strong>
+                <span>Model Accuracy</span>
+            </div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon"><i class="fa-solid fa-globe"></i></div>
+            <div class="stat-text">
+                <strong>22</strong>
+                <span>Indian Languages</span>
             </div>
         </div>
     </div>
@@ -275,26 +313,70 @@
             <!-- Heatmap / Explainable AI Card -->
             <div id="explain-card" class="card glass-card explain-card hidden">
                 <div class="explain-header">
-                    <h2><i class="fa-solid fa-eye-dropper"></i> Explainable AI (Grad-CAM)</h2>
-                    <span class="badge">Attention Heatmap</span>
+                    <h2><i class="fa-solid fa-brain"></i> Explainable AI — Grad-CAM Heatmap</h2>
+                    <span class="badge heatmap-badge"><i class="fa-solid fa-circle-dot pulse-dot"></i> Live Analysis</span>
                 </div>
-                <p class="subtitle">The heatmap highlights the exact regions on the leaf that led to the diagnosis.</p>
-                
+                <p class="subtitle">Watch the AI scan the leaf and highlight infected regions using Vision Transformer attention maps.</p>
+
+                <!-- Heatmap Viewer -->
                 <div class="viewer-container">
-                    <div class="heatmap-comparison">
-                        <!-- Original Image Background -->
+                    <div class="heatmap-comparison" id="heatmap-comparison">
+                        <!-- Base leaf image -->
                         <img id="base-image" class="blend-image base" src="" alt="Base crop leaf">
-                        <!-- Blended Heatmap Overlay -->
+                        <!-- Grad-CAM overlay -->
                         <img id="heatmap-image" class="blend-image overlay" src="" alt="Grad-CAM overlay" style="opacity: 0.5;">
+
+                        <!-- AI Scan beam (animates on reveal) -->
+                        <div class="ai-scan-beam" id="ai-scan-beam"></div>
+
+                        <!-- Scan status label -->
+                        <div class="heatmap-scan-label" id="heatmap-scan-label">
+                            <i class="fa-solid fa-microchip"></i>
+                            <span id="heatmap-scan-text">Scanning leaf...</span>
+                        </div>
+
+                        <!-- Hotspot markers (injected by JS) -->
+                        <div id="hotspot-markers" class="hotspot-markers"></div>
                     </div>
-                    
+
+                    <!-- Auto-pulse toggle row -->
+                    <div class="heatmap-controls-row">
+                        <button class="heatmap-ctrl-btn active" id="heatmap-auto-btn">
+                            <i class="fa-solid fa-play"></i> Auto Pulse
+                        </button>
+                        <button class="heatmap-ctrl-btn" id="heatmap-freeze-btn">
+                            <i class="fa-solid fa-pause"></i> Freeze
+                        </button>
+                        <button class="heatmap-ctrl-btn" id="heatmap-rescan-btn">
+                            <i class="fa-solid fa-rotate"></i> Re-Scan
+                        </button>
+                    </div>
+
+                    <!-- Slider -->
                     <div class="slider-control">
                         <span><i class="fa-regular fa-image"></i> Leaf</span>
                         <input type="range" id="opacity-slider" min="0" max="100" value="50" class="styled-slider">
                         <span>Heatmap <i class="fa-solid fa-fire"></i></span>
                     </div>
+
+                    <!-- Color legend -->
+                    <div class="heatmap-legend">
+                        <div class="legend-item">
+                            <span class="legend-swatch" style="background: linear-gradient(90deg, #00f 0%, #0ff 100%);"></span>
+                            <span>Low Attention</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-swatch" style="background: linear-gradient(90deg, #0f0 0%, #ff0 100%);"></span>
+                            <span>Moderate</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-swatch" style="background: linear-gradient(90deg, #f80 0%, #f00 100%);"></span>
+                            <span>High — Disease Focus</span>
+                        </div>
+                    </div>
                 </div>
             </div>
+
 
             <!-- Treatment Recommendation (Cure) Card -->
             <div id="treatment-card" class="card glass-card treatment-card hidden">
@@ -391,6 +473,7 @@
             
             <div class="chat-input-area">
                 <input type="text" id="chat-input" placeholder="Type your query here..." disabled>
+                <button id="mic-btn" class="chat-send-btn" type="button" title="Voice input" disabled style="background: rgba(255,255,255,0.05); color: #64748b;"><i class="fa-solid fa-microphone"></i></button>
                 <button id="chat-send-btn" class="chat-send-btn" disabled><i class="fa-solid fa-paper-plane"></i></button>
             </div>
         </div>
