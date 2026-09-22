@@ -1,0 +1,23 @@
+GRAPE DISEASE CROP MANAGEMENT GUIDE
+
+1. Grape Black Rot (Guignardia bidwellii)
+Symptoms: Circular tan to brown leaf spots with dark borders. Small black fruiting bodies (pycnidia) visible in the center of leaf spots. Berries shrivel and become black mummified raisins attached to the cluster.
+Treatment and Cure:
+- Chemical Control: Apply Mancozeb 75% WP at 2g/L from bud break onwards. Myclobutanil 10% WP at 1g/L after bloom. Tebuconazole 25.9% EC at 1ml/L for systemic control. Spray every 7-10 days during wet weather.
+- Biological Control: Bacillus subtilis (Serenade) as preventive foliar spray. Copper sulfate solution (3g/L) as Bordeaux mixture spray before bud break.
+- Preventative Control: Remove and destroy all mummified berries and infected canes during winter pruning. Maintain open canopy through leaf removal to improve air circulation. Use drip irrigation to keep foliage dry.
+- Fungicide: Mancozeb, Myclobutanil, Tebuconazole, Copper Sulfate, Captan
+
+2. Grape Powdery Mildew (Erysiphe necator)
+Symptoms: White to gray powdery coating on leaves, shoots, and berries. Affected leaves may curl, distort, and drop prematurely. Infected berries crack and develop off-flavor.
+Treatment and Cure:
+- Chemical Control: Sulfur-based fungicides (Wettable Sulfur 80% WP) at 3g/L applied every 7-14 days. Myclobutanil 10% WP at 1g/L. Azoxystrobin at 1ml/L for systemic control.
+- Biological Control: Neem oil (5ml/L) + soap emulsifier. Potassium bicarbonate (5g/L) as contact fungicide.
+- Preventative Control: Maintain open vine canopy. Avoid excess nitrogen fertilization. Plant powdery mildew resistant grape varieties.
+
+3. Grape Downy Mildew (Plasmopara viticola)
+Symptoms: Yellow oil spots on upper leaf surfaces. White cottony growth (sporulation) on leaf undersides. Berries turn brown and shrivel.
+Treatment and Cure:
+- Chemical Control: Copper Oxychloride 50% WP at 3g/L as preventive. Metalaxyl + Mancozeb for curative action. Dimethomorph + Mancozeb alternated with copper fungicides.
+- Biological Control: Bacillus pumilus spray as preventive biocontrol.
+- Preventative Control: Ensure good drainage. Avoid overhead irrigation. Remove infected shoots promptly.

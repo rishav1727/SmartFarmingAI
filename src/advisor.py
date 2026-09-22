@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import numpy as np
 from openai import OpenAI
 from src.consts import MODEL_DIR
@@ -12,14 +13,25 @@ class SmartAdvisor:
         else:
             self.client = None
             print("WARNING: OPENAI_API_KEY not found in environment. Running in Offline Mock mode.")
-            
+
         self.doc_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "documents")
         os.makedirs(self.doc_dir, exist_ok=True)
-        
+
         self.index_path_embeddings = os.path.join(MODEL_DIR, "rag_embeddings.npy")
-        self.index_path_chunks = os.path.join(MODEL_DIR, "rag_chunks.json")
-        
-        self.chunks = []
+        self.index_path_chunks     = os.path.join(MODEL_DIR, "rag_chunks.json")
+        self.cache_path            = os.path.join(MODEL_DIR, "advice_cache.json")
+
+        # ── Pre-computed advice cache (PRIMARY — <2ms lookup) ─────────────
+        self._advice_cache = {}
+        if os.path.exists(self.cache_path):
+            try:
+                with open(self.cache_path, "r", encoding="utf-8") as f:
+                    self._advice_cache = json.load(f)
+                print(f"Loaded advice cache: {len(self._advice_cache)} diseases (instant lookup enabled)")
+            except Exception as e:
+                print(f"Warning: Could not load advice cache ({e}). Falling back to LLM.")
+
+        self.chunks    = []
         self.embeddings = None
         self.load_index()
 
@@ -204,10 +216,10 @@ class SmartAdvisor:
         return retrieved[:top_k]
 
     def get_treatment_advice(self, disease_name, confidence, language="English"):
-        """Get structured treatment recommendations, leveraging RAG if available."""
+        """Get structured treatment recommendations — Cache → RAG+LLM → Mock fallback."""
         # Standardize disease name by replacing underscores
         clean_disease_name = disease_name.replace("___", " - ").replace("_", " ")
-        
+
         # Check for OOD / Safety Fallbacks
         if "not a specialized plant" in clean_disease_name.lower() or "uncertain" in clean_disease_name.lower() or "unknown" in clean_disease_name.lower():
             is_hindi = language.lower() == "hindi"
@@ -227,18 +239,34 @@ class SmartAdvisor:
                     "preventative": "Guidance: Please upload a clear, high-resolution close-up photo of a crop leaf.",
                     "advice": "To run a valid diagnosis, please submit leaf images for supported agricultural plants."
                 }
-        
-        # 1. RAG search
+
+        # ── 1. PRE-COMPUTED CACHE LOOKUP (<2ms) ───────────────────────────
+        # Try exact disease_name key first, then clean_disease_name
+        _t0 = time.perf_counter()
+        for _key in [disease_name, clean_disease_name]:
+            if _key in self._advice_cache:
+                lang_data = self._advice_cache[_key]
+                # Language match: exact → English fallback
+                result = lang_data.get(language) or lang_data.get("English")
+                if result:
+                    _ms = (time.perf_counter() - _t0) * 1000
+                    print(f"Cache HIT: '{_key}' [{language}] in {_ms:.2f}ms")
+                    return result
+
+        print(f"Cache MISS for '{disease_name}' [{language}] — falling back to LLM/Mock")
+
+        # ── 2. RAG search ─────────────────────────────────────────────────
         context_str = ""
         retrieved_items = self.retrieve_context(clean_disease_name, top_k=2)
         if retrieved_items:
             context_chunks = [f"[Source: {item['chunk']['source']}] {item['chunk']['text']}" for item in retrieved_items]
             context_str = "\n\n".join(context_chunks)
             print(f"RAG context retrieved for '{clean_disease_name}': {len(retrieved_items)} chunks.")
-            
-        # 2. Call OpenAI or fall back to mock
+
+        # ── 3. Call OpenAI or fall back to mock ───────────────────────────
         if not self.client:
             return self._get_mock_advice(clean_disease_name, confidence, language)
+
             
         try:
             system_prompt = (

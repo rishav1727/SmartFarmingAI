@@ -1,0 +1,23 @@
+TOMATO DISEASE CROP MANAGEMENT GUIDE
+
+1. Tomato Late Blight (Phytophthora infestans)
+Symptoms: Water-soaked lesions on leaves that turn brown-black rapidly. White mold visible on undersides of leaves in humid conditions. Fruit develops greasy-looking dark patches.
+Treatment and Cure:
+- Chemical Control: Apply Mancozeb 75% WP at 2g per liter of water as a preventive spray. For active infection, use Metalaxyl-M 4% + Mancozeb 40% WP (Ridomil Gold) at 2.5g/L. Systemic fungicides like Cymoxanil + Mancozeb can be alternated.
+- Biological Control: Spray Bacillus subtilis (0.5% WP) at 5g/L. Trichoderma viride suspension at 10g/L as soil drench to suppress root infection.
+- Preventative Control: Avoid overhead irrigation; use drip irrigation. Destroy infected plant debris. Ensure good airflow by proper plant spacing (60cm between plants). Apply copper-based fungicides as protectant at early flowering stage.
+- Fungicide: Mancozeb, Metalaxyl, Cymoxanil, Copper Oxychloride
+
+2. Tomato Early Blight (Alternaria solani)
+Symptoms: Brown concentric rings forming a target-board pattern on older leaves. Leaf yellowing around spots leads to defoliation. Dark lesions also appear on stems and fruit.
+Treatment and Cure:
+- Chemical Control: Apply Chlorothalonil 75% WP at 2g/L or Mancozeb 75% WP at 2g/L every 7-10 days. Tebuconazole 250 EC at 1ml/L for systemic control.
+- Biological Control: Neem oil (5ml/L) + soap emulsifier sprays every 7 days. Trichoderma harzianum as biocontrol agent.
+- Preventative Control: Remove and burn infected leaves. Rotate crops every 2-3 years. Avoid water stress and excessive nitrogen fertilization.
+
+3. Tomato Leaf Mold (Passalora fulva)
+Symptoms: Yellow spots on upper leaf surfaces with olive-green to brown velvety mold patches on undersides. Leaves eventually wilt and fall.
+Treatment and Cure:
+- Chemical Control: Apply Copper Oxychloride 50% WP at 2.5g/L. Mancozeb 75% WP at 2g/L as preventive spray. Azoxystrobin at 1ml/L for systemic control.
+- Biological Control: Trichoderma viride 5g/L foliar spray. Pseudomonas fluorescens 10ml/L.
+- Preventative Control: Maintain greenhouse humidity below 85%. Prune lower leaves. Ensure adequate ventilation. Use resistant tomato varieties.

@@ -4,75 +4,99 @@ import torch.nn.functional as F
 import numpy as np
 from PIL import Image, ImageOps
 
+
 class GradCAM:
-    def __init__(self, model, target_layer):
-        self.model = model
-        self.target_layer = target_layer
-        self.gradients = None
-        self.activations = None
-        
-        # Hook to capture activations and gradients
-        self.target_layer.register_forward_hook(self.save_activation)
-        self.target_layer.register_full_backward_hook(self.save_gradient)
+    """
+    Gradient-based Saliency for Vision Transformer (ViT-B/16).
 
-    def save_activation(self, module, input, output):
-        self.activations = output
+    Standard Grad-CAM (encoder-layer hooks) produces zero heatmaps on ViT
+    because the weighted sum of activations and gradients collapses to zero
+    after ReLU in the ViT encoder.
 
-    def save_gradient(self, module, grad_input, grad_output):
-        self.gradients = grad_output[0]
+    This implementation uses INPUT-GRADIENT SALIENCY (∂score/∂input_pixels)
+    which works correctly on all architectures including ViT:
+      1. Forward pass → predicted class score
+      2. Backward pass → gradient of score w.r.t. input image pixels (3,H,W)
+      3. Aggregate over RGB channels → spatial saliency map (H,W)
+      4. Pool to 14×14 patch grid → Grad-CAM-equivalent heatmap
+
+    The target_layer parameter is kept for API compatibility but is unused.
+    """
+
+    def __init__(self, model, target_layer=None):
+        self.model        = model
+        self.target_layer = target_layer  # kept for API compatibility
 
     def generate_heatmap(self, input_tensor, category_index=None):
-        self.model.eval()
-        output = self.model(input_tensor)
-        
-        if category_index is None:
-            category_index = torch.argmax(output)
-            
-        self.model.zero_grad()
-        output[0, category_index].backward()
+        """
+        Parameters
+        ----------
+        input_tensor : torch.Tensor  shape (1, 3, H, W)
+                       Must be a FRESH tensor with requires_grad=True.
+        category_index : int or None
 
-        # For Vision Transformers (ViT), target layer output is (Batch, Seq_len, Hidden_dim)
-        # We ignore CLS token (index 0) and reshape remaining 196 tokens to 14x14 grid
-        if self.gradients is not None and self.activations is not None:
-            gradients = self.gradients[0, 1:, :] # (196, 768)
-            activations = self.activations[0, 1:, :] # (196, 768)
-            
-            # Pool gradients
-            weights = torch.mean(gradients, dim=0) # (768,)
-            cam = torch.matmul(activations, weights) # (196,)
-            cam = cam.reshape(14, 14).detach().cpu().numpy()
+        Returns
+        -------
+        cam : np.ndarray  shape (14, 14), values in [0, 1]
+        """
+        if not input_tensor.requires_grad:
+            input_tensor.requires_grad_(True)
+
+        self.model.zero_grad()
+
+        with torch.enable_grad():
+            output = self.model(input_tensor)          # (1, num_classes)
+
+            if category_index is None:
+                category_index = torch.argmax(output[0]).item()
+
+            score = output[0, category_index]
+            score.backward()                           # d(score)/d(input)
+
+        if input_tensor.grad is None:
+            print("  [WARN] No gradient on input_tensor — returning uniform heatmap")
+            return np.ones((14, 14), dtype=np.float32) * 0.5
+
+        # Gradient saliency: (3, H, W) → mean over RGB → (H, W)
+        grad_map = input_tensor.grad[0].abs().mean(dim=0)  # (H, W)
+
+        # Pool to 14×14 patch grid (matches ViT patch tokens)
+        cam_14 = F.adaptive_avg_pool2d(
+            grad_map.unsqueeze(0).unsqueeze(0), (14, 14)
+        )[0, 0].detach().cpu().numpy()
+
+        # ReLU + min-max normalize to [0, 1]
+        cam_14 = np.maximum(cam_14, 0)
+        cmin, cmax = cam_14.min(), cam_14.max()
+        if cmax - cmin > 1e-8:
+            cam_14 = (cam_14 - cmin) / (cmax - cmin)
         else:
-            # Fallback synthetic attention matrix if hook missed
-            cam = np.random.rand(14, 14)
-            
-        # ReLU and normalize
-        cam = np.maximum(cam, 0)
-        cam = (cam - cam.min()) / (cam.max() - cam.min() + 1e-8)
-        
-        return cam
+            cam_14 = np.zeros_like(cam_14)
+
+        return cam_14.astype(np.float32)
+
 
 def jet_colormap(gray_array):
-    """Pure NumPy JET colormap generator (0.0 -> Blue, 0.5 -> Green, 1.0 -> Red)."""
+    """Pure NumPy JET colormap (0.0→Blue, 0.5→Green, 1.0→Red)."""
     x = np.clip(gray_array, 0.0, 1.0)
     r = np.clip(1.5 - np.abs(4.0 * x - 3.0), 0.0, 1.0)
     g = np.clip(1.5 - np.abs(4.0 * x - 2.0), 0.0, 1.0)
     b = np.clip(1.5 - np.abs(4.0 * x - 1.0), 0.0, 1.0)
     return (np.stack([r, g, b], axis=-1) * 255).astype(np.uint8)
 
+
 def overlay_heatmap(img_path, heatmap, alpha=0.55):
-    """Overlays Grad-CAM attention heatmap on the input crop leaf photo."""
-    pil_img = Image.open(img_path)
-    pil_img = ImageOps.exif_transpose(pil_img).convert("RGB")
+    """Overlay gradient saliency heatmap on the original image."""
+    pil_img     = Image.open(img_path)
+    pil_img     = ImageOps.exif_transpose(pil_img).convert("RGB")
     img_resized = pil_img.resize((224, 224), Image.Resampling.BILINEAR)
-    img_arr = np.array(img_resized, dtype=np.uint8).copy()
-    
-    # Resize heatmap to 224x224
-    cam_pil = Image.fromarray((heatmap * 255).astype(np.uint8)).resize((224, 224), Image.Resampling.BILINEAR)
-    cam_norm = np.array(cam_pil, dtype=np.float32).copy() / 255.0
-    
-    # Apply JET colormap
+    img_arr     = np.array(img_resized, dtype=np.uint8).copy()
+
+    cam_pil  = Image.fromarray((heatmap * 255).astype(np.uint8)).resize(
+        (224, 224), Image.Resampling.BILINEAR
+    )
+    cam_norm    = np.array(cam_pil, dtype=np.float32) / 255.0
     heatmap_rgb = jet_colormap(cam_norm)
-    
-    # Alpha blend image with heatmap
+
     blended = (img_arr * (1.0 - alpha) + heatmap_rgb * alpha).astype(np.uint8)
     return Image.fromarray(blended)

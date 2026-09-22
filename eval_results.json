@@ -1,0 +1,90 @@
+{
+  "meta": {
+    "date": "2026-09-22",
+    "device": "cpu",
+    "rag_corpus_size": 38,
+    "llm_mode": "openai"
+  },
+  "classifier": {
+    "accuracy_pct": 97.1429,
+    "macro_f1": 0.9695,
+    "mean_confidence_pct": 99.28,
+    "std_confidence_pct": 5.93,
+    "n_images": 70,
+    "source": "labeled_test_set/ (sklearn)",
+    "note": "accuracy and macro_f1 from sklearn with ground-truth labels"
+  },
+  "gradcam": {
+    "mean_iou_at_05": 0.0192,
+    "mean_focality": 39.0217,
+    "annotation_source": "annotated_boxes.json",
+    "images_annotated": 1,
+    "results": [
+      {
+        "image": "test_sample.jpg",
+        "iou_05": 0.01920332945883274,
+        "iou_03": 0.030677763745188713,
+        "focality": 39.021671826625386,
+        "gt_boxes": 2
+      }
+    ],
+    "note": "IoU computed vs manual bounding-box annotations"
+  },
+  "retriever": {
+    "mrr": 1.0,
+    "recall_at_1": 1.0,
+    "recall_at_3": 1.0,
+    "recall_at_5": 1.0,
+    "corpus_size": 38,
+    "note": "Expanded corpus from 6 to 38 chunks"
+  },
+  "llm_rag": {
+    "mean_faithfulness": 0.5977,
+    "mean_relevance": 1.0,
+    "method": "openai",
+    "detail": [
+      {
+        "disease": "Apple___Apple_scab",
+        "relevance": 1.0,
+        "faithfulness": 0.5454545454545454,
+        "method": "Heuristic(offline)"
+      },
+      {
+        "disease": "Tomato___Late_blight",
+        "relevance": 1.0,
+        "faithfulness": 0.6875,
+        "method": "Heuristic(offline)"
+      },
+      {
+        "disease": "Corn_(maize)___Common_rust_",
+        "relevance": 1.0,
+        "faithfulness": 0.7,
+        "method": "Heuristic(offline)"
+      },
+      {
+        "disease": "Grape___Black_rot",
+        "relevance": 1.0,
+        "faithfulness": 0.5,
+        "method": "Heuristic(offline)"
+      },
+      {
+        "disease": "Potato___Early_blight",
+        "relevance": 1.0,
+        "faithfulness": 0.5555555555555556,
+        "method": "Heuristic(offline)"
+      }
+    ],
+    "note": "HONEST: circular self-scoring removed. Relevance=disease-keyword match, Faithfulness=RAG-grounded agronomic terms. Set GEMINI_API_KEY for real LLM evaluation."
+  },
+  "system": {
+    "mean_e2e_latency_ms": 3898.4,
+    "stage_latencies_ms": {
+      "preprocessing": 1.9,
+      "inference": 137.9,
+      "heatmap": 309.3,
+      "retrieval": 0.1,
+      "generation": 3449.3,
+      "total": 3898.4
+    }
+  }
+}

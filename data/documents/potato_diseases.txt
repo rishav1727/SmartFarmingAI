@@ -1,0 +1,22 @@
+POTATO DISEASE CROP MANAGEMENT GUIDE
+
+1. Potato Early Blight (Alternaria solani)
+Symptoms: Dark brown to black concentric ring lesions (target-board pattern) appear first on older lower leaves. Yellow halo surrounds each lesion. Severe infection causes defoliation and reduced tuber yield.
+Treatment and Cure:
+- Chemical Control: Apply Mancozeb 75% WP at 2g/L every 7-10 days from 30 days after planting. Chlorothalonil 75% WP at 2g/L as preventive. Tebuconazole 25.9% EC at 1ml/L for systemic control when lesions appear. Azoxystrobin + Difenoconazole (Amistar Top) at 0.75ml/L.
+- Biological Control: Trichoderma viride 10g/L as soil drench plus foliar spray. Pseudomonas fluorescens 10ml/L every 15 days. Neem oil (5ml/L) + soap emulsifier spray.
+- Preventative Control: Use certified disease-free seed tubers. Maintain proper plant spacing (30cm x 60cm) for good airflow. Avoid overhead irrigation; use drip irrigation. Rotate crops with non-solanaceous crops for 2-3 years. Remove and destroy infected plant debris.
+- Fungicide: Mancozeb, Chlorothalonil, Tebuconazole, Azoxystrobin
+
+2. Potato Late Blight (Phytophthora infestans)
+Symptoms: Water-soaked pale green to dark brown irregular lesions on leaves and stems. White cottony mold on leaf undersides in humid conditions. Tubers develop reddish-brown dry rot.
+Treatment and Cure:
+- Chemical Control: Metalaxyl-M 4% + Mancozeb 40% WP (Ridomil Gold) at 2.5g/L immediately at first symptom. Standard Metalaxyl-M fungicide sprays at 1.8g/L under extreme humidity. Cymoxanil + Mancozeb as curative spray. Copper Oxychloride 50% WP at 3g/L as preventive.
+- Biological Control: Bacillus subtilis foliar spray. Trichoderma bio-agent suspension (custom Trichoderma bio-agent suspension per Agronomy Extension Office PDF Bulletin). Copper sulfate Bordeaux mixture (3g/L) as preventive.
+- Preventative Control: Plant blight-resistant potato varieties. Avoid wet foliage conditions; use drip irrigation. Destroy volunteer potato plants. Monitor weather forecasts and spray preventively during cool humid weather.
+
+3. Potato Leaf Roll Virus (PLRV)
+Symptoms: Rolling and yellowing of leaves starting from upper canopy. Leaves become stiff and leathery with a pinkish discoloration on undersides. Affected plants are stunted with reduced tuber yield.
+Treatment and Cure:
+- Chemical Control: No direct chemical treatment for virus. Control aphid vectors with Imidacloprid (0.3ml/L) or Thiamethoxam (0.2g/L) systemic insecticides.
+- Preventative Control: Use certified virus-free seed tubers. Rogue out infected plants early. Control aphid populations that spread the virus.

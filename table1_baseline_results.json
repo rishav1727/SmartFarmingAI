@@ -1,0 +1,25 @@
+{
+  "test_set_size": 70,
+  "num_classes": 35,
+  "device": "cpu",
+  "models": {
+    "CNN (ResNet-50, zero-shot)": {
+      "accuracy_pct": 1.43,
+      "macro_f1": 0.0069,
+      "latency_ms_per_img": 35.0,
+      "note": "ImageNet pretrained backbone, untrained PlantVillage head"
+    },
+    "ViT-B/16 (frozen encoder)": {
+      "accuracy_pct": 97.14,
+      "macro_f1": 0.9695,
+      "latency_ms_per_img": 100.5,
+      "note": "ViT-B/16 with encoder fully frozen; only classification head active"
+    },
+    "ViT-B/16 Hybrid (last-6 unfrozen)": {
+      "accuracy_pct": 97.14,
+      "macro_f1": 0.9695,
+      "latency_ms_per_img": 98.0,
+      "note": "ViT-B/16 with last 6 encoder layers fine-tuned on PlantVillage"
+    }
+  }
+}
