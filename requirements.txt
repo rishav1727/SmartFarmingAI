@@ -11,6 +11,7 @@ opencv-python
 fastapi
 uvicorn
 openai
+google-generativeai
 pypdf
 python-multipart
 requests

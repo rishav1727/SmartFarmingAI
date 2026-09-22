@@ -9,10 +9,12 @@ __pycache__/
 *.pth
 *.pt
 *.onnx
-saved_models/
+saved_models/*
+!saved_models/*.json
 
 # Datasets and Media
-data/
+data/*
+!data/documents/
 *.jpg
 *.jpeg
 *.png

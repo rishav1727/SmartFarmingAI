@@ -1,0 +1,22 @@
+PEPPER (BELL PEPPER / CHILLI) DISEASE CROP MANAGEMENT GUIDE
+
+1. Pepper Bacterial Spot (Xanthomonas campestris pv. vesicatoria)
+Symptoms: Small water-soaked lesions on leaves that enlarge and turn brown to black with yellow halos. Lesions may have a greasy appearance. Infected fruit develops raised corky scabs and sunken spots, reducing marketability.
+Treatment and Cure:
+- Chemical Control: Copper-based bactericides are primary treatment — Copper Oxychloride 50% WP at 3g/L spray every 7-10 days. Copper Hydroxide (Kocide 3000) at 2g/L. Streptomycin Sulfate 90% SP at 1g/L for severe bacterial outbreak (where legally permitted). Bactericide rotation recommended to prevent resistance.
+- Biological Control: Bacillus subtilis (Serenade Opti) foliar spray at 5ml/L every 7 days. Pseudomonas fluorescens 10ml/L as preventive spray. Trichoderma-based bio-fungicide as soil drench to improve root health.
+- Preventative Control: Use certified disease-free transplants. Avoid overhead irrigation; switch to drip irrigation to keep foliage dry. Do not work in the field when plants are wet. Remove and destroy infected plant material. Rotate crops with non-solanaceous crops for 2-3 years. Use copper-resistant variety management. Sanitize farm equipment.
+- Bactericide/Fungicide: Copper Oxychloride, Copper Hydroxide, Streptomycin, Mancozeb
+
+2. Pepper Phytophthora Blight (Phytophthora capsici)
+Symptoms: Water-soaked lesions on leaves, stems, and fruit. Stem lesions girdle the plant causing sudden wilting and collapse. Fruit develops water-soaked lesions that become covered with white mold.
+Treatment and Cure:
+- Chemical Control: Metalaxyl-M + Mancozeb (Ridomil Gold) at 2.5g/L. Propamocarb Hydrochloride (Previcur) as soil drench. Copper Oxychloride 50% WP at 3g/L as foliar spray.
+- Biological Control: Trichoderma harzianum soil drench (10g/L). Pseudomonas fluorescens foliar spray.
+- Preventative Control: Avoid water logging; use raised beds. Ensure proper soil drainage. Rotate away from peppers and other solanaceous crops for 3 years.
+
+3. Pepper Anthracnose (Colletotrichum spp.)
+Symptoms: Circular, sunken, water-soaked lesions on ripening fruit that enlarge and become covered with salmon-orange spore masses. Leaves show small brown spots.
+Treatment and Cure:
+- Chemical Control: Mancozeb 75% WP at 2g/L. Azoxystrobin at 1ml/L. Chlorothalonil 75% WP at 2g/L. Start spray program at first fruit set.
+- Preventative Control: Harvest fruit promptly. Avoid wounds during harvest. Use resistant pepper varieties. Proper post-harvest handling.

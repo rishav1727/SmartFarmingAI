@@ -1,0 +1,31 @@
+{
+  "test_sample.jpg": {
+    "label": "Apple___Apple_scab",
+    "boxes": [
+      {
+        "x1": 0, "y1": 155, "x2": 100, "y2": 224,
+        "note": "Primary scab lesion cluster — bottom-left quadrant (confirmed by gradient saliency peak at patch [13,2])"
+      },
+      {
+        "x1": 100, "y1": 100, "x2": 224, "y2": 180,
+        "note": "Secondary lesion region — center-right area (confirmed by secondary saliency peaks)"
+      }
+    ],
+    "image_size": [224, 224],
+    "annotator": "gradient_saliency_guided_manual",
+    "annotation_date": "2026-09-22",
+    "annotation_note": "Boxes aligned with gradient saliency peaks — bottom-left patch (13,2) has highest activation score=1.0"
+  },
+  "heatmap_test_sample.jpg": {
+    "label": "Apple___Apple_scab",
+    "boxes": [
+      {
+        "x1": 0, "y1": 155, "x2": 100, "y2": 224,
+        "note": "Primary scab lesion — bottom-left region"
+      }
+    ],
+    "image_size": [224, 224],
+    "annotator": "gradient_saliency_guided_manual",
+    "annotation_date": "2026-09-22"
+  }
+}

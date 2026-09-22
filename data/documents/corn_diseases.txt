@@ -1,0 +1,22 @@
+CORN (MAIZE) DISEASE CROP MANAGEMENT GUIDE
+
+1. Corn Common Rust (Puccinia sorghi)
+Symptoms: Small, circular to elongate, brick-red to dark brown pustules on both upper and lower leaf surfaces. Pustules rupture to release powdery rust-colored spores. Severe infections cause premature leaf death.
+Treatment and Cure:
+- Chemical Control: Apply Propiconazole 25% EC at 1ml/L of water. Tebuconazole 25.9% EC at 1ml/L. Azoxystrobin + Propiconazole (Amistar Xtra) at 1ml/L for broad-spectrum control. Spray at first sign of rust pustule appearance.
+- Biological Control: Trichoderma viride suspension (10g/L) as foliar spray. Bacillus amyloliquefaciens applied preventively.
+- Preventative Control: Plant rust-resistant corn hybrids. Avoid late planting to escape peak rust periods. Destroy infected crop residue after harvest. Apply potassium-rich fertilizer to improve plant resistance.
+- Fungicide: Propiconazole, Tebuconazole, Azoxystrobin, Mancozeb
+
+2. Corn Gray Leaf Spot (Cercospora zeae-maydis)
+Symptoms: Rectangular tan to gray lesions bounded by leaf veins. Lesions expand in humid conditions, causing premature leaf senescence.
+Treatment and Cure:
+- Chemical Control: Strobilurin fungicides (Azoxystrobin, Pyraclostrobin) applied at tasseling stage. Triazoles like Propiconazole at 1ml/L every 14 days.
+- Biological Control: Pseudomonas fluorescens spray at 10ml/L. Neem oil 5ml/L as repellent.
+- Preventative Control: Crop rotation with non-host crops for 2 years. Tillage to reduce surface residue. Plant resistant hybrids in areas with high gray leaf spot pressure.
+
+3. Corn Northern Leaf Blight (Exserohilum turcicum)
+Symptoms: Long, cigar-shaped, tan to olive-colored lesions (10-15 cm) on leaves. Lesions develop dark borders and produce dark fungal spores under wet conditions.
+Treatment and Cure:
+- Chemical Control: Mancozeb 75% WP at 2g/L. Propiconazole 25% EC at 1ml/L. Apply at VT (tasseling) and R1 (silking) growth stages.
+- Preventative Control: Plant resistant corn varieties. Maintain proper plant spacing for airflow. Remove and destroy crop debris post harvest.

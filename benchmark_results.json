@@ -1,0 +1,22 @@
+{
+  "before_cache": {
+    "preprocessing": 2.1,
+    "inference": 137.9,
+    "heatmap": 309.3,
+    "retrieval": 0.1,
+    "generation": 3449.3,
+    "total": 3898.4
+  },
+  "after_cache": {
+    "preprocessing": 2.9184800001530675,
+    "inference": 129.9641799996607,
+    "heatmap": 597.6874000001771,
+    "retrieval": 0.09908000010909745,
+    "generation": 0.02156000009563286,
+    "total": 730.6907000001956
+  },
+  "generation_pct_after": 0.0,
+  "speedup_x": 5.3,
+  "ms_saved_per_request": 3167.7,
+  "target_met": true
+}
