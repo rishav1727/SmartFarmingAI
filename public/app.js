@@ -328,8 +328,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     const errorData = await response.json();
                     throw new Error(errorData.detail || "Server inference error");
                 } else {
-                    // HTML 404/500 page returned — backend is likely not running
-                    throw new Error("AI backend server is not running. Please start the Python server with: python -m uvicorn src.app:app --port 8000");
+                    // HTML 502/503/404 page returned (e.g. Render spin-up or gateway timeout)
+                    throw new Error("AI server is initializing or warming up. Please wait 10 seconds and try again.");
                 }
             }
             
