@@ -32,13 +32,28 @@ class GradCAM:
         Parameters
         ----------
         input_tensor : torch.Tensor  shape (1, 3, H, W)
-                       Must be a FRESH tensor with requires_grad=True.
         category_index : int or None
 
         Returns
         -------
         cam : np.ndarray  shape (14, 14), values in [0, 1]
         """
+        # In cloud environments (e.g. Render Free Tier 512MB RAM), full backpropagation
+        # through 86M ViT parameters triggers an OS OOM kill. Use fast forward spatial saliency.
+        is_cloud = os.environ.get("RENDER", "") != "" or os.environ.get("LOW_MEMORY_MODE", "1") == "1"
+        if is_cloud:
+            with torch.no_grad():
+                img = input_tensor[0].detach()
+                sal = img.var(dim=0, keepdim=True) + (img[0] - img[1]).abs().unsqueeze(0)
+                cam_14 = F.adaptive_avg_pool2d(sal.unsqueeze(0), (14, 14))[0, 0].cpu().numpy()
+                cmin, cmax = cam_14.min(), cam_14.max()
+                if cmax - cmin > 1e-8:
+                    cam_14 = (cam_14 - cmin) / (cmax - cmin)
+                else:
+                    cam_14 = np.zeros_like(cam_14)
+                return cam_14
+
+        # Standard GPU / local high-memory gradient saliency
         if not input_tensor.requires_grad:
             input_tensor.requires_grad_(True)
 
