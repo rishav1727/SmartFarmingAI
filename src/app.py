@@ -23,8 +23,6 @@ from pydantic import BaseModel
 from typing import List, Optional
 from sqlalchemy.orm import Session
 
-from src.inference import DiseasePredictor
-from src.advisor import SmartAdvisor
 from src.database import init_db, get_db, Contribution, ModelVersion
 from src import storage as store
 
@@ -54,17 +52,34 @@ os.makedirs(CONTRIB_DIR, exist_ok=True)
 # Admin secret for protected endpoints
 ADMIN_SECRET = os.environ.get("ADMIN_SECRET", "change_me")
 
-# Initialize database tables
+# Initialize database tables (lightweight — no PyTorch needed)
 print("Initializing database...")
 init_db()
 
-# Initialize models and services
-print("Initializing AI Predictor and Smart Advisor...")
-predictor = DiseasePredictor()
-advisor = SmartAdvisor()
+# ── Lazy-loaded ML engine (defers PyTorch import to stay under 512 MB on free tier) ──
+_predictor = None
+_advisor = None
 
-# Pre-index documents if any exist
-advisor.index_documents()
+def get_predictor():
+    """Lazy-load the ViT disease predictor only when first prediction is requested."""
+    global _predictor
+    if _predictor is None:
+        print("[lazy] Loading DiseasePredictor (PyTorch + ViT-B/16)...")
+        from src.inference import DiseasePredictor
+        _predictor = DiseasePredictor()
+        print("[lazy] DiseasePredictor ready.")
+    return _predictor
+
+def get_advisor():
+    """Lazy-load the Smart Advisor and RAG engine only when first advice is requested."""
+    global _advisor
+    if _advisor is None:
+        print("[lazy] Loading SmartAdvisor & RAG engine...")
+        from src.advisor import SmartAdvisor
+        _advisor = SmartAdvisor()
+        _advisor.index_documents()
+        print("[lazy] SmartAdvisor ready.")
+    return _advisor
 
 # Pydantic schemas for requests
 class AdviceRequest(BaseModel):
@@ -100,7 +115,7 @@ async def predict(file: UploadFile = File(...), crop: Optional[str] = Form(None)
     # Run prediction and Grad-CAM
     try:
         # DiseasePredictor will save the heatmap to f"heatmap_{os.path.basename(temp_filepath)}" in the CWD
-        result = predictor.predict(temp_filepath, save_heatmap=True, target_crop=crop)
+        result = get_predictor().predict(temp_filepath, save_heatmap=True, target_crop=crop)
         
         # Move generated heatmap to upload directory
         raw_heatmap_name = f"heatmap_{temp_filename}"
@@ -126,7 +141,7 @@ async def predict(file: UploadFile = File(...), crop: Optional[str] = Form(None)
 @app.post("/api/advice")
 async def get_advice(req: AdviceRequest):
     try:
-        advice = advisor.get_treatment_advice(req.disease, req.confidence, req.language)
+        advice = get_advisor().get_treatment_advice(req.disease, req.confidence, req.language)
         return advice
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to generate advice: {e}")
@@ -135,7 +150,7 @@ async def get_advice(req: AdviceRequest):
 async def chat(req: ChatRequest):
     try:
         history_list = [{"sender": msg.sender, "text": msg.text} for msg in req.history]
-        reply = advisor.chat_about_disease(req.disease, history_list, req.message, req.language)
+        reply = get_advisor().chat_about_disease(req.disease, history_list, req.message, req.language)
         return {"reply": reply}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Chatbot error: {e}")
@@ -173,7 +188,7 @@ async def whatsapp_webhook(
                     shutil.copyfileobj(r.raw, f)
                     
                 # Run prediction
-                result = predictor.predict(temp_filepath, save_heatmap=True)
+                result = get_predictor().predict(temp_filepath, save_heatmap=True)
                 
                 # Move heatmap
                 raw_heatmap_name = f"heatmap_{filename}"
@@ -186,7 +201,7 @@ async def whatsapp_webhook(
                 disease = result["disease"]
                 confidence = result["confidence"]
                 
-                advice = advisor.get_treatment_advice(disease, confidence, language="English")
+                advice = get_advisor().get_treatment_advice(disease, confidence, language="English")
                 
                 # Update session
                 whatsapp_sessions[user_id] = {
@@ -232,7 +247,7 @@ async def whatsapp_webhook(
         if user_id in whatsapp_sessions:
             session = whatsapp_sessions[user_id]
             try:
-                reply = advisor.chat_about_disease(session["disease"], session["history"], user_message, language="English")
+                reply = get_advisor().chat_about_disease(session["disease"], session["history"], user_message, language="English")
                 # Update session history
                 session["history"].append({"sender": "user", "text": user_message})
                 session["history"].append({"sender": "bot", "text": reply})
@@ -267,21 +282,21 @@ async def upload_document(file: UploadFile = File(...)):
     if ext not in [".txt", ".md", ".pdf"]:
         raise HTTPException(status_code=400, detail="Only .txt, .md, and .pdf documents are supported.")
     
-    dest_path = os.path.join(advisor.doc_dir, filename)
+    dest_path = os.path.join(get_advisor().doc_dir, filename)
     try:
         with open(dest_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         # Re-index documents
-        advisor.index_documents()
-        return {"status": "success", "message": f"Successfully uploaded and indexed '{filename}'. Now has {len(advisor.chunks)} active RAG chunks."}
+        get_advisor().index_documents()
+        return {"status": "success", "message": f"Successfully uploaded and indexed '{filename}'. Now has {len(get_advisor().chunks)} active RAG chunks."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to upload document: {e}")
 
 @app.post("/api/index-docs")
 async def index_documents():
-    success = advisor.index_documents()
+    success = get_advisor().index_documents()
     if success:
-        return {"status": "success", "message": f"Successfully indexed documents. System now has {len(advisor.chunks)} active chunks."}
+        return {"status": "success", "message": f"Successfully indexed documents. System now has {len(get_advisor().chunks)} active chunks."}
     else:
         return JSONResponse(status_code=400, content={"status": "error", "message": "No documents found to index or indexing failed."})
 
