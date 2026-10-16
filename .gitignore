@@ -11,7 +11,6 @@ __pycache__/
 *.onnx
 saved_models/*
 !saved_models/*.json
-!saved_models/cloud_model.pth
 
 # Datasets and Media
 data/*

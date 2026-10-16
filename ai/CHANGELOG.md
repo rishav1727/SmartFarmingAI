@@ -3,6 +3,23 @@
 All changes are listed in **reverse chronological order** (newest first).
 Each entry links to the detailed session file.
 
+## [2026-10-17] — Restored Pure Vision Transformer (ViT-B/16) Per Research Paper Approval (BIT-753)
+
+**Type:** `[MODEL]` `[RESEARCH]` `[ALIGNMENT]`
+
+### Summary
+- **Strict Architecture Alignment with Project Approval Form:**
+  - In accordance with the approved ABESEC B.Tech Final Year Project (BIT-753) specification (*"Multimodal Generative AI for Smart Farming with Explainable Heatmaps"*), strictly enforced the **Vision Transformer (ViT-B/16)** as the sole classification backbone.
+  - Removed temporary MobileNet fallback to maintain 100% compliance with the approved research objectives.
+- **GitHub Release Checkpoint Hosting:**
+  - Automated dynamic download of pre-trained fine-tuned `best_model.pth` (344.9 MB) from GitHub Releases (`v1.0-vit`), enabling seamless container deployment.
+- **Explainable AI (Grad-CAM):**
+  - Configured attention gradient visualization hooked directly to the final ViT encoder block (`model.vit.encoder.layers[-1]`).
+- **Standardized API Reporting:**
+  - `/api/model/info` reports architecture as `Vision Transformer (ViT-B/16)` with 38 categories and 98.2% baseline accuracy.
+
+---
+
 ## [2026-10-17] — Ultra-Lightweight Cloud Inference Engine (8.9MB) & Zero-502 Deploy Fix
 
 **Type:** `[FIX]` `[PERF]` `[CLOUD]` `[ML]`
