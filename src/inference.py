@@ -235,57 +235,54 @@ class DiseasePredictor:
                         
                         if not hasattr(self, "imagenet_classes") or not self.imagenet_classes:
                             url = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"
-                        self.imagenet_classes = urllib.request.urlopen(url, timeout=4).read().decode("utf-8").split("\n")
-                    
-                    # Get TOP-5 MobileNet predictions for better coverage
-                    imagenet_tensor = TF.resize(winning_tensor, [224, 224])
-                    with torch.no_grad():
-                        mn_out = self.mobilenet_classifier(imagenet_tensor)
-                        mn_prob = torch.nn.functional.softmax(mn_out[0], dim=0)
-                        mn_top_prob, mn_top_catids = torch.topk(mn_prob, 5)
-
-                    # Collect all top-5 labels
-                    top5_labels = []
-                    for cid in mn_top_catids:
-                        lbl = self.imagenet_classes[cid].strip().lower() if cid < len(self.imagenet_classes) else ""
-                        top5_labels.append(lbl)
-                    
-                    detected_object = self.imagenet_classes[mn_top_catids[0]].strip()
-                    
-                    # ===== PLANT WHITELIST (Top-5 scan) =====
-                    # If ANY of the top-5 MobileNet predictions match a known plant/food,
-                    # we treat the image as a plant and SKIP non-plant rejection.
-                    plant_safelist_keywords = [
-                        "cabbage", "broccoli", "cauliflower", "artichoke", "spinach", "lettuce",
-                        "cucumber", "zucchini", "pumpkin", "squash", "acorn", "butternut",
-                        "mushroom", "fig", "pineapple", "banana", "strawberry", "orange", "lemon",
-                        "lime", "apple", "grape", "cherry", "peach", "pear", "mango", "papaya",
-                        "corn", "maize", "wheat", "rice", "potato", "yam",
-                        "tomato", "pepper", "chili", "eggplant", "avocado", "coconut",
-                        "plant", "leaf", "flower", "blossom", "herb", "fern", "moss",
-                        "tree", "shrub", "vine", "grass", "seed", "root", "stem", "petal",
-                        "vegetable", "fruit", "crop", "foliage", "daisy", "tulip", "rose",
-                        "sunflower", "clover", "algae", "seaweed", "bamboo", "cactus", "succulent",
-                        "kale", "celery", "carrot", "radish", "beet", "turnip", "onion", "garlic",
-                        "soybean", "bean", "pea", "lentil", "chickpea", "rapeseed", "hay"
-                    ]
-                    
-                    # Check if ANY top-5 label contains a plant keyword
-                    is_plant_confirmed = any(
-                        any(p in lbl for p in plant_safelist_keywords)
-                        for lbl in top5_labels
-                    )
-                    
-                    # ===== NON-PLANT WHITELIST CHECK =====
-                    # If NO top-5 prediction matched a plant keyword → non-plant
-                    if not is_plant_confirmed:
-                        is_non_plant = True
-                    
-                    print(f"[OOD] Top-5 MobileNet: {top5_labels}")
-                    print(f"[OOD] Plant confirmed: {is_plant_confirmed}, is_non_plant: {is_non_plant}")
+                            self.imagenet_classes = urllib.request.urlopen(url, timeout=4).read().decode("utf-8").split("\n")
                         
-                except Exception as e:
-                    print("General object pre-screener error:", e)
+                        # Get TOP-5 MobileNet predictions for better coverage
+                        imagenet_tensor = TF.resize(winning_tensor, [224, 224])
+                        with torch.no_grad():
+                            mn_out = self.mobilenet_classifier(imagenet_tensor)
+                            mn_prob = torch.nn.functional.softmax(mn_out[0], dim=0)
+                            mn_top_prob, mn_top_catids = torch.topk(mn_prob, 5)
+
+                        # Collect all top-5 labels
+                        top5_labels = []
+                        for cid in mn_top_catids:
+                            lbl = self.imagenet_classes[cid].strip().lower() if cid < len(self.imagenet_classes) else ""
+                            top5_labels.append(lbl)
+                        
+                        detected_object = self.imagenet_classes[mn_top_catids[0]].strip()
+                        
+                        # ===== PLANT WHITELIST (Top-5 scan) =====
+                        plant_safelist_keywords = [
+                            "cabbage", "broccoli", "cauliflower", "artichoke", "spinach", "lettuce",
+                            "cucumber", "zucchini", "pumpkin", "squash", "acorn", "butternut",
+                            "mushroom", "fig", "pineapple", "banana", "strawberry", "orange", "lemon",
+                            "lime", "apple", "grape", "cherry", "peach", "pear", "mango", "papaya",
+                            "corn", "maize", "wheat", "rice", "potato", "yam",
+                            "tomato", "pepper", "chili", "eggplant", "avocado", "coconut",
+                            "plant", "leaf", "flower", "blossom", "herb", "fern", "moss",
+                            "tree", "shrub", "vine", "grass", "seed", "root", "stem", "petal",
+                            "vegetable", "fruit", "crop", "foliage", "daisy", "tulip", "rose",
+                            "sunflower", "clover", "algae", "seaweed", "bamboo", "cactus", "succulent",
+                            "kale", "celery", "carrot", "radish", "beet", "turnip", "onion", "garlic",
+                            "soybean", "bean", "pea", "lentil", "chickpea", "rapeseed", "hay"
+                        ]
+                        
+                        # Check if ANY top-5 label contains a plant keyword
+                        is_plant_confirmed = any(
+                            any(p in lbl for p in plant_safelist_keywords)
+                            for lbl in top5_labels
+                        )
+                        
+                        # If NO top-5 prediction matched a plant keyword → non-plant
+                        if not is_plant_confirmed:
+                            is_non_plant = True
+                        
+                        print(f"[OOD] Top-5 MobileNet: {top5_labels}")
+                        print(f"[OOD] Plant confirmed: {is_plant_confirmed}, is_non_plant: {is_non_plant}")
+                            
+                    except Exception as e:
+                        print("General object pre-screener error:", e)
 
                 # Determine overall Out-of-Distribution status
                 # Priority 1: MobileNet whitelist (most reliable — catches humans, animals, objects)
