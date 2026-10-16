@@ -3,12 +3,16 @@ import torch.nn as nn
 from torchvision.models import vit_b_16, ViT_B_16_Weights
 
 class PlantDiseaseModel(nn.Module):
-    def __init__(self, num_classes):
+    def __init__(self, num_classes, pretrained=False):
         super(PlantDiseaseModel, self).__init__()
         
-        # Load pre-trained Vision Transformer
-        print("Loading pre-trained ViT Model...")
-        self.vit = vit_b_16(weights=ViT_B_16_Weights.DEFAULT)
+        # Load Vision Transformer (weights=None in low-memory cloud mode to prevent OOM)
+        if pretrained:
+            print("Loading pre-trained ViT Model from PyTorch Hub...")
+            self.vit = vit_b_16(weights=ViT_B_16_Weights.DEFAULT)
+        else:
+            print("Initializing ViT Model architecture (zero download, memory-safe)...")
+            self.vit = vit_b_16(weights=None)
         
         # Freeze early layers to speed up fine-tuning and prevent overfitting
         for param in self.vit.parameters():
@@ -32,7 +36,7 @@ class PlantDiseaseModel(nn.Module):
     def forward(self, x):
         return self.vit(x)
 
-def get_model(num_classes, device):
-    model = PlantDiseaseModel(num_classes=num_classes)
+def get_model(num_classes, device, pretrained=False):
+    model = PlantDiseaseModel(num_classes=num_classes, pretrained=pretrained)
     model.to(device)
     return model

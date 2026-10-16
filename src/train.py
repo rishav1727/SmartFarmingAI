@@ -35,7 +35,7 @@ def train():
         json.dump(class_names, f)
 
     # Initialize model
-    model = get_model(num_classes=num_classes, device=DEVICE)
+    model = get_model(num_classes=num_classes, device=DEVICE, pretrained=True)
 
     # Loss function
     criterion = nn.CrossEntropyLoss()

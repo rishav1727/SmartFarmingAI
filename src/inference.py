@@ -222,17 +222,19 @@ class DiseasePredictor:
                 detected_object = None
                 is_non_plant = False
                 
-                try:
-                    import torchvision.models as models
-                    import urllib.request
-                    import torchvision.transforms.functional as TF
-                    
-                    if not hasattr(self, "mobilenet_classifier") or self.mobilenet_classifier is None:
-                        self.mobilenet_classifier = models.mobilenet_v3_small(weights=models.MobileNet_V3_Small_Weights.IMAGENET1K_V1).to(winning_tensor.device)
-                        self.mobilenet_classifier.eval()
-                    
-                    if not hasattr(self, "imagenet_classes") or not self.imagenet_classes:
-                        url = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"
+                ENABLE_OOD = os.environ.get("ENABLE_OOD_FILTER", "0") == "1"
+                if ENABLE_OOD:
+                    try:
+                        import torchvision.models as models
+                        import urllib.request
+                        import torchvision.transforms.functional as TF
+                        
+                        if not hasattr(self, "mobilenet_classifier") or self.mobilenet_classifier is None:
+                            self.mobilenet_classifier = models.mobilenet_v3_small(weights=models.MobileNet_V3_Small_Weights.IMAGENET1K_V1).to(winning_tensor.device)
+                            self.mobilenet_classifier.eval()
+                        
+                        if not hasattr(self, "imagenet_classes") or not self.imagenet_classes:
+                            url = "https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt"
                         self.imagenet_classes = urllib.request.urlopen(url, timeout=4).read().decode("utf-8").split("\n")
                     
                     # Get TOP-5 MobileNet predictions for better coverage
@@ -310,17 +312,21 @@ class DiseasePredictor:
                 }
 
         if save_heatmap:
-            from src.visualize import GradCAM, overlay_heatmap
-            
-            target_layer = self.model.vit.encoder.layers[-1]
-            cam_engine = GradCAM(self.model, target_layer)
-            
-            heatmap = cam_engine.generate_heatmap(winning_tensor, category_index=best_result["catid"])
-            vis_img = overlay_heatmap(image_path, heatmap)
-            
-            output_path = f"heatmap_{os.path.basename(image_path)}"
-            vis_img.save(output_path, "JPEG")
-            best_result["heatmap_path"] = output_path
+            try:
+                from src.visualize import GradCAM, overlay_heatmap
+                
+                target_layer = self.model.vit.encoder.layers[-1]
+                cam_engine = GradCAM(self.model, target_layer)
+                
+                heatmap = cam_engine.generate_heatmap(winning_tensor, category_index=best_result["catid"])
+                vis_img = overlay_heatmap(image_path, heatmap)
+                
+                output_path = f"heatmap_{os.path.basename(image_path)}"
+                vis_img.save(output_path, "JPEG")
+                best_result["heatmap_path"] = output_path
+            except Exception as cam_err:
+                print(f"[inference] Grad-CAM generation skipped or failed ({cam_err}).")
+                best_result["heatmap_path"] = None
             
         return best_result
 
