@@ -13,9 +13,12 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 # Local dev   → falls back to SQLite file in project root
 DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./smartfarming.db")
 
-# Render / Railway give postgres:// — SQLAlchemy needs postgresql://
+# Render / Railway give postgres:// or postgresql:// — SQLAlchemy 2.0 defaults to psycopg (v3).
+# Explicitly use postgresql+psycopg2:// to use psycopg2-binary reliably.
 if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg2://", 1)
+elif DATABASE_URL.startswith("postgresql://") and not DATABASE_URL.startswith("postgresql+"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://", 1)
 
 _connect_args = {"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
 engine = create_engine(DATABASE_URL, connect_args=_connect_args)
