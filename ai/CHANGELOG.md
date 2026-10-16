@@ -5,6 +5,24 @@ Each entry links to the detailed session file.
 
 ---
 
+## [2026-10-17] — Cloud Database Initializer, CI/CD Pipeline & Remote Weights Engine
+
+**Type:** `[ADD]` `[FEAT]` `[DEVOPS]` `[DB]`
+
+### Summary
+- **Database & Storage Setup Tool (`src/setup_db.py`):**
+  - Automated diagnostic and setup tool supporting PostgreSQL (Supabase / Render) and local SQLite.
+  - Automatically provisions tables (`contributions`, `model_versions`), tests latency, seeds baseline `v1.0-base` ViT-B/16 checkpoint, and checks Supabase bucket connectivity.
+- **Dynamic Remote Weights Downloader (`src/inference.py`):**
+  - Added support for `WEIGHTS_URL` and `HF_MODEL_REPO` (`huggingface_hub`) to automatically fetch checkpoints if missing locally on container boot.
+- **GitHub Actions CI/CD (`.github/workflows/deploy.yml`):**
+  - Automated workflow verifying dependencies, database integrity, and module imports on push, with support for Render deploy hook.
+- **One-Click Render Cloud Deployment:**
+  - Configured `render.yaml` with free managed PostgreSQL database and web service.
+  - Added "Deploy to Render" one-click button and complete architecture documentation to `README.md`.
+
+---
+
 ## [2026-10-17] — Precision Agritech Theme Overhaul & Multi-Phone Zero-Overflow Guarantee
 
 **Type:** `[UI/UX]` `[THEME]` `[MOBILE]`
