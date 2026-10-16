@@ -17,9 +17,10 @@ Each entry links to the detailed session file.
   - Added support for `WEIGHTS_URL` and `HF_MODEL_REPO` (`huggingface_hub`) to automatically fetch checkpoints if missing locally on container boot.
 - **GitHub Actions CI/CD (`.github/workflows/deploy.yml`):**
   - Automated workflow verifying dependencies, database integrity, and module imports on push, with support for Render deploy hook.
-- **One-Click Render Cloud Deployment:**
+- **One-Click Render Cloud Deployment & Docker Optimization:**
   - Configured `render.yaml` with free managed PostgreSQL database and web service.
   - Added "Deploy to Render" one-click button and complete architecture documentation to `README.md`.
+  - Optimized `Dockerfile` for Debian Bookworm, PyTorch CPU (`--index-url https://download.pytorch.org/whl/cpu`), and `opencv-python-headless` to eliminate 2 GB CUDA bloat and fix cloud build failures.
 
 ---
 
