@@ -26,11 +26,14 @@ COPY . .
 # Step 4: Create runtime directories
 RUN mkdir -p public/uploads public/contributions public/samples saved_models data/documents
 
+# Step 5: Bake official ViT-B/16 research checkpoint into the image
+RUN python -c "import urllib.request; print('Downloading ViT-B/16 weights...'); urllib.request.urlretrieve('https://github.com/rishav1727/SmartFarmingAI/releases/download/v1.0-vit/best_model.pth', 'saved_models/best_model.pth'); print('ViT-B/16 weights ready.')"
+
 # Non-root user support (compatible with HuggingFace Spaces & secure Linux containers)
 RUN chown -R 1000:1000 /app
 USER 1000
 
-# Render uses port $PORT (defaults to 10000 on Render, 7860 on HuggingFace Spaces, 8000 locally)
-EXPOSE 10000 7860 8000
+# HuggingFace Spaces uses port 7860, Render injects its own $PORT (e.g. 10000)
+EXPOSE 7860 10000 8000
 
-CMD ["sh", "-c", "python -m uvicorn src.app:app --host 0.0.0.0 --port ${PORT:-10000}"]
+CMD ["sh", "-c", "python -m uvicorn src.app:app --host 0.0.0.0 --port ${PORT:-7860}"]
