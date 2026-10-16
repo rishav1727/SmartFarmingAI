@@ -2,21 +2,37 @@ import os
 import sys
 import shutil
 import uuid
+import json
+from datetime import datetime
+
+# Load .env file if present (local development)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 # Ensure root directory is in sys.path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from fastapi import FastAPI, File, UploadFile, HTTPException, Form
+from fastapi import FastAPI, File, UploadFile, HTTPException, Form, Depends, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 from typing import List, Optional
+from sqlalchemy.orm import Session
 
 from src.inference import DiseasePredictor
 from src.advisor import SmartAdvisor
+from src.database import init_db, get_db, Contribution, ModelVersion
+from src import storage as store
 
-app = FastAPI(title="SmartFarmingAI", description="Multimodal Generative AI for Smart Farming")
+app = FastAPI(
+    title="SmartFarmingAI",
+    description="Multimodal Generative AI for Smart Farming — with community retraining",
+    version="2.0.0",
+)
 
 # Enable CORS for development
 app.add_middleware(
@@ -28,10 +44,19 @@ app.add_middleware(
 )
 
 # Setup directories
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PUBLIC_DIR = os.path.join(BASE_DIR, "public")
-UPLOAD_DIR = os.path.join(PUBLIC_DIR, "uploads")
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+BASE_DIR     = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PUBLIC_DIR   = os.path.join(BASE_DIR, "public")
+UPLOAD_DIR   = os.path.join(PUBLIC_DIR, "uploads")
+CONTRIB_DIR  = os.path.join(PUBLIC_DIR, "contributions")
+os.makedirs(UPLOAD_DIR,  exist_ok=True)
+os.makedirs(CONTRIB_DIR, exist_ok=True)
+
+# Admin secret for protected endpoints
+ADMIN_SECRET = os.environ.get("ADMIN_SECRET", "change_me")
+
+# Initialize database tables
+print("Initializing database...")
+init_db()
 
 # Initialize models and services
 print("Initializing AI Predictor and Smart Advisor...")
@@ -293,10 +318,237 @@ async def get_index():
     return {"message": "Welcome to SmartFarmingAI API. Frontend dashboard files are missing."}
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# COMMUNITY CONTRIBUTION & RETRAINING ENDPOINTS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class ContributeRequest(BaseModel):
+    label: str
+    crop_type: Optional[str] = None
+    contributor_name: Optional[str] = None
+    contributor_email: Optional[str] = None
+    notes: Optional[str] = None
+
+@app.post("/api/contribute", summary="Submit a labeled image for retraining")
+async def contribute_image(
+    file: UploadFile = File(...),
+    label: str = Form(...),
+    crop_type: Optional[str] = Form(None),
+    contributor_name: Optional[str] = Form(None),
+    contributor_email: Optional[str] = Form(None),
+    notes: Optional[str] = Form(None),
+    db: Session = Depends(get_db),
+):
+    """
+    Upload a labeled plant image to help improve the model.
+
+    - **file** : image file (jpg / png)
+    - **label**: disease class name, e.g. `Tomato___Late_blight`
+                 (must match one of the class names in class_names.json)
+    - **crop_type**, **contributor_name**, **contributor_email** : optional
+    """
+    # Validate file type
+    ext = os.path.splitext(file.filename or "image.jpg")[1].lower()
+    if ext not in {".jpg", ".jpeg", ".png", ".webp"}:
+        raise HTTPException(status_code=400, detail="Only JPG / PNG / WebP images are accepted.")
+
+    file_bytes = await file.read()
+    if len(file_bytes) > 20 * 1024 * 1024:  # 20 MB limit
+        raise HTTPException(status_code=413, detail="Image must be smaller than 20 MB.")
+
+    # Upload to cloud / local storage
+    try:
+        public_url, storage_path = store.upload_image(file_bytes, file.filename or "contribution.jpg")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Storage error: {e}")
+
+    # Save record in DB
+    record = Contribution(
+        image_url        = public_url,
+        storage_path     = storage_path,
+        label            = label,
+        crop_type        = crop_type,
+        contributor_name = contributor_name,
+        contributor_email= contributor_email,
+        notes            = notes,
+    )
+    db.add(record)
+    db.commit()
+    db.refresh(record)
+
+    return {
+        "status":      "success",
+        "id":          record.id,
+        "image_url":   public_url,
+        "label":       label,
+        "message":     "Thank you! Your image has been submitted. After admin verification it will be used to improve the model.",
+        "submitted_at": record.submitted_at.isoformat(),
+    }
+
+
+@app.get("/api/contributions", summary="List community-contributed training images")
+async def list_contributions(
+    verified_only: bool = False,
+    limit: int = 50,
+    offset: int = 0,
+    db: Session = Depends(get_db),
+):
+    """Returns community-submitted images. Use `verified_only=true` to see only approved ones."""
+    query = db.query(Contribution)
+    if verified_only:
+        query = query.filter(Contribution.verified == True)  # noqa: E712
+    total  = query.count()
+    items  = query.order_by(Contribution.submitted_at.desc()).offset(offset).limit(limit).all()
+    return {
+        "total": total,
+        "offset": offset,
+        "limit": limit,
+        "contributions": [
+            {
+                "id":              c.id,
+                "image_url":       c.image_url,
+                "label":           c.label,
+                "crop_type":       c.crop_type,
+                "contributor_name":c.contributor_name,
+                "verified":        c.verified,
+                "used_in_training":c.used_in_training,
+                "submitted_at":    c.submitted_at.isoformat() if c.submitted_at else None,
+            }
+            for c in items
+        ],
+    }
+
+
+@app.get("/api/model/info", summary="Current model version and statistics")
+async def model_info(db: Session = Depends(get_db)):
+    """Returns info about the currently active model and contribution stats."""
+    import json as _json
+    class_names_path = os.path.join(BASE_DIR, "saved_models", "class_names.json")
+    num_classes = 0
+    if os.path.exists(class_names_path):
+        with open(class_names_path) as f:
+            num_classes = len(_json.load(f))
+
+    weights_path = os.path.join(BASE_DIR, "saved_models", "best_model.pth")
+    weights_size_mb = round(os.path.getsize(weights_path) / 1e6, 1) if os.path.exists(weights_path) else 0
+
+    active_version = db.query(ModelVersion).filter(ModelVersion.is_active == True).first()  # noqa: E712
+    total_contributions  = db.query(Contribution).count()
+    pending_verification = db.query(Contribution).filter(Contribution.verified == False).count()  # noqa: E712
+    verified_unused      = db.query(Contribution).filter(
+        Contribution.verified == True, Contribution.used_in_training == False
+    ).count()
+
+    return {
+        "model": {
+            "architecture":     "Vision Transformer (ViT-B/16)",
+            "num_classes":      num_classes,
+            "weights_size_mb":  weights_size_mb,
+            "weights_loaded":   os.path.exists(weights_path),
+            "version":          active_version.version if active_version else "v1.0-base",
+            "accuracy":         active_version.accuracy if active_version else None,
+            "hf_repo":          active_version.hf_repo if active_version else None,
+        },
+        "community": {
+            "total_contributions":  total_contributions,
+            "pending_verification": pending_verification,
+            "verified_ready_to_train": verified_unused,
+        },
+    }
+
+
+# ── Admin: verify a contribution ──────────────────────────────────────────────
+@app.post("/api/admin/verify/{contribution_id}", summary="[Admin] Approve a contribution label")
+async def verify_contribution(
+    contribution_id: str,
+    admin_secret: str = Form(...),
+    db: Session = Depends(get_db),
+):
+    if admin_secret != ADMIN_SECRET:
+        raise HTTPException(status_code=403, detail="Invalid admin secret.")
+    record = db.query(Contribution).filter(Contribution.id == contribution_id).first()
+    if not record:
+        raise HTTPException(status_code=404, detail="Contribution not found.")
+    record.verified = True
+    db.commit()
+    return {"status": "verified", "id": contribution_id}
+
+
+# ── Admin: trigger retraining ─────────────────────────────────────────────────
+_retrain_status: dict = {"running": False, "last_result": None}
+
+def _run_retrain(db_records: list):
+    """Background retraining task."""
+    global _retrain_status
+    _retrain_status["running"] = True
+    try:
+        from src.retrain import retrain_with_contributions
+        result = retrain_with_contributions(db_records, epochs=3, batch_size=8)
+        _retrain_status["last_result"] = result
+        _retrain_status["finished_at"] = datetime.utcnow().isoformat()
+    except Exception as e:
+        _retrain_status["last_result"] = {"error": str(e)}
+    finally:
+        _retrain_status["running"] = False
+
+
+@app.post("/api/admin/retrain", summary="[Admin] Fine-tune model on verified contributions")
+async def admin_retrain(
+    background_tasks: BackgroundTasks,
+    admin_secret: str = Form(...),
+    epochs: int = Form(3),
+    db: Session = Depends(get_db),
+):
+    """
+    Triggers fine-tuning on all verified, unused community contributions.
+    Runs in the background — poll `/api/admin/retrain/status` to track progress.
+    """
+    if admin_secret != ADMIN_SECRET:
+        raise HTTPException(status_code=403, detail="Invalid admin secret.")
+    if _retrain_status["running"]:
+        raise HTTPException(status_code=409, detail="Retraining is already in progress.")
+
+    records = db.query(Contribution).filter(
+        Contribution.verified == True,        # noqa: E712
+        Contribution.used_in_training == False
+    ).all()
+
+    if not records:
+        raise HTTPException(status_code=400, detail="No verified, unused contributions found.")
+
+    db_records = [
+        {"storage_path": r.storage_path, "image_url": r.image_url, "label": r.label}
+        for r in records
+    ]
+
+    # Mark all as used so they aren't double-counted
+    for r in records:
+        r.used_in_training = True
+    db.commit()
+
+    background_tasks.add_task(_run_retrain, db_records)
+    return {
+        "status":  "started",
+        "samples": len(db_records),
+        "epochs":  epochs,
+        "message": "Retraining started in background. Poll /api/admin/retrain/status for updates.",
+    }
+
+
+@app.get("/api/admin/retrain/status", summary="[Admin] Check retraining progress")
+async def retrain_status(admin_secret: str):
+    if admin_secret != ADMIN_SECRET:
+        raise HTTPException(status_code=403, detail="Invalid admin secret.")
+    return _retrain_status
+
+
+# Mount contributions folder so images are publicly accessible
+app.mount("/contributions", StaticFiles(directory=CONTRIB_DIR), name="contributions")
+
 # Mount static files (uploads and other assets)
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 app.mount("/", StaticFiles(directory=PUBLIC_DIR), name="public")
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("src.app:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run("src.app:app", host="0.0.0.0", port=8000, reload=False)

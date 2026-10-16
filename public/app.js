@@ -1409,5 +1409,314 @@ function applyLanguageUI(selectedLang) {
             showToast("Chat conversation cleared.", "info");
         });
     }
+
+    // ==========================================
+    // COMMUNITY CONTRIBUTION & RETRAINING MODAL
+    // ==========================================
+    const openContribBtn = document.getElementById("open-contribute-modal-btn");
+    const closeContribBtn = document.getElementById("close-contribute-modal-btn");
+    const contribModal = document.getElementById("contribute-modal");
+    const contribForm = document.getElementById("contribute-form");
+    const contribLabelSelect = document.getElementById("contrib-label-select");
+
+    // Populate disease categories into select dropdown
+    const knownDiseases = [
+        "Apple___Apple_scab", "Apple___Black_rot", "Apple___Cedar_apple_rust", "Apple___healthy",
+        "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot", "Corn_(maize)___Common_rust_", "Corn_(maize)___Northern_Leaf_Blight", "Corn_(maize)___healthy",
+        "Grape___Black_rot", "Grape___Esca_(Black_Measles)", "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)", "Grape___healthy",
+        "Pepper,_bell___Bacterial_spot", "Pepper,_bell___healthy",
+        "Potato___Early_blight", "Potato___Late_blight", "Potato___healthy",
+        "Strawberry___Leaf_scorch", "Strawberry___healthy",
+        "Tomato___Bacterial_spot", "Tomato___Early_blight", "Tomato___Late_blight", "Tomato___Leaf_Mold", "Tomato___Septoria_leaf_spot", "Tomato___Spider_mites Two-spotted_spider_mite", "Tomato___Target_Spot", "Tomato___Tomato_Yellow_Leaf_Curl_Virus", "Tomato___Tomato_mosaic_virus", "Tomato___healthy"
+    ];
+
+    if (contribLabelSelect) {
+        knownDiseases.forEach(d => {
+            const opt = document.createElement("option");
+            opt.value = d;
+            opt.textContent = d.replace(/___/g, " - ").replace(/_/g, " ");
+            contribLabelSelect.appendChild(opt);
+        });
+    }
+
+    if (openContribBtn && contribModal) {
+        openContribBtn.addEventListener("click", () => {
+            contribModal.classList.remove("hidden");
+        });
+    }
+
+    if (closeContribBtn && contribModal) {
+        closeContribBtn.addEventListener("click", () => {
+            contribModal.classList.add("hidden");
+        });
+    }
+
+    if (contribForm) {
+        contribForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const fileInput = document.getElementById("contrib-file-input");
+            const labelSelect = document.getElementById("contrib-label-select");
+            const nameInput = document.getElementById("contrib-name-input");
+            const cropInput = document.getElementById("contrib-crop-input");
+            const notesInput = document.getElementById("contrib-notes-input");
+
+            if (!fileInput.files || !fileInput.files[0]) {
+                showToast("Please choose an image file to upload.", "error");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+            formData.append("label", labelSelect.value);
+            if (nameInput.value) formData.append("contributor_name", nameInput.value);
+            if (cropInput.value) formData.append("crop_type", cropInput.value);
+            if (notesInput.value) formData.append("notes", notesInput.value);
+
+            try {
+                setLoader(true, "Uploading community training sample to database...");
+                const response = await fetch("/api/contribute", {
+                    method: "POST",
+                    body: formData
+                });
+                setLoader(false);
+
+                if (!response.ok) {
+                    const errData = await response.json().catch(() => ({}));
+                    throw new Error(errData.detail || "Upload failed");
+                }
+
+                const res = await response.json();
+                showToast("🌱 " + res.message, "success");
+                contribForm.reset();
+                contribModal.classList.add("hidden");
+            } catch (err) {
+                setLoader(false);
+                showToast("Contribution Error: " + err.message, "error");
+            }
+        });
+    }
+
+    // ============================================================
+    // THREE.JS 3D BOTANICAL DIGITAL TWIN INTERACTIVE ENGINE
+    // ============================================================
+    function init3DPlantHero() {
+        const canvas = document.getElementById("three-plant-canvas");
+        if (!canvas || typeof THREE === "undefined") return;
+
+        const container = canvas.parentElement;
+        const width = container.clientWidth || 500;
+        const height = container.clientHeight || 380;
+
+        // Scene, Camera, Renderer
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x03080c, 0.04);
+
+        const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+        camera.position.set(0, 0, 5.5);
+
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0x10b981, 0.6);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        dirLight.position.set(5, 8, 5);
+        scene.add(dirLight);
+
+        const pointLight = new THREE.PointLight(0x34d399, 2.5, 10);
+        pointLight.position.set(0, 1.5, 2);
+        scene.add(pointLight);
+
+        // Group container for easy rotation
+        const plantGroup = new THREE.Group();
+        scene.add(plantGroup);
+
+        // 1. Procedural 3D Botanical Leaf Geometry
+        const leafShape = new THREE.Shape();
+        leafShape.moveTo(0, -1.8);
+        leafShape.bezierCurveTo(1.2, -0.9, 1.4, 0.5, 0, 1.8);
+        leafShape.bezierCurveTo(-1.4, 0.5, -1.2, -0.9, 0, -1.8);
+
+        const extrudeSettings = {
+            depth: 0.08,
+            bevelEnabled: true,
+            bevelSegments: 4,
+            steps: 2,
+            bevelSize: 0.04,
+            bevelThickness: 0.03
+        };
+        const leafGeo = new THREE.ExtrudeGeometry(leafShape, extrudeSettings);
+
+        // Materials for different display modes
+        const organicMat = new THREE.MeshStandardMaterial({
+            color: 0x10b981,
+            roughness: 0.25,
+            metalness: 0.1,
+            emissive: 0x064e3b,
+            emissiveIntensity: 0.35,
+            wireframe: false
+        });
+
+        const neuralMat = new THREE.MeshStandardMaterial({
+            color: 0x34d399,
+            wireframe: true,
+            emissive: 0x10b981,
+            emissiveIntensity: 0.8
+        });
+
+        const leafMesh = new THREE.Mesh(leafGeo, organicMat);
+        leafMesh.rotation.x = -0.15;
+        plantGroup.add(leafMesh);
+
+        // 2. Central Leaf Vein
+        const veinGeo = new THREE.CylinderGeometry(0.04, 0.015, 3.4, 12);
+        const veinMat = new THREE.MeshBasicMaterial({ color: 0xa7f3d0 });
+        const vein = new THREE.Mesh(veinGeo, veinMat);
+        vein.position.set(0, 0, 0.06);
+        plantGroup.add(vein);
+
+        // 3. Floating Chloroplast Bio-Particles
+        const particleCount = 180;
+        const particleGeo = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        const scales = new Float32Array(particleCount);
+
+        for (let i = 0; i < particleCount * 3; i += 3) {
+            positions[i] = (Math.random() - 0.5) * 4.2;
+            positions[i + 1] = (Math.random() - 0.5) * 4.2;
+            positions[i + 2] = (Math.random() - 0.5) * 3.5;
+            scales[i / 3] = Math.random();
+        }
+
+        particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+        const particleMat = new THREE.PointsMaterial({
+            color: 0x34d399,
+            size: 0.08,
+            transparent: true,
+            opacity: 0.85,
+            blending: THREE.AdditiveBlending
+        });
+
+        const particles = new THREE.Points(particleGeo, particleMat);
+        plantGroup.add(particles);
+
+        // 4. Interactive Drag-to-Rotate & Inertia
+        let isDragging = false;
+        let prevMousePos = { x: 0, y: 0 };
+        let rotationVelocity = { x: 0.003, y: 0.007 };
+
+        function onPointerDown(e) {
+            isDragging = true;
+            prevMousePos = { x: e.clientX || e.touches[0].clientX, y: e.clientY || e.touches[0].clientY };
+        }
+
+        function onPointerMove(e) {
+            const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+            const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+
+            if (isDragging) {
+                const deltaX = clientX - prevMousePos.x;
+                const deltaY = clientY - prevMousePos.y;
+
+                rotationVelocity.y = deltaX * 0.005;
+                rotationVelocity.x = deltaY * 0.005;
+
+                plantGroup.rotation.y += rotationVelocity.y;
+                plantGroup.rotation.x += rotationVelocity.x;
+
+                prevMousePos = { x: clientX, y: clientY };
+            }
+        }
+
+        function onPointerUp() {
+            isDragging = false;
+        }
+
+        canvas.addEventListener("mousedown", onPointerDown);
+        window.addEventListener("mousemove", onPointerMove);
+        window.addEventListener("mouseup", onPointerUp);
+
+        canvas.addEventListener("touchstart", onPointerDown, { passive: true });
+        window.addEventListener("touchmove", onPointerMove, { passive: true });
+        window.addEventListener("touchend", onPointerUp);
+
+        // 5. Mode Switchers (Organic / ViT Attention Grid / Bio-Particles)
+        const organicBtn = document.getElementById("mode-organic-btn");
+        const neuralBtn = document.getElementById("mode-neural-btn");
+        const particlesBtn = document.getElementById("mode-particles-btn");
+        const modeBtns = [organicBtn, neuralBtn, particlesBtn];
+
+        function setMode(mode) {
+            modeBtns.forEach(btn => btn && btn.classList.remove("active"));
+            if (mode === "organic") {
+                if (organicBtn) organicBtn.classList.add("active");
+                leafMesh.visible = true;
+                leafMesh.material = organicMat;
+                vein.visible = true;
+                particles.visible = true;
+            } else if (mode === "neural") {
+                if (neuralBtn) neuralBtn.classList.add("active");
+                leafMesh.visible = true;
+                leafMesh.material = neuralMat;
+                vein.visible = false;
+                particles.visible = true;
+            } else if (mode === "particles") {
+                if (particlesBtn) particlesBtn.classList.add("active");
+                leafMesh.visible = false;
+                vein.visible = false;
+                particles.visible = true;
+                particleMat.size = 0.12;
+            }
+        }
+
+        if (organicBtn) organicBtn.addEventListener("click", () => setMode("organic"));
+        if (neuralBtn) neuralBtn.addEventListener("click", () => setMode("neural"));
+        if (particlesBtn) particlesBtn.addEventListener("click", () => setMode("particles"));
+
+        // Resize handler
+        window.addEventListener("resize", () => {
+            const newW = container.clientWidth;
+            const newH = container.clientHeight;
+            camera.aspect = newW / newH;
+            camera.updateProjectionMatrix();
+            renderer.setSize(newW, newH);
+        });
+
+        // 6. Animation Render Loop (60 FPS)
+        let clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const elapsedTime = clock.getElapsedTime();
+
+            // Continuous smooth rotation with damping
+            if (!isDragging) {
+                plantGroup.rotation.y += rotationVelocity.y;
+                plantGroup.rotation.x += rotationVelocity.x;
+
+                // Gentle return to base speed
+                rotationVelocity.y += (0.006 - rotationVelocity.y) * 0.05;
+                rotationVelocity.x += (0.0 - rotationVelocity.x) * 0.05;
+            }
+
+            // Natural organic floating bounce
+            plantGroup.position.y = Math.sin(elapsedTime * 1.5) * 0.12;
+
+            // Animate floating bio-particles
+            particles.rotation.y = elapsedTime * 0.08;
+            particles.rotation.x = Math.sin(elapsedTime * 0.5) * 0.1;
+
+            renderer.render(scene, camera);
+        }
+        animate();
+    }
+
+    // Initialize 3D Botanical Hero
+    init3DPlantHero();
 });
+
 

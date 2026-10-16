@@ -1,0 +1,41 @@
+services:
+  - type: web
+    name: smartfarming-ai
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    # Scale up if you have >512MB model — starter plan recommended
+    plan: starter          # change to "free" if model fits in 512MB RAM (it won't for ViT)
+    healthCheckPath: /api/model/info
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: smartfarming-db
+          property: connectionString
+      - key: SUPABASE_URL
+        sync: false          # Fill in Render dashboard → Environment
+      - key: SUPABASE_KEY
+        sync: false
+      - key: SUPABASE_BUCKET
+        value: training-contributions
+      - key: HF_TOKEN
+        sync: false
+      - key: HF_MODEL_REPO
+        sync: false
+      - key: ADMIN_SECRET
+        generateValue: true  # Render auto-generates a secure random value
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: USE_CUDA
+        value: "0"
+      - key: BASE_URL
+        sync: false          # Set to your Render URL: https://smartfarming-ai.onrender.com
+    disk:
+      name: model-weights
+      mountPath: /app/saved_models
+      sizeGB: 2              # Enough for ViT weights + backups
+
+databases:
+  - name: smartfarming-db
+    databaseName: smartfarming
+    user: smartfarming
+    plan: free               # Free PostgreSQL on Render

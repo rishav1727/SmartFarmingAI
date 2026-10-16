@@ -14,6 +14,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Three.js 3D WebGL Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
     <div class="glass-bg">
@@ -38,6 +40,9 @@
             </label>
             <button id="index-docs-btn" class="secondary-btn" title="Refresh local RAG database">
                 <i class="fa-solid fa-arrows-rotate"></i> Sync Database
+            </button>
+            <button id="open-contribute-modal-btn" class="secondary-btn" style="border-color: rgba(16, 185, 129, 0.6); background: rgba(16, 185, 129, 0.15); color: #34d399;" title="Contribute labeled images to improve model accuracy">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Contribute Data
             </button>
             <div class="language-selector">
                 <label for="lang-select"><i class="fa-solid fa-globe"></i> Language: </label>
@@ -68,6 +73,47 @@
             </div>
         </div>
     </header>
+
+    <!-- 3D INTERACTIVE HOLOGRAPHIC BOTANICAL TWIN HERO -->
+    <div class="hero-3d-container glass-card">
+        <div class="hero-3d-canvas-wrap">
+            <canvas id="three-plant-canvas"></canvas>
+            <div class="hero-3d-overlay">
+                <div class="badge-3d-live">
+                    <span class="live-pulse"></span>
+                    <i class="fa-solid fa-cube"></i> Interactive 3D Digital Twin • Drag to Rotate & Inspect
+                </div>
+                <div class="hero-3d-modes">
+                    <button id="mode-organic-btn" class="mode-pill active" type="button"><i class="fa-solid fa-leaf"></i> Organic Leaf</button>
+                    <button id="mode-neural-btn" class="mode-pill" type="button"><i class="fa-solid fa-network-wired"></i> ViT Attention Grid</button>
+                    <button id="mode-particles-btn" class="mode-pill" type="button"><i class="fa-solid fa-atom"></i> Bio-Particles</button>
+                </div>
+            </div>
+            <div class="hero-3d-hud">
+                <div class="hud-item"><span class="hud-label">Architecture</span><strong class="hud-val">ViT-B/16 Multi-Head</strong></div>
+                <div class="hud-item"><span class="hud-label">Explainability</span><strong class="hud-val">Grad-CAM Layer 11</strong></div>
+                <div class="hud-item"><span class="hud-label">Engine</span><strong class="hud-val">WebGL 60 FPS</strong></div>
+            </div>
+        </div>
+        <div class="hero-3d-intro">
+            <div class="hero-pill-badge">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Next-Gen Smart Agritech AI
+            </div>
+            <h2>Multimodal AI Diagnostics for Crop Protection</h2>
+            <p>
+                Empowering farmers worldwide with instant Vision Transformer pathology, 
+                explainable Grad-CAM leaf heatmaps, and multilingual treatment guidance.
+            </p>
+            <div class="hero-action-row">
+                <button type="button" class="primary-btn hero-cta-btn" onclick="document.getElementById('open-camera-btn').click()">
+                    <i class="fa-solid fa-camera"></i> Diagnose My Crop Leaf
+                </button>
+                <button type="button" class="secondary-btn" onclick="document.getElementById('open-contribute-modal-btn').click()">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Contribute Field Data
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Plantix-Style Crop Selection Pills & Search -->
     <div class="crop-pills-container glass-card">
@@ -443,8 +489,77 @@
                 <h2>Welcome to SmartFarming.AI Dashboard</h2>
                 <p>Upload an image of a plant leaf (such as Apple, Tomato, Potato, Grape, or Corn) and run the diagnostic tool to view real-time disease detection, neural network attention maps, and customized treatment recommendations.</p>
             </div>
-        </section>
     </main>
+
+    <!-- COMPREHENSIVE SMARTFARMING.AI FOOTER -->
+    <footer class="site-footer glass-card">
+        <div class="footer-top">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <div class="logo-icon-wrap">
+                        <i class="fa-solid fa-leaf logo-icon"></i>
+                    </div>
+                    <h2>SmartFarming<span>.AI</span></h2>
+                </div>
+                <p class="footer-tagline">
+                    Multimodal Generative AI for Smart Farming — Combining Vision Transformers (ViT-B/16),
+                    Explainable Grad-CAM Attention Heatmaps, and Hybrid Agricultural RAG for Real-Time Crop Protection.
+                </p>
+                <div class="footer-tech-badges">
+                    <span class="tech-pill"><i class="fa-solid fa-microchip"></i> ViT-B/16</span>
+                    <span class="tech-pill"><i class="fa-solid fa-fire"></i> Grad-CAM</span>
+                    <span class="tech-pill"><i class="fa-solid fa-cubes"></i> Three.js 3D</span>
+                    <span class="tech-pill"><i class="fa-solid fa-database"></i> Hybrid RAG</span>
+                    <span class="tech-pill"><i class="fa-solid fa-bolt"></i> FastAPI</span>
+                    <span class="tech-pill"><i class="fa-brands fa-whatsapp"></i> Twilio Bot</span>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4><i class="fa-solid fa-graduation-cap"></i> Academic Project</h4>
+                <p class="footer-inst"><strong>B. Tech. Final Year Project (BIT-753)</strong></p>
+                <p class="footer-inst-sub">Department of Information Technology</p>
+                <p class="footer-college">ABES Engineering College, Ghaziabad</p>
+                <p class="footer-guide"><strong>Project Guide:</strong> Ms. Tanaya Gupta</p>
+            </div>
+
+            <div class="footer-col">
+                <h4><i class="fa-solid fa-users"></i> Project Team</h4>
+                <ul class="footer-team-list">
+                    <li><span>Rishav Kumar Gupta</span> <small>(230032013196)</small></li>
+                    <li><span>Rajesh Yadav</span> <small>(2300320130190)</small></li>
+                    <li><span>Rajneesh Chaubey</span> <small>(2200320130134)</small></li>
+                    <li><span>Nadeem</span> <small>(2300230130155)</small></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4><i class="fa-solid fa-link"></i> Quick Navigation</h4>
+                <div class="footer-links">
+                    <button type="button" class="footer-link-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})"><i class="fa-solid fa-house"></i> Dashboard Top</button>
+                    <button type="button" class="footer-link-btn" onclick="document.getElementById('open-camera-btn').click()"><i class="fa-solid fa-camera"></i> Live Crop Scanner</button>
+                    <button type="button" class="footer-link-btn" onclick="document.getElementById('open-contribute-modal-btn').click()"><i class="fa-solid fa-cloud-arrow-up"></i> Contribute Training Data</button>
+                    <button type="button" class="footer-link-btn" onclick="document.getElementById('open-whatsapp-modal-btn').click()"><i class="fa-brands fa-whatsapp"></i> WhatsApp Assistant</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-disclaimer-box">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>
+                <strong>Agricultural Advisory Notice:</strong> AI predictions and explainable heatmaps are designed for early detection support. 
+                Always cross-verify severe crop blight or pest infestations with local Krishi Vigyan Kendra (KVK) or certified agricultural agronomists before large-scale chemical spraying.
+            </span>
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2026 SmartFarming.AI • Multimodal Agricultural Intelligence Platform • Batch 2026-27</p>
+            <div class="footer-status">
+                <span class="status-dot"></span>
+                <span>Neural Engine Online • 38 Diseases • 14 Crops</span>
+            </div>
+        </div>
+    </footer>
 
     <!-- FLOATING CHAT DRAWER -->
     <div id="chat-drawer" class="chat-drawer collapsed hidden">
@@ -529,6 +644,55 @@
                 <a id="launch-whatsapp-link" href="https://wa.me/14155238886?text=join%20smart-farming" target="_blank" class="primary-btn" style="text-decoration: none; justify-content: center; background: #25D366; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);">
                     <i class="fa-brands fa-whatsapp" style="font-size: 20px;"></i> Open WhatsApp Bot App
                 </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Community Contribution Modal -->
+    <div id="contribute-modal" class="camera-modal hidden">
+        <div class="camera-modal-content glass-card" style="max-width: 520px; width: 90%;">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-seedling" style="color: #10b981;"></i> Community Training Contribution</h3>
+                <button id="close-contribute-modal-btn" class="close-modal-btn" type="button"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" style="text-align: left; padding: 10px 0;">
+                <p style="font-size: 13px; color: #94a3b8; margin-bottom: 16px;">
+                    Anyone anywhere can upload labeled crop disease leaves to help continuously retrain the AI and increase model accuracy across farms.
+                </p>
+
+                <form id="contribute-form" style="display: flex; flex-direction: column; gap: 12px;">
+                    <div>
+                        <label style="font-size: 12px; color: #cbd5e1; font-weight: 600; display: block; margin-bottom: 4px;">1. Select Leaf Photo *</label>
+                        <input type="file" id="contrib-file-input" accept="image/*" required style="width: 100%; padding: 8px; border-radius: 6px; background: #0f172a; border: 1px solid var(--border-color); color: #e2e8f0; font-size: 13px;">
+                    </div>
+
+                    <div>
+                        <label style="font-size: 12px; color: #cbd5e1; font-weight: 600; display: block; margin-bottom: 4px;">2. Disease / Health Label *</label>
+                        <select id="contrib-label-select" required style="width: 100%; padding: 10px; border-radius: 6px; background: #0f172a; border: 1px solid var(--border-color); color: #e2e8f0; font-size: 13px;">
+                            <option value="">-- Choose Disease Category --</option>
+                        </select>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>
+                            <label style="font-size: 12px; color: #cbd5e1; font-weight: 600; display: block; margin-bottom: 4px;">Contributor Name</label>
+                            <input type="text" id="contrib-name-input" placeholder="e.g. Ramesh Patel" style="width: 100%; padding: 8px; border-radius: 6px; background: #0f172a; border: 1px solid var(--border-color); color: #e2e8f0; font-size: 13px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 12px; color: #cbd5e1; font-weight: 600; display: block; margin-bottom: 4px;">Target Crop</label>
+                            <input type="text" id="contrib-crop-input" placeholder="e.g. Tomato, Apple" style="width: 100%; padding: 8px; border-radius: 6px; background: #0f172a; border: 1px solid var(--border-color); color: #e2e8f0; font-size: 13px;">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label style="font-size: 12px; color: #cbd5e1; font-weight: 600; display: block; margin-bottom: 4px;">Notes / Field Observations</label>
+                        <textarea id="contrib-notes-input" rows="2" placeholder="e.g. Early stage symptoms noticed after heavy rainfall" style="width: 100%; padding: 8px; border-radius: 6px; background: #0f172a; border: 1px solid var(--border-color); color: #e2e8f0; font-size: 13px; resize: none;"></textarea>
+                    </div>
+
+                    <button type="submit" id="contrib-submit-btn" class="primary-btn" style="margin-top: 6px; justify-content: center;">
+                        <i class="fa-solid fa-paper-plane"></i> Submit to AI Training Pipeline
+                    </button>
+                </form>
             </div>
         </div>
     </div>
