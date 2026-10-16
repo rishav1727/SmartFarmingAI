@@ -118,4 +118,6 @@ python -m uvicorn src.app:app --host 0.0.0.0 --port 8000 --reload
 - **Course:** Final Year B.Tech Project BIT-753
 - **Department:** Information Technology, ABES Engineering College, Ghaziabad
 - **Affiliation:** Dr. A.P.J. Abdul Kalam Technical University (AKTU), Lucknow
+- **Project Guide:** Mr. Deepak Aneja
+- **Project Team:** Rishav Kumar Gupta, Rajesh Yadav, Rajneesh Chaubey, Nadeem
 - **License:** MIT Open Source

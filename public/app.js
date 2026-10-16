@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return JSON.parse(text);
         } catch {
             if (text.trim().startsWith("<")) {
-                throw new Error("Backend server is offline. Please start it: python -m uvicorn src.app:app --port 8000 --reload");
+                throw new Error("Server is warming up. The AI engine loads on first use — please try again in a few seconds.");
             }
             throw new Error("Invalid server response: " + text.slice(0, 120));
         }
