@@ -34,3 +34,15 @@ android/app/build/
 android/local.properties
 android/.idea/
 
+# Local databases & secrets
+*.db
+*.sqlite
+*.sqlite3
+.env
+
+# Binary tools & archives
+*.exe
+*.zip
+*.tar.gz
+
+

@@ -1,17 +1,37 @@
+# ── Core ML ──────────────────────────────────────────────────────────────────
 torch
 torchvision
 torchaudio
-datasets
 Pillow
+numpy
 scikit-learn
 tqdm
-numpy
 matplotlib
 opencv-python
+
+# ── Web framework ─────────────────────────────────────────────────────────────
 fastapi
-uvicorn
-openai
-google-generativeai
-pypdf
+uvicorn[standard]
 python-multipart
 requests
+
+# ── Database (SQLite local / PostgreSQL production) ───────────────────────────
+sqlalchemy
+psycopg2-binary          # PostgreSQL adapter (ignored when using SQLite)
+
+# ── Cloud storage ─────────────────────────────────────────────────────────────
+supabase                 # Supabase Python client (storage + DB)
+
+# ── ML model hub ─────────────────────────────────────────────────────────────
+huggingface_hub          # Push/pull model weights to HuggingFace Hub
+datasets                 # HuggingFace datasets (training data loader)
+
+# ── AI advisor ────────────────────────────────────────────────────────────────
+openai
+google-generativeai
+
+# ── Document RAG ─────────────────────────────────────────────────────────────
+pypdf
+
+# ── Misc ──────────────────────────────────────────────────────────────────────
+python-dotenv            # Load .env file locally

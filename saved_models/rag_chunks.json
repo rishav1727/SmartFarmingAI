@@ -1,192 +1,162 @@
 [
-  {
-    "source": "apple_disease_guide.txt",
-    "chunk_id": "apple_disease_guide.txt_0",
-    "text": "APPLE DISEASE CROP MANAGEMENT GUIDE"
-  },
-  {
-    "source": "apple_disease_guide.txt",
-    "chunk_id": "apple_disease_guide.txt_1",
-    "text": "1. Apple Scab (Venturia inaequalis)\nSymptoms: Olive-green to black spots on leaves and fruit. Leaves may turn yellow and drop early. Fruit develops corky, brown lesions.\nTreatment and Cure:\n- Chemical Control: Apply Captan or Mancozeb fungicides during the early green tip stage. Systemic fungicides like Myclobutanil work well if the infection has already set in.\n- Biological Control: Apply liquid sulfur sprays or copper octanoate organic soap. \n- Preventative Control: Rake and destroy fallen leaves in autumn to reduce the overwintering spore population. Keep the tree canopy open by pruning to allow leaves to dry rapidly."
-  },
-  {
-    "source": "apple_disease_guide.txt",
-    "chunk_id": "apple_disease_guide.txt_2",
-    "text": "2. Cedar Apple Rust (Gymnosporangium juniperi-virginianae)\nSymptoms: Bright orange-yellow spots appear on the upper surface of leaves. Tubular structures form on the lower leaf surface, releasing rusty spores.\nTreatment and Cure:\n- Chemical Control: Apply Myclobutanil or Propiconazole fungicides starting at bud break and repeat every 7-14 days until flower petals fall.\n- Biological Control: Spray with sulfur-based organic fungicides.\n- Preventative Control: Remove nearby wild red cedar or juniper trees (which act as alternate hosts for the rust fungus) within a 1-mile radius if possible. Plant rust-resistant cultivars."
-  },
-  {
-    "source": "apple_disease_guide.txt",
-    "chunk_id": "apple_disease_guide.txt_3",
-    "text": "3. Apple Black Rot (Botryosphaeria obtusa)\nSymptoms: Leaves show \"frogeye\" leaf spots (circular brown spots with purple margins). Fruit develops a firm, dark rot that turns black with concentric rings. Cankers form on branches.\nTreatment and Cure:\n- Chemical Control: Apply Captan or Thiophanate-methyl fungicides during the growing season.\n- Biological Control: Use Bacillus subtilis or Trichoderma-based organic bio-fungicides.\n- Preventative Control: Prune out dead wood and cankered branches. Remove mummified fruit from the tree and orchard floor."
-  },
-  {
-    "source": "corn_diseases.txt",
-    "chunk_id": "corn_diseases.txt_0",
-    "text": "CORN (MAIZE) DISEASE CROP MANAGEMENT GUIDE"
-  },
-  {
-    "source": "corn_diseases.txt",
-    "chunk_id": "corn_diseases.txt_1_5",
-    "text": "1. Corn Common Rust (Puccinia sorghi)\nSymptoms: Small, circular to elongate, brick-red to dark brown pustules on both upper and lower leaf surfaces. Pustules rupture to release powdery rust-colored spores. Severe infections cause premature leaf death.\nTreatment and Cure:\n- Chemical Control: Apply Propiconazole 25% EC at 1ml/L of water. Tebuconazole 25.9% EC at 1ml/L. Azoxystrobin + Propiconazole (Amistar Xtra) at 1ml/L for broad-spectrum control. Spray at first sign of rust pustule appearance.\n- Biological Control: Trichoderma viride suspension (10g/L) as foliar spray. Bacillus amyloliquefaciens applied preventively.\n- Preventative Control: Plant rust-resistant corn hybrids."
-  },
-  {
-    "source": "corn_diseases.txt",
-    "chunk_id": "corn_diseases.txt_1_6",
-    "text": "Avoid late planting to escape peak rust periods. Destroy infected crop residue after harvest. Apply potassium-rich fertilizer to improve plant resistance.\n- Fungicide: Propiconazole, Tebuconazole, Azoxystrobin, Mancozeb."
-  },
-  {
-    "source": "corn_diseases.txt",
-    "chunk_id": "corn_diseases.txt_2",
-    "text": "2. Corn Gray Leaf Spot (Cercospora zeae-maydis)\nSymptoms: Rectangular tan to gray lesions bounded by leaf veins. Lesions expand in humid conditions, causing premature leaf senescence.\nTreatment and Cure:\n- Chemical Control: Strobilurin fungicides (Azoxystrobin, Pyraclostrobin) applied at tasseling stage. Triazoles like Propiconazole at 1ml/L every 14 days.\n- Biological Control: Pseudomonas fluorescens spray at 10ml/L. Neem oil 5ml/L as repellent.\n- Preventative Control: Crop rotation with non-host crops for 2 years. Tillage to reduce surface residue. Plant resistant hybrids in areas with high gray leaf spot pressure."
-  },
-  {
-    "source": "corn_diseases.txt",
-    "chunk_id": "corn_diseases.txt_3",
-    "text": "3. Corn Northern Leaf Blight (Exserohilum turcicum)\nSymptoms: Long, cigar-shaped, tan to olive-colored lesions (10-15 cm) on leaves. Lesions develop dark borders and produce dark fungal spores under wet conditions.\nTreatment and Cure:\n- Chemical Control: Mancozeb 75% WP at 2g/L. Propiconazole 25% EC at 1ml/L. Apply at VT (tasseling) and R1 (silking) growth stages.\n- Preventative Control: Plant resistant corn varieties. Maintain proper plant spacing for airflow. Remove and destroy crop debris post harvest."
-  },
-  {
-    "source": "grape_diseases.txt",
-    "chunk_id": "grape_diseases.txt_0",
-    "text": "GRAPE DISEASE CROP MANAGEMENT GUIDE"
-  },
-  {
-    "source": "grape_diseases.txt",
-    "chunk_id": "grape_diseases.txt_1_10",
-    "text": "1. Grape Black Rot (Guignardia bidwellii)\nSymptoms: Circular tan to brown leaf spots with dark borders. Small black fruiting bodies (pycnidia) visible in the center of leaf spots. Berries shrivel and become black mummified raisins attached to the cluster.\nTreatment and Cure:\n- Chemical Control: Apply Mancozeb 75% WP at 2g/L from bud break onwards. Myclobutanil 10% WP at 1g/L after bloom. Tebuconazole 25.9% EC at 1ml/L for systemic control. Spray every 7-10 days during wet weather.\n- Biological Control: Bacillus subtilis (Serenade) as preventive foliar spray."
-  },
-  {
-    "source": "grape_diseases.txt",
-    "chunk_id": "grape_diseases.txt_1_11",
-    "text": "Copper sulfate solution (3g/L) as Bordeaux mixture spray before bud break.\n- Preventative Control: Remove and destroy all mummified berries and infected canes during winter pruning. Maintain open canopy through leaf removal to improve air circulation. Use drip irrigation to keep foliage dry.\n- Fungicide: Mancozeb, Myclobutanil, Tebuconazole, Copper Sulfate, Captan."
-  },
-  {
-    "source": "grape_diseases.txt",
-    "chunk_id": "grape_diseases.txt_2",
-    "text": "2. Grape Powdery Mildew (Erysiphe necator)\nSymptoms: White to gray powdery coating on leaves, shoots, and berries. Affected leaves may curl, distort, and drop prematurely. Infected berries crack and develop off-flavor.\nTreatment and Cure:\n- Chemical Control: Sulfur-based fungicides (Wettable Sulfur 80% WP) at 3g/L applied every 7-14 days. Myclobutanil 10% WP at 1g/L. Azoxystrobin at 1ml/L for systemic control.\n- Biological Control: Neem oil (5ml/L) + soap emulsifier. Potassium bicarbonate (5g/L) as contact fungicide.\n- Preventative Control: Maintain open vine canopy. Avoid excess nitrogen fertilization. Plant powdery mildew resistant grape varieties."
-  },
-  {
-    "source": "grape_diseases.txt",
-    "chunk_id": "grape_diseases.txt_3",
-    "text": "3. Grape Downy Mildew (Plasmopara viticola)\nSymptoms: Yellow oil spots on upper leaf surfaces. White cottony growth (sporulation) on leaf undersides. Berries turn brown and shrivel.\nTreatment and Cure:\n- Chemical Control: Copper Oxychloride 50% WP at 3g/L as preventive. Metalaxyl + Mancozeb for curative action. Dimethomorph + Mancozeb alternated with copper fungicides.\n- Biological Control: Bacillus pumilus spray as preventive biocontrol.\n- Preventative Control: Ensure good drainage. Avoid overhead irrigation. Remove infected shoots promptly."
-  },
-  {
-    "source": "pepper_diseases.txt",
-    "chunk_id": "pepper_diseases.txt_0",
-    "text": "PEPPER (BELL PEPPER / CHILLI) DISEASE CROP MANAGEMENT GUIDE"
-  },
-  {
-    "source": "pepper_diseases.txt",
-    "chunk_id": "pepper_diseases.txt_1_15",
-    "text": "1. Pepper Bacterial Spot (Xanthomonas campestris pv. vesicatoria)\nSymptoms: Small water-soaked lesions on leaves that enlarge and turn brown to black with yellow halos. Lesions may have a greasy appearance. Infected fruit develops raised corky scabs and sunken spots, reducing marketability.\nTreatment and Cure:\n- Chemical Control: Copper-based bactericides are primary treatment \u2014 Copper Oxychloride 50% WP at 3g/L spray every 7-10 days. Copper Hydroxide (Kocide 3000) at 2g/L. Streptomycin Sulfate 90% SP at 1g/L for severe bacterial outbreak (where legally permitted)."
-  },
-  {
-    "source": "pepper_diseases.txt",
-    "chunk_id": "pepper_diseases.txt_1_16",
-    "text": "Bactericide rotation recommended to prevent resistance.\n- Biological Control: Bacillus subtilis (Serenade Opti) foliar spray at 5ml/L every 7 days. Pseudomonas fluorescens 10ml/L as preventive spray. Trichoderma-based bio-fungicide as soil drench to improve root health.\n- Preventative Control: Use certified disease-free transplants. Avoid overhead irrigation; switch to drip irrigation to keep foliage dry. Do not work in the field when plants are wet. Remove and destroy infected plant material. Rotate crops with non-solanaceous crops for 2-3 years. Use copper-resistant variety management."
-  },
-  {
-    "source": "pepper_diseases.txt",
-    "chunk_id": "pepper_diseases.txt_1_17",
-    "text": "Sanitize farm equipment.\n- Bactericide/Fungicide: Copper Oxychloride, Copper Hydroxide, Streptomycin, Mancozeb."
-  },
-  {
-    "source": "pepper_diseases.txt",
-    "chunk_id": "pepper_diseases.txt_2",
-    "text": "2. Pepper Phytophthora Blight (Phytophthora capsici)\nSymptoms: Water-soaked lesions on leaves, stems, and fruit. Stem lesions girdle the plant causing sudden wilting and collapse. Fruit develops water-soaked lesions that become covered with white mold.\nTreatment and Cure:\n- Chemical Control: Metalaxyl-M + Mancozeb (Ridomil Gold) at 2.5g/L. Propamocarb Hydrochloride (Previcur) as soil drench. Copper Oxychloride 50% WP at 3g/L as foliar spray.\n- Biological Control: Trichoderma harzianum soil drench (10g/L). Pseudomonas fluorescens foliar spray.\n- Preventative Control: Avoid water logging; use raised beds. Ensure proper soil drainage. Rotate away from peppers and other solanaceous crops for 3 years."
-  },
-  {
-    "source": "pepper_diseases.txt",
-    "chunk_id": "pepper_diseases.txt_3",
-    "text": "3. Pepper Anthracnose (Colletotrichum spp.)\nSymptoms: Circular, sunken, water-soaked lesions on ripening fruit that enlarge and become covered with salmon-orange spore masses. Leaves show small brown spots.\nTreatment and Cure:\n- Chemical Control: Mancozeb 75% WP at 2g/L. Azoxystrobin at 1ml/L. Chlorothalonil 75% WP at 2g/L. Start spray program at first fruit set.\n- Preventative Control: Harvest fruit promptly. Avoid wounds during harvest. Use resistant pepper varieties. Proper post-harvest handling."
-  },
-  {
-    "source": "potato_diseases.txt",
-    "chunk_id": "potato_diseases.txt_0",
-    "text": "POTATO DISEASE CROP MANAGEMENT GUIDE"
-  },
-  {
-    "source": "potato_diseases.txt",
-    "chunk_id": "potato_diseases.txt_1_21",
-    "text": "1. Potato Early Blight (Alternaria solani)\nSymptoms: Dark brown to black concentric ring lesions (target-board pattern) appear first on older lower leaves. Yellow halo surrounds each lesion. Severe infection causes defoliation and reduced tuber yield.\nTreatment and Cure:\n- Chemical Control: Apply Mancozeb 75% WP at 2g/L every 7-10 days from 30 days after planting. Chlorothalonil 75% WP at 2g/L as preventive. Tebuconazole 25.9% EC at 1ml/L for systemic control when lesions appear. Azoxystrobin + Difenoconazole (Amistar Top) at 0.75ml/L.\n- Biological Control: Trichoderma viride 10g/L as soil drench plus foliar spray. Pseudomonas fluorescens 10ml/L every 15 days."
-  },
-  {
-    "source": "potato_diseases.txt",
-    "chunk_id": "potato_diseases.txt_1_22",
-    "text": "Neem oil (5ml/L) + soap emulsifier spray.\n- Preventative Control: Use certified disease-free seed tubers. Maintain proper plant spacing (30cm x 60cm) for good airflow. Avoid overhead irrigation; use drip irrigation. Rotate crops with non-solanaceous crops for 2-3 years. Remove and destroy infected plant debris.\n- Fungicide: Mancozeb, Chlorothalonil, Tebuconazole, Azoxystrobin."
-  },
-  {
-    "source": "potato_diseases.txt",
-    "chunk_id": "potato_diseases.txt_2_23",
-    "text": "2. Potato Late Blight (Phytophthora infestans)\nSymptoms: Water-soaked pale green to dark brown irregular lesions on leaves and stems. White cottony mold on leaf undersides in humid conditions. Tubers develop reddish-brown dry rot.\nTreatment and Cure:\n- Chemical Control: Metalaxyl-M 4% + Mancozeb 40% WP (Ridomil Gold) at 2.5g/L immediately at first symptom. Standard Metalaxyl-M fungicide sprays at 1.8g/L under extreme humidity. Cymoxanil + Mancozeb as curative spray. Copper Oxychloride 50% WP at 3g/L as preventive.\n- Biological Control: Bacillus subtilis foliar spray. Trichoderma bio-agent suspension (custom Trichoderma bio-agent suspension per Agronomy Extension Office PDF Bulletin)."
-  },
-  {
-    "source": "potato_diseases.txt",
-    "chunk_id": "potato_diseases.txt_2_24",
-    "text": "Copper sulfate Bordeaux mixture (3g/L) as preventive.\n- Preventative Control: Plant blight-resistant potato varieties. Avoid wet foliage conditions; use drip irrigation. Destroy volunteer potato plants. Monitor weather forecasts and spray preventively during cool humid weather.."
-  },
-  {
-    "source": "potato_diseases.txt",
-    "chunk_id": "potato_diseases.txt_3",
-    "text": "3. Potato Leaf Roll Virus (PLRV)\nSymptoms: Rolling and yellowing of leaves starting from upper canopy. Leaves become stiff and leathery with a pinkish discoloration on undersides. Affected plants are stunted with reduced tuber yield.\nTreatment and Cure:\n- Chemical Control: No direct chemical treatment for virus. Control aphid vectors with Imidacloprid (0.3ml/L) or Thiamethoxam (0.2g/L) systemic insecticides.\n- Preventative Control: Use certified virus-free seed tubers. Rogue out infected plants early. Control aphid populations that spread the virus."
-  },
-  {
-    "source": "strawberry_diseases.txt",
-    "chunk_id": "strawberry_diseases.txt_0",
-    "text": "STRAWBERRY DISEASE CROP MANAGEMENT GUIDE"
-  },
-  {
-    "source": "strawberry_diseases.txt",
-    "chunk_id": "strawberry_diseases.txt_1_27",
-    "text": "1. Strawberry Leaf Scorch (Diplocarpon earlianum)\nSymptoms: Small, irregular, dark purple to red spots on upper leaf surfaces. Spots enlarge and centers turn tan to brown while margins remain purple-red, giving a scorched appearance. Severe infections cause early defoliation.\nTreatment and Cure:\n- Chemical Control: Apply Captan 50% WP at 3g/L. Myclobutanil 10% WP at 1g/L. Azoxystrobin at 1ml/L as systemic control. Spray every 10-14 days from early spring through harvest.\n- Biological Control: Bacillus subtilis (Serenade) at 5ml/L foliar spray. Neem oil (5ml/L) with soap emulsifier every 7 days.\n- Preventative Control: Remove and destroy infected leaves after harvest."
-  },
-  {
-    "source": "strawberry_diseases.txt",
-    "chunk_id": "strawberry_diseases.txt_1_28",
-    "text": "Avoid overhead irrigation. Plant resistant strawberry varieties. Ensure adequate plant spacing (30cm x 40cm) for good air circulation.\n- Fungicide: Captan, Myclobutanil, Azoxystrobin, Tebuconazole."
-  },
-  {
-    "source": "strawberry_diseases.txt",
-    "chunk_id": "strawberry_diseases.txt_2",
-    "text": "2. Strawberry Gray Mold (Botrytis cinerea)\nSymptoms: Brown water-soaked lesions on berries, flowers, and leaves. Gray fluffy mold sporulation on infected tissue in humid conditions. Infected berries rot rapidly.\nTreatment and Cure:\n- Chemical Control: Iprodione 50% WP at 1g/L. Fenhexamid (Teldor) at 1g/L. Pyrimethanil at 1ml/L. Begin spray program at early bloom and repeat every 7-10 days.\n- Biological Control: Trichoderma harzianum 10g/L foliar spray. Bacillus subtilis preventive spray.\n- Preventative Control: Harvest ripe fruit promptly. Remove decaying berries. Improve air circulation through mulching and proper spacing."
-  },
-  {
-    "source": "strawberry_diseases.txt",
-    "chunk_id": "strawberry_diseases.txt_3",
-    "text": "3. Strawberry Angular Leaf Spot (Xanthomonas fragariae)\nSymptoms: Small water-soaked irregular lesions on lower leaf surface that turn brown and angular. White bacterial exudate may dry to a white crust on leaf surfaces.\nTreatment and Cure:\n- Chemical Control: Copper Oxychloride 50% WP at 3g/L. Copper Hydroxide bactericide spray every 7-10 days during wet weather.\n- Preventative Control: Avoid overhead irrigation. Use certified disease-free transplants. Rotate planting sites every 3 years."
-  },
-  {
-    "source": "temp_reference_guide.txt",
-    "chunk_id": "temp_reference_guide.txt_0",
-    "text": "CROP ADVISOR SPECIAL INFO"
-  },
-  {
-    "source": "temp_reference_guide.txt",
-    "chunk_id": "temp_reference_guide.txt_1",
-    "text": "Potato Late Blight Treatment Special Guidelines:\nUnder extreme humidity conditions, apply standard metalaxyl-M fungicide sprays at a dosage of 1.8g/L. Biological: Spray with custom Trichoderma bio-agent suspension. Source: Agronomy Extension Office PDF Bulletin."
-  },
-  {
-    "source": "tomato_diseases.txt",
-    "chunk_id": "tomato_diseases.txt_0",
-    "text": "TOMATO DISEASE CROP MANAGEMENT GUIDE"
-  },
-  {
-    "source": "tomato_diseases.txt",
-    "chunk_id": "tomato_diseases.txt_1_34",
-    "text": "1. Tomato Late Blight (Phytophthora infestans)\nSymptoms: Water-soaked lesions on leaves that turn brown-black rapidly. White mold visible on undersides of leaves in humid conditions. Fruit develops greasy-looking dark patches.\nTreatment and Cure:\n- Chemical Control: Apply Mancozeb 75% WP at 2g per liter of water as a preventive spray. For active infection, use Metalaxyl-M 4% + Mancozeb 40% WP (Ridomil Gold) at 2.5g/L. Systemic fungicides like Cymoxanil + Mancozeb can be alternated.\n- Biological Control: Spray Bacillus subtilis (0.5% WP) at 5g/L."
-  },
-  {
-    "source": "tomato_diseases.txt",
-    "chunk_id": "tomato_diseases.txt_1_35",
-    "text": "Trichoderma viride suspension at 10g/L as soil drench to suppress root infection.\n- Preventative Control: Avoid overhead irrigation; use drip irrigation. Destroy infected plant debris. Ensure good airflow by proper plant spacing (60cm between plants). Apply copper-based fungicides as protectant at early flowering stage.\n- Fungicide: Mancozeb, Metalaxyl, Cymoxanil, Copper Oxychloride."
-  },
-  {
-    "source": "tomato_diseases.txt",
-    "chunk_id": "tomato_diseases.txt_2",
-    "text": "2. Tomato Early Blight (Alternaria solani)\nSymptoms: Brown concentric rings forming a target-board pattern on older leaves. Leaf yellowing around spots leads to defoliation. Dark lesions also appear on stems and fruit.\nTreatment and Cure:\n- Chemical Control: Apply Chlorothalonil 75% WP at 2g/L or Mancozeb 75% WP at 2g/L every 7-10 days. Tebuconazole 250 EC at 1ml/L for systemic control.\n- Biological Control: Neem oil (5ml/L) + soap emulsifier sprays every 7 days. Trichoderma harzianum as biocontrol agent.\n- Preventative Control: Remove and burn infected leaves. Rotate crops every 2-3 years. Avoid water stress and excessive nitrogen fertilization."
-  },
-  {
-    "source": "tomato_diseases.txt",
-    "chunk_id": "tomato_diseases.txt_3",
-    "text": "3. Tomato Leaf Mold (Passalora fulva)\nSymptoms: Yellow spots on upper leaf surfaces with olive-green to brown velvety mold patches on undersides. Leaves eventually wilt and fall.\nTreatment and Cure:\n- Chemical Control: Apply Copper Oxychloride 50% WP at 2.5g/L. Mancozeb 75% WP at 2g/L as preventive spray. Azoxystrobin at 1ml/L for systemic control.\n- Biological Control: Trichoderma viride 5g/L foliar spray. Pseudomonas fluorescens 10ml/L.\n- Preventative Control: Maintain greenhouse humidity below 85%. Prune lower leaves. Ensure adequate ventilation. Use resistant tomato varieties."
-  }
+    {
+        "source": "apple_disease_guide.txt",
+        "chunk_id": "apple_disease_guide.txt_0",
+        "text": "APPLE DISEASE CROP MANAGEMENT GUIDE"
+    },
+    {
+        "source": "apple_disease_guide.txt",
+        "chunk_id": "apple_disease_guide.txt_1",
+        "text": "1. Apple Scab (Venturia inaequalis)\nSymptoms: Olive-green to black spots on leaves and fruit. Leaves may turn yellow and drop early. Fruit develops corky, brown lesions.\nTreatment and Cure:\n- Chemical Control: Apply Captan or Mancozeb fungicides during the early green tip stage. Systemic fungicides like Myclobutanil work well if the infection has already set in.\n- Biological Control: Apply liquid sulfur sprays or copper octanoate organic soap. \n- Preventative Control: Rake and destroy fallen leaves in autumn to reduce the overwintering spore population. Keep the tree canopy open by pruning to allow leaves to dry rapidly."
+    },
+    {
+        "source": "apple_disease_guide.txt",
+        "chunk_id": "apple_disease_guide.txt_2",
+        "text": "2. Cedar Apple Rust (Gymnosporangium juniperi-virginianae)\nSymptoms: Bright orange-yellow spots appear on the upper surface of leaves. Tubular structures form on the lower leaf surface, releasing rusty spores.\nTreatment and Cure:\n- Chemical Control: Apply Myclobutanil or Propiconazole fungicides starting at bud break and repeat every 7-14 days until flower petals fall.\n- Biological Control: Spray with sulfur-based organic fungicides.\n- Preventative Control: Remove nearby wild red cedar or juniper trees (which act as alternate hosts for the rust fungus) within a 1-mile radius if possible. Plant rust-resistant cultivars."
+    },
+    {
+        "source": "apple_disease_guide.txt",
+        "chunk_id": "apple_disease_guide.txt_3",
+        "text": "3. Apple Black Rot (Botryosphaeria obtusa)\nSymptoms: Leaves show \"frogeye\" leaf spots (circular brown spots with purple margins). Fruit develops a firm, dark rot that turns black with concentric rings. Cankers form on branches.\nTreatment and Cure:\n- Chemical Control: Apply Captan or Thiophanate-methyl fungicides during the growing season.\n- Biological Control: Use Bacillus subtilis or Trichoderma-based organic bio-fungicides.\n- Preventative Control: Prune out dead wood and cankered branches. Remove mummified fruit from the tree and orchard floor."
+    },
+    {
+        "source": "corn_diseases.txt",
+        "chunk_id": "corn_diseases.txt_0",
+        "text": "CORN (MAIZE) DISEASE CROP MANAGEMENT GUIDE"
+    },
+    {
+        "source": "corn_diseases.txt",
+        "chunk_id": "corn_diseases.txt_1",
+        "text": "1. Corn Common Rust (Puccinia sorghi)\nSymptoms: Small, circular to elongate, brick-red to dark brown pustules on both upper and lower leaf surfaces. Pustules rupture to release powdery rust-colored spores. Severe infections cause premature leaf death.\nTreatment and Cure:\n- Chemical Control: Apply Propiconazole 25% EC at 1ml/L of water. Tebuconazole 25.9% EC at 1ml/L. Azoxystrobin + Propiconazole (Amistar Xtra) at 1ml/L for broad-spectrum control. Spray at first sign of rust pustule appearance.\n- Biological Control: Trichoderma viride suspension (10g/L) as foliar spray. Bacillus amyloliquefaciens applied preventively.\n- Preventative Control: Plant rust-resistant corn hybrids. Avoid late planting to escape peak rust periods. Destroy infected crop residue after harvest. Apply potassium-rich fertilizer to improve plant resistance.\n- Fungicide: Propiconazole, Tebuconazole, Azoxystrobin, Mancozeb"
+    },
+    {
+        "source": "corn_diseases.txt",
+        "chunk_id": "corn_diseases.txt_2",
+        "text": "2. Corn Gray Leaf Spot (Cercospora zeae-maydis)\nSymptoms: Rectangular tan to gray lesions bounded by leaf veins. Lesions expand in humid conditions, causing premature leaf senescence.\nTreatment and Cure:\n- Chemical Control: Strobilurin fungicides (Azoxystrobin, Pyraclostrobin) applied at tasseling stage. Triazoles like Propiconazole at 1ml/L every 14 days.\n- Biological Control: Pseudomonas fluorescens spray at 10ml/L. Neem oil 5ml/L as repellent.\n- Preventative Control: Crop rotation with non-host crops for 2 years. Tillage to reduce surface residue. Plant resistant hybrids in areas with high gray leaf spot pressure."
+    },
+    {
+        "source": "corn_diseases.txt",
+        "chunk_id": "corn_diseases.txt_3",
+        "text": "3. Corn Northern Leaf Blight (Exserohilum turcicum)\nSymptoms: Long, cigar-shaped, tan to olive-colored lesions (10-15 cm) on leaves. Lesions develop dark borders and produce dark fungal spores under wet conditions.\nTreatment and Cure:\n- Chemical Control: Mancozeb 75% WP at 2g/L. Propiconazole 25% EC at 1ml/L. Apply at VT (tasseling) and R1 (silking) growth stages.\n- Preventative Control: Plant resistant corn varieties. Maintain proper plant spacing for airflow. Remove and destroy crop debris post harvest."
+    },
+    {
+        "source": "grape_diseases.txt",
+        "chunk_id": "grape_diseases.txt_0",
+        "text": "GRAPE DISEASE CROP MANAGEMENT GUIDE"
+    },
+    {
+        "source": "grape_diseases.txt",
+        "chunk_id": "grape_diseases.txt_1",
+        "text": "1. Grape Black Rot (Guignardia bidwellii)\nSymptoms: Circular tan to brown leaf spots with dark borders. Small black fruiting bodies (pycnidia) visible in the center of leaf spots. Berries shrivel and become black mummified raisins attached to the cluster.\nTreatment and Cure:\n- Chemical Control: Apply Mancozeb 75% WP at 2g/L from bud break onwards. Myclobutanil 10% WP at 1g/L after bloom. Tebuconazole 25.9% EC at 1ml/L for systemic control. Spray every 7-10 days during wet weather.\n- Biological Control: Bacillus subtilis (Serenade) as preventive foliar spray. Copper sulfate solution (3g/L) as Bordeaux mixture spray before bud break.\n- Preventative Control: Remove and destroy all mummified berries and infected canes during winter pruning. Maintain open canopy through leaf removal to improve air circulation. Use drip irrigation to keep foliage dry.\n- Fungicide: Mancozeb, Myclobutanil, Tebuconazole, Copper Sulfate, Captan"
+    },
+    {
+        "source": "grape_diseases.txt",
+        "chunk_id": "grape_diseases.txt_2",
+        "text": "2. Grape Powdery Mildew (Erysiphe necator)\nSymptoms: White to gray powdery coating on leaves, shoots, and berries. Affected leaves may curl, distort, and drop prematurely. Infected berries crack and develop off-flavor.\nTreatment and Cure:\n- Chemical Control: Sulfur-based fungicides (Wettable Sulfur 80% WP) at 3g/L applied every 7-14 days. Myclobutanil 10% WP at 1g/L. Azoxystrobin at 1ml/L for systemic control.\n- Biological Control: Neem oil (5ml/L) + soap emulsifier. Potassium bicarbonate (5g/L) as contact fungicide.\n- Preventative Control: Maintain open vine canopy. Avoid excess nitrogen fertilization. Plant powdery mildew resistant grape varieties."
+    },
+    {
+        "source": "grape_diseases.txt",
+        "chunk_id": "grape_diseases.txt_3",
+        "text": "3. Grape Downy Mildew (Plasmopara viticola)\nSymptoms: Yellow oil spots on upper leaf surfaces. White cottony growth (sporulation) on leaf undersides. Berries turn brown and shrivel.\nTreatment and Cure:\n- Chemical Control: Copper Oxychloride 50% WP at 3g/L as preventive. Metalaxyl + Mancozeb for curative action. Dimethomorph + Mancozeb alternated with copper fungicides.\n- Biological Control: Bacillus pumilus spray as preventive biocontrol.\n- Preventative Control: Ensure good drainage. Avoid overhead irrigation. Remove infected shoots promptly."
+    },
+    {
+        "source": "pepper_diseases.txt",
+        "chunk_id": "pepper_diseases.txt_0",
+        "text": "PEPPER (BELL PEPPER / CHILLI) DISEASE CROP MANAGEMENT GUIDE"
+    },
+    {
+        "source": "pepper_diseases.txt",
+        "chunk_id": "pepper_diseases.txt_1_13",
+        "text": "1. Pepper Bacterial Spot (Xanthomonas campestris pv. vesicatoria)\nSymptoms: Small water-soaked lesions on leaves that enlarge and turn brown to black with yellow halos. Lesions may have a greasy appearance. Infected fruit develops raised corky scabs and sunken spots, reducing marketability.\nTreatment and Cure:\n- Chemical Control: Copper-based bactericides are primary treatment \u2014 Copper Oxychloride 50% WP at 3g/L spray every 7-10 days. Copper Hydroxide (Kocide 3000) at 2g/L. Streptomycin Sulfate 90% SP at 1g/L for severe bacterial outbreak (where legally permitted). Bactericide rotation recommended to prevent resistance.\n- Biological Control: Bacillus subtilis (Serenade Opti) foliar spray at 5ml/L every 7 days. Pseudomonas fluorescens 10ml/L as preventive spray."
+    },
+    {
+        "source": "pepper_diseases.txt",
+        "chunk_id": "pepper_diseases.txt_1_14",
+        "text": "Trichoderma-based bio-fungicide as soil drench to improve root health.\n- Preventative Control: Use certified disease-free transplants. Avoid overhead irrigation; switch to drip irrigation to keep foliage dry. Do not work in the field when plants are wet. Remove and destroy infected plant material. Rotate crops with non-solanaceous crops for 2-3 years. Use copper-resistant variety management. Sanitize farm equipment.\n- Bactericide/Fungicide: Copper Oxychloride, Copper Hydroxide, Streptomycin, Mancozeb."
+    },
+    {
+        "source": "pepper_diseases.txt",
+        "chunk_id": "pepper_diseases.txt_2",
+        "text": "2. Pepper Phytophthora Blight (Phytophthora capsici)\nSymptoms: Water-soaked lesions on leaves, stems, and fruit. Stem lesions girdle the plant causing sudden wilting and collapse. Fruit develops water-soaked lesions that become covered with white mold.\nTreatment and Cure:\n- Chemical Control: Metalaxyl-M + Mancozeb (Ridomil Gold) at 2.5g/L. Propamocarb Hydrochloride (Previcur) as soil drench. Copper Oxychloride 50% WP at 3g/L as foliar spray.\n- Biological Control: Trichoderma harzianum soil drench (10g/L). Pseudomonas fluorescens foliar spray.\n- Preventative Control: Avoid water logging; use raised beds. Ensure proper soil drainage. Rotate away from peppers and other solanaceous crops for 3 years."
+    },
+    {
+        "source": "pepper_diseases.txt",
+        "chunk_id": "pepper_diseases.txt_3",
+        "text": "3. Pepper Anthracnose (Colletotrichum spp.)\nSymptoms: Circular, sunken, water-soaked lesions on ripening fruit that enlarge and become covered with salmon-orange spore masses. Leaves show small brown spots.\nTreatment and Cure:\n- Chemical Control: Mancozeb 75% WP at 2g/L. Azoxystrobin at 1ml/L. Chlorothalonil 75% WP at 2g/L. Start spray program at first fruit set.\n- Preventative Control: Harvest fruit promptly. Avoid wounds during harvest. Use resistant pepper varieties. Proper post-harvest handling."
+    },
+    {
+        "source": "potato_diseases.txt",
+        "chunk_id": "potato_diseases.txt_0",
+        "text": "POTATO DISEASE CROP MANAGEMENT GUIDE"
+    },
+    {
+        "source": "potato_diseases.txt",
+        "chunk_id": "potato_diseases.txt_1_18",
+        "text": "1. Potato Early Blight (Alternaria solani)\nSymptoms: Dark brown to black concentric ring lesions (target-board pattern) appear first on older lower leaves. Yellow halo surrounds each lesion. Severe infection causes defoliation and reduced tuber yield.\nTreatment and Cure:\n- Chemical Control: Apply Mancozeb 75% WP at 2g/L every 7-10 days from 30 days after planting. Chlorothalonil 75% WP at 2g/L as preventive. Tebuconazole 25.9% EC at 1ml/L for systemic control when lesions appear. Azoxystrobin + Difenoconazole (Amistar Top) at 0.75ml/L.\n- Biological Control: Trichoderma viride 10g/L as soil drench plus foliar spray. Pseudomonas fluorescens 10ml/L every 15 days. Neem oil (5ml/L) + soap emulsifier spray.\n- Preventative Control: Use certified disease-free seed tubers."
+    },
+    {
+        "source": "potato_diseases.txt",
+        "chunk_id": "potato_diseases.txt_1_19",
+        "text": "Maintain proper plant spacing (30cm x 60cm) for good airflow. Avoid overhead irrigation; use drip irrigation. Rotate crops with non-solanaceous crops for 2-3 years. Remove and destroy infected plant debris.\n- Fungicide: Mancozeb, Chlorothalonil, Tebuconazole, Azoxystrobin."
+    },
+    {
+        "source": "potato_diseases.txt",
+        "chunk_id": "potato_diseases.txt_2",
+        "text": "2. Potato Late Blight (Phytophthora infestans)\nSymptoms: Water-soaked pale green to dark brown irregular lesions on leaves and stems. White cottony mold on leaf undersides in humid conditions. Tubers develop reddish-brown dry rot.\nTreatment and Cure:\n- Chemical Control: Metalaxyl-M 4% + Mancozeb 40% WP (Ridomil Gold) at 2.5g/L immediately at first symptom. Standard Metalaxyl-M fungicide sprays at 1.8g/L under extreme humidity. Cymoxanil + Mancozeb as curative spray. Copper Oxychloride 50% WP at 3g/L as preventive.\n- Biological Control: Bacillus subtilis foliar spray. Trichoderma bio-agent suspension (custom Trichoderma bio-agent suspension per Agronomy Extension Office PDF Bulletin). Copper sulfate Bordeaux mixture (3g/L) as preventive.\n- Preventative Control: Plant blight-resistant potato varieties. Avoid wet foliage conditions; use drip irrigation. Destroy volunteer potato plants. Monitor weather forecasts and spray preventively during cool humid weather."
+    },
+    {
+        "source": "potato_diseases.txt",
+        "chunk_id": "potato_diseases.txt_3",
+        "text": "3. Potato Leaf Roll Virus (PLRV)\nSymptoms: Rolling and yellowing of leaves starting from upper canopy. Leaves become stiff and leathery with a pinkish discoloration on undersides. Affected plants are stunted with reduced tuber yield.\nTreatment and Cure:\n- Chemical Control: No direct chemical treatment for virus. Control aphid vectors with Imidacloprid (0.3ml/L) or Thiamethoxam (0.2g/L) systemic insecticides.\n- Preventative Control: Use certified virus-free seed tubers. Rogue out infected plants early. Control aphid populations that spread the virus."
+    },
+    {
+        "source": "strawberry_diseases.txt",
+        "chunk_id": "strawberry_diseases.txt_0",
+        "text": "STRAWBERRY DISEASE CROP MANAGEMENT GUIDE"
+    },
+    {
+        "source": "strawberry_diseases.txt",
+        "chunk_id": "strawberry_diseases.txt_1",
+        "text": "1. Strawberry Leaf Scorch (Diplocarpon earlianum)\nSymptoms: Small, irregular, dark purple to red spots on upper leaf surfaces. Spots enlarge and centers turn tan to brown while margins remain purple-red, giving a scorched appearance. Severe infections cause early defoliation.\nTreatment and Cure:\n- Chemical Control: Apply Captan 50% WP at 3g/L. Myclobutanil 10% WP at 1g/L. Azoxystrobin at 1ml/L as systemic control. Spray every 10-14 days from early spring through harvest.\n- Biological Control: Bacillus subtilis (Serenade) at 5ml/L foliar spray. Neem oil (5ml/L) with soap emulsifier every 7 days.\n- Preventative Control: Remove and destroy infected leaves after harvest. Avoid overhead irrigation. Plant resistant strawberry varieties. Ensure adequate plant spacing (30cm x 40cm) for good air circulation.\n- Fungicide: Captan, Myclobutanil, Azoxystrobin, Tebuconazole"
+    },
+    {
+        "source": "strawberry_diseases.txt",
+        "chunk_id": "strawberry_diseases.txt_2",
+        "text": "2. Strawberry Gray Mold (Botrytis cinerea)\nSymptoms: Brown water-soaked lesions on berries, flowers, and leaves. Gray fluffy mold sporulation on infected tissue in humid conditions. Infected berries rot rapidly.\nTreatment and Cure:\n- Chemical Control: Iprodione 50% WP at 1g/L. Fenhexamid (Teldor) at 1g/L. Pyrimethanil at 1ml/L. Begin spray program at early bloom and repeat every 7-10 days.\n- Biological Control: Trichoderma harzianum 10g/L foliar spray. Bacillus subtilis preventive spray.\n- Preventative Control: Harvest ripe fruit promptly. Remove decaying berries. Improve air circulation through mulching and proper spacing."
+    },
+    {
+        "source": "strawberry_diseases.txt",
+        "chunk_id": "strawberry_diseases.txt_3",
+        "text": "3. Strawberry Angular Leaf Spot (Xanthomonas fragariae)\nSymptoms: Small water-soaked irregular lesions on lower leaf surface that turn brown and angular. White bacterial exudate may dry to a white crust on leaf surfaces.\nTreatment and Cure:\n- Chemical Control: Copper Oxychloride 50% WP at 3g/L. Copper Hydroxide bactericide spray every 7-10 days during wet weather.\n- Preventative Control: Avoid overhead irrigation. Use certified disease-free transplants. Rotate planting sites every 3 years."
+    },
+    {
+        "source": "temp_reference_guide.txt",
+        "chunk_id": "temp_reference_guide.txt_0",
+        "text": "CROP ADVISOR SPECIAL INFO"
+    },
+    {
+        "source": "temp_reference_guide.txt",
+        "chunk_id": "temp_reference_guide.txt_1",
+        "text": "Potato Late Blight Treatment Special Guidelines:\nUnder extreme humidity conditions, apply standard metalaxyl-M fungicide sprays at a dosage of 1.8g/L. Biological: Spray with custom Trichoderma bio-agent suspension. Source: Agronomy Extension Office PDF Bulletin."
+    },
+    {
+        "source": "tomato_diseases.txt",
+        "chunk_id": "tomato_diseases.txt_0",
+        "text": "TOMATO DISEASE CROP MANAGEMENT GUIDE"
+    },
+    {
+        "source": "tomato_diseases.txt",
+        "chunk_id": "tomato_diseases.txt_1",
+        "text": "1. Tomato Late Blight (Phytophthora infestans)\nSymptoms: Water-soaked lesions on leaves that turn brown-black rapidly. White mold visible on undersides of leaves in humid conditions. Fruit develops greasy-looking dark patches.\nTreatment and Cure:\n- Chemical Control: Apply Mancozeb 75% WP at 2g per liter of water as a preventive spray. For active infection, use Metalaxyl-M 4% + Mancozeb 40% WP (Ridomil Gold) at 2.5g/L. Systemic fungicides like Cymoxanil + Mancozeb can be alternated.\n- Biological Control: Spray Bacillus subtilis (0.5% WP) at 5g/L. Trichoderma viride suspension at 10g/L as soil drench to suppress root infection.\n- Preventative Control: Avoid overhead irrigation; use drip irrigation. Destroy infected plant debris. Ensure good airflow by proper plant spacing (60cm between plants). Apply copper-based fungicides as protectant at early flowering stage.\n- Fungicide: Mancozeb, Metalaxyl, Cymoxanil, Copper Oxychloride"
+    },
+    {
+        "source": "tomato_diseases.txt",
+        "chunk_id": "tomato_diseases.txt_2",
+        "text": "2. Tomato Early Blight (Alternaria solani)\nSymptoms: Brown concentric rings forming a target-board pattern on older leaves. Leaf yellowing around spots leads to defoliation. Dark lesions also appear on stems and fruit.\nTreatment and Cure:\n- Chemical Control: Apply Chlorothalonil 75% WP at 2g/L or Mancozeb 75% WP at 2g/L every 7-10 days. Tebuconazole 250 EC at 1ml/L for systemic control.\n- Biological Control: Neem oil (5ml/L) + soap emulsifier sprays every 7 days. Trichoderma harzianum as biocontrol agent.\n- Preventative Control: Remove and burn infected leaves. Rotate crops every 2-3 years. Avoid water stress and excessive nitrogen fertilization."
+    },
+    {
+        "source": "tomato_diseases.txt",
+        "chunk_id": "tomato_diseases.txt_3",
+        "text": "3. Tomato Leaf Mold (Passalora fulva)\nSymptoms: Yellow spots on upper leaf surfaces with olive-green to brown velvety mold patches on undersides. Leaves eventually wilt and fall.\nTreatment and Cure:\n- Chemical Control: Apply Copper Oxychloride 50% WP at 2.5g/L. Mancozeb 75% WP at 2g/L as preventive spray. Azoxystrobin at 1ml/L for systemic control.\n- Biological Control: Trichoderma viride 5g/L foliar spray. Pseudomonas fluorescens 10ml/L.\n- Preventative Control: Maintain greenhouse humidity below 85%. Prune lower leaves. Ensure adequate ventilation. Use resistant tomato varieties."
+    }
 ]
