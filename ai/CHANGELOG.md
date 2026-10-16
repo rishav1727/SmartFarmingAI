@@ -21,6 +21,7 @@ Each entry links to the detailed session file.
   - Configured `render.yaml` with free managed PostgreSQL database and web service.
   - Added "Deploy to Render" one-click button and complete architecture documentation to `README.md`.
   - Optimized `Dockerfile` for Debian Bookworm, PyTorch CPU (`--index-url https://download.pytorch.org/whl/cpu`), and `opencv-python-headless` to eliminate 2 GB CUDA bloat and fix cloud build failures.
+  - Updated Project Guide attribution across footer (`public/index.html`) and documentation (`README.md`) to **Mr. Deepak Aneja**.
 
 ---
 
