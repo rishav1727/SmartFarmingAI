@@ -25,12 +25,38 @@ class DiseasePredictor:
         if model_weights_path:
             candidate_weights.append(model_weights_path)
         else:
-            candidate_weights = [
-                os.path.join(MODEL_DIR, "best_model.pth"),
+            default_weight = os.path.join(MODEL_DIR, "best_model.pth")
+            
+            # Check for remote weights URL (e.g., S3, Google Drive direct link, release assets)
+            remote_url = os.environ.get("WEIGHTS_URL")
+            if remote_url and not os.path.exists(default_weight):
+                try:
+                    import urllib.request
+                    print(f"[inference] Downloading model weights from WEIGHTS_URL: {remote_url}...")
+                    os.makedirs(MODEL_DIR, exist_ok=True)
+                    urllib.request.urlretrieve(remote_url, default_weight)
+                    print(f"[inference] Successfully downloaded weights to {default_weight}")
+                except Exception as e:
+                    print(f"[inference] Remote weights download failed: {e}")
+
+            # Check for Hugging Face model repository
+            hf_repo = os.environ.get("HF_MODEL_REPO")
+            if hf_repo and not os.path.exists(default_weight):
+                try:
+                    from huggingface_hub import hf_hub_download
+                    token = os.environ.get("HF_TOKEN")
+                    print(f"[inference] Pulling model checkpoint from Hugging Face: {hf_repo}...")
+                    downloaded_path = hf_hub_download(repo_id=hf_repo, filename="best_model.pth", token=token)
+                    candidate_weights.append(downloaded_path)
+                except Exception as e:
+                    print(f"[inference] Hugging Face Hub download failed: {e}")
+
+            candidate_weights.extend([
+                default_weight,
                 os.path.join(MODEL_DIR, "best_model.pt"),
                 os.path.join(MODEL_DIR, "crop_disease_model.pth"),
                 os.path.join(MODEL_DIR, "model.pth")
-            ]
+            ])
             
         found_weights = False
         for weight_file in candidate_weights:

@@ -1,0 +1,56 @@
+name: SmartFarmingAI CI/CD & Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  validate-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+        cache: 'pip'
+
+    - name: Install System Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libgl1-mesa-glx libglib2.0-0
+
+    - name: Install Python Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Verify Code & Database Integrity
+      run: |
+        python -m src.setup_db
+
+    - name: Test Core Modules Import
+      run: |
+        python -c "import src.model; print('Model module ok')"
+        python -c "import src.advisor; print('Advisor & RAG module ok')"
+        python -c "import src.database; print('Database ORM ok')"
+        python -c "import src.storage; print('Storage layer ok')"
+
+  trigger-render-deploy:
+    needs: validate-and-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Trigger Render Deploy Hook (if configured)
+      run: |
+        if [ -n "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
+          echo "Triggering automated deployment on Render..."
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+        else
+          echo "RENDER_DEPLOY_HOOK_URL not configured. Render Git auto-deploy will handle deployment automatically via repo webhook."
+        fi
