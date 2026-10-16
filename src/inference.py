@@ -18,92 +18,74 @@ class DiseasePredictor:
             print("Warning: No class names found. Model will use default 38 classes.")
             num_classes = 38 # Default for PlantVillage if classes missing
             
-        # Check cloud/free-tier or low memory deployment
-        is_cloud = os.environ.get("RENDER", "") != "" or os.environ.get("LOW_MEMORY_MODE", "0") == "1"
-        cloud_weights = os.path.join(MODEL_DIR, "cloud_model.pth")
-        default_weight = os.path.join(MODEL_DIR, "best_model.pth")
+        # Vision Transformer (ViT-B/16) - Core Research Architecture
+        self.model = get_model(num_classes, self.device)
+        self.model_type = "vit"
         
-        # Decide architecture: if in cloud OR if custom ViT weights are absent, use cloud MobileNetV2 (8.9MB, ~20MB RAM)
-        if (is_cloud or not os.path.exists(default_weight)) and os.path.exists(cloud_weights) and not model_weights_path:
-            from src.model import get_cloud_model
-            self.model = get_cloud_model(num_classes, self.device)
-            self.model.load_state_dict(torch.load(cloud_weights, map_location=self.device))
-            self.model_type = "mobilenet_v2"
-            self.weights_loaded = True
-            print(f"[inference] Cloud mode active: Successfully loaded MobileNetV2 ({cloud_weights}, 8.9MB, ~20MB RAM, <30ms latency).")
+        # Determine weights path dynamically across candidates
+        candidate_weights = []
+        if model_weights_path:
+            candidate_weights.append(model_weights_path)
         else:
-            self.model = get_model(num_classes, self.device)
-            self.model_type = "vit"
+            default_weight = os.path.join(MODEL_DIR, "best_model.pth")
             
-            # Determine weights path dynamically across candidates
-            candidate_weights = []
-            if model_weights_path:
-                candidate_weights.append(model_weights_path)
-            else:
-                # Check for remote weights URL (e.g., S3, Google Drive direct link, release assets)
-                remote_url = os.environ.get("WEIGHTS_URL")
-                if remote_url and not os.path.exists(default_weight):
-                    try:
-                        import urllib.request
-                        print(f"[inference] Downloading model weights from WEIGHTS_URL: {remote_url}...")
-                        os.makedirs(MODEL_DIR, exist_ok=True)
-                        urllib.request.urlretrieve(remote_url, default_weight)
-                        print(f"[inference] Successfully downloaded weights to {default_weight}")
-                    except Exception as e:
-                        print(f"[inference] Remote weights download failed: {e}")
+            # Check for remote weights URL (e.g., GitHub Release assets, S3, custom CDN)
+            github_release_url = "https://github.com/rishav1727/SmartFarmingAI/releases/download/v1.0-vit/best_model.pth"
+            remote_url = os.environ.get("WEIGHTS_URL", github_release_url)
+            if not os.path.exists(default_weight):
+                try:
+                    import urllib.request
+                    print(f"[inference] Pulling ViT-B/16 checkpoint from: {remote_url}...")
+                    os.makedirs(MODEL_DIR, exist_ok=True)
+                    urllib.request.urlretrieve(remote_url, default_weight)
+                    print(f"[inference] Successfully downloaded weights to {default_weight}")
+                except Exception as e:
+                    print(f"[inference] Remote weights download failed: {e}")
 
-                # Check for Hugging Face model repository
-                hf_repo = os.environ.get("HF_MODEL_REPO")
-                if hf_repo and not os.path.exists(default_weight):
-                    try:
-                        from huggingface_hub import hf_hub_download
-                        token = os.environ.get("HF_TOKEN")
-                        print(f"[inference] Pulling model checkpoint from Hugging Face: {hf_repo}...")
-                        downloaded_path = hf_hub_download(repo_id=hf_repo, filename="best_model.pth", token=token)
-                        candidate_weights.append(downloaded_path)
-                    except Exception as e:
-                        print(f"[inference] Hugging Face Hub download failed: {e}")
+            # Check for Hugging Face model repository
+            hf_repo = os.environ.get("HF_MODEL_REPO")
+            if hf_repo and not os.path.exists(default_weight):
+                try:
+                    from huggingface_hub import hf_hub_download
+                    token = os.environ.get("HF_TOKEN")
+                    print(f"[inference] Pulling model checkpoint from Hugging Face: {hf_repo}...")
+                    downloaded_path = hf_hub_download(repo_id=hf_repo, filename="best_model.pth", token=token)
+                    candidate_weights.append(downloaded_path)
+                except Exception as e:
+                    print(f"[inference] Hugging Face Hub download failed: {e}")
 
-                candidate_weights.extend([
-                    default_weight,
-                    os.path.join(MODEL_DIR, "best_model.pt"),
-                    os.path.join(MODEL_DIR, "crop_disease_model.pth"),
-                    os.path.join(MODEL_DIR, "model.pth")
-                ])
-                
-            found_weights = False
-            for weight_file in candidate_weights:
-                if os.path.exists(weight_file):
-                    try:
-                        self.model.load_state_dict(torch.load(weight_file, map_location=self.device))
-                        print(f"Successfully loaded pre-trained model weights from {weight_file}")
-                        self.weights_loaded = True
-                        found_weights = True
-                        break
-                    except Exception as e:
-                        print(f"Error loading weights from {weight_file}: {e}")
-                        
-            if not found_weights:
-                print("Notice: Running inference with pre-trained ViT weights. Instant testing ready without re-training!")
-                self.weights_loaded = True
-                
+            candidate_weights.extend([
+                default_weight,
+                os.path.join(MODEL_DIR, "best_model.pt"),
+                os.path.join(MODEL_DIR, "crop_disease_model.pth"),
+                os.path.join(MODEL_DIR, "model.pth")
+            ])
+            
+        found_weights = False
+        for weight_file in candidate_weights:
+            if os.path.exists(weight_file):
+                try:
+                    self.model.load_state_dict(torch.load(weight_file, map_location=self.device))
+                    print(f"[inference] Successfully loaded pre-trained ViT-B/16 weights from {weight_file}")
+                    self.weights_loaded = True
+                    found_weights = True
+                    break
+                except Exception as e:
+                    print(f"Error loading weights from {weight_file}: {e}")
+                    
+        if not found_weights:
+            print("Notice: Running inference with base ViT-B/16 architecture.")
+            self.weights_loaded = False
+            
         self.model.eval()
         
-        # Enhanced transformations for real-world robustness
-        if getattr(self, "model_type", "vit") == "mobilenet_v2":
-            self.transform = transforms.Compose([
-                transforms.Resize(256),
-                transforms.CenterCrop(IMAGE_SIZE),
-                transforms.ToTensor(),
-                transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
-            ])
-        else:
-            self.transform = transforms.Compose([
-                transforms.Resize(256),              # Resize smaller edge to 256
-                transforms.CenterCrop(IMAGE_SIZE),  # Take 224x224 square from center
-                transforms.ToTensor(),
-                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-            ])
+        # Standard transformations for Vision Transformer (ViT-B/16)
+        self.transform = transforms.Compose([
+            transforms.Resize(256),              # Resize smaller edge to 256
+            transforms.CenterCrop(IMAGE_SIZE),  # Take 224x224 square from center
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
 
     def _load_class_names(self):
         class_names_path = os.path.join(MODEL_DIR, "class_names.json")
@@ -154,19 +136,10 @@ class DiseasePredictor:
                 if any(term in cname_lower for term in search_terms):
                     crop_indices.append(idx)
 
-        # Adaptive views: MobileNetV2 single fast pass on cloud, or multi-view for ViT
+        # Adaptive views for Vision Transformer
         is_cloud = os.environ.get("RENDER", "") != "" or os.environ.get("LOW_MEMORY_MODE", "1") == "1"
         
-        if getattr(self, "model_type", "vit") == "mobilenet_v2":
-            views = {
-                "Cloud Ultra-Fast Engine": transforms.Compose([
-                    transforms.Resize(256),
-                    transforms.CenterCrop(IMAGE_SIZE),
-                    transforms.ToTensor(),
-                    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
-                ])
-            }
-        elif is_cloud:
+        if is_cloud:
             views = {
                 "Standard": transforms.Compose([
                     transforms.Resize((IMAGE_SIZE, IMAGE_SIZE)),
@@ -346,12 +319,7 @@ class DiseasePredictor:
             try:
                 from src.visualize import GradCAM, overlay_heatmap
                 
-                target_layer = None
-                if hasattr(self.model, "vit"):
-                    target_layer = self.model.vit.encoder.layers[-1]
-                elif hasattr(self.model, "features"):
-                    target_layer = self.model.features[-1]
-                
+                target_layer = self.model.vit.encoder.layers[-1]
                 cam_engine = GradCAM(self.model, target_layer)
                 
                 cat_id = int(best_result["catid"]) if best_result and "catid" in best_result else None
