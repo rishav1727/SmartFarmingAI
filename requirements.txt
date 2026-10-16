@@ -17,7 +17,8 @@ requests
 
 # ── Database (SQLite local / PostgreSQL production) ───────────────────────────
 sqlalchemy
-psycopg2-binary          # PostgreSQL adapter (ignored when using SQLite)
+psycopg2-binary          # PostgreSQL psycopg2 adapter
+psycopg[binary]          # PostgreSQL psycopg3 adapter (SQLAlchemy 2.0 default)
 
 # ── Cloud storage ─────────────────────────────────────────────────────────────
 supabase                 # Supabase Python client (storage + DB)
