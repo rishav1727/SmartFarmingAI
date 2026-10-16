@@ -22,6 +22,7 @@ Each entry links to the detailed session file.
   - Added "Deploy to Render" one-click button and complete architecture documentation to `README.md`.
   - Optimized `Dockerfile` for Debian Bookworm, PyTorch CPU (`--index-url https://download.pytorch.org/whl/cpu`), and `opencv-python-headless` to eliminate 2 GB CUDA bloat and fix cloud build failures.
   - Updated Project Guide attribution across footer (`public/index.html`) and documentation (`README.md`) to **Mr. Deepak Aneja**.
+  - Engineered **Memory-Safe Cloud Inference Engine**: eliminated runtime 330 MB default weight download (`weights=None`), guarded secondary MobileNet network, and wrapped Grad-CAM in robust error recovery so diagnosis runs smoothly under 512 MB RAM without OOM 502 errors.
 
 ---
 
