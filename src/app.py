@@ -54,7 +54,11 @@ ADMIN_SECRET = os.environ.get("ADMIN_SECRET", "change_me")
 
 # Initialize database tables (lightweight — no PyTorch needed)
 print("Initializing database...")
-init_db()
+try:
+    init_db()
+    print("Database tables initialized successfully.")
+except Exception as e:
+    print(f"[warning] Initial DB check non-fatal: {e}")
 
 # ── Lazy-loaded ML engine (defers PyTorch import to stay under 512 MB on free tier) ──
 _predictor = None
@@ -91,22 +95,6 @@ def get_advisor():
                 _advisor.index_documents()
                 print("[lazy] SmartAdvisor ready.")
     return _advisor
-
-def _warmup_background():
-    """Pre-warm ViT predictor only at boot (on Render free-tier — 512MB RAM).
-    Advisor is NOT warmed here to avoid OOM; it lazy-loads on first /api/advice call."""
-    import time
-    time.sleep(5)  # allow server port to bind + health check to pass first
-    try:
-        print("[warmup] Pre-loading DiseasePredictor (ViT-B/16 quantized)...")
-        get_predictor()
-        print("[warmup] DiseasePredictor ready in memory — first /api/predict will be fast!")
-    except Exception as e:
-        print(f"[warmup] Predictor warmup error (non-fatal): {e}")
-
-# Only run warmup on Render (avoids loading 88 MB model unnecessarily on local dev)
-if os.environ.get("RENDER") or os.environ.get("LOW_MEMORY_MODE") == "1":
-    threading.Thread(target=_warmup_background, daemon=True).start()
 
 def _self_ping_loop():
     """Ping own /health endpoint every 14 minutes to prevent Render free-tier spin-down.
