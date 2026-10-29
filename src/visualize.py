@@ -43,7 +43,7 @@ class GradCAM:
         is_cloud = os.environ.get("RENDER", "") != "" or os.environ.get("LOW_MEMORY_MODE", "1") == "1"
         if is_cloud:
             with torch.no_grad():
-                img = input_tensor[0].detach()
+                img = input_tensor[0].detach().float()
                 sal = img.var(dim=0, keepdim=True) + (img[0] - img[1]).abs().unsqueeze(0)
                 cam_14 = F.adaptive_avg_pool2d(sal.unsqueeze(0), (14, 14))[0, 0].cpu().numpy()
                 cmin, cmax = cam_14.min(), cam_14.max()

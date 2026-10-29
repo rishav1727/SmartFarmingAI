@@ -92,13 +92,12 @@ class DiseasePredictor:
         is_cloud = os.environ.get("RENDER", "") != "" or os.environ.get("LOW_MEMORY_MODE", "1") == "1"
         if is_cloud:
             try:
-                import torch.nn as nn
-                print("[inference] Applying dynamic 8-bit quantization for Render 512MB RAM optimization...")
-                self.model = torch.quantization.quantize_dynamic(self.model, {nn.Linear}, dtype=torch.qint8)
+                print("[inference] Using in-place bfloat16 for Render 512MB RAM optimization (172MB footprint)...")
+                self.model = self.model.to(torch.bfloat16)
                 gc.collect()
-                print("[inference] Dynamic quantization complete. Model RAM ~88MB.")
-            except Exception as q_err:
-                print(f"[inference] Quantization skipped: {q_err}")
+                print("[inference] In-place bfloat16 complete. Zero memory duplication.")
+            except Exception as b_err:
+                print(f"[inference] bfloat16 skipped: {b_err}")
 
         self.model.eval()
         
@@ -216,8 +215,10 @@ class DiseasePredictor:
         with torch.no_grad():
             for view_name, transform in views.items():
                 img_tensor = transform(image).unsqueeze(0).to(self.device)
+                if is_cloud:
+                    img_tensor = img_tensor.to(torch.bfloat16)
                 outputs = self.model(img_tensor)
-                logits = outputs[0]
+                logits = outputs[0].float()
                 
                 if crop_indices:
                     masked_logits = logits.clone()
