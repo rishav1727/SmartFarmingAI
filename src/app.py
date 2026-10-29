@@ -23,7 +23,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from sqlalchemy.orm import Session
 
-from src.database import init_db, get_db, Contribution, ModelVersion
+from src.database import init_db, get_db, Contribution, ModelVersion, DATABASE_URL
 from src import storage as store
 
 app = FastAPI(
@@ -82,25 +82,21 @@ def get_advisor():
     return _advisor
 
 def _warmup_background():
-    """Pre-warm ML and Advisor engines in background so first user request responds in <1s."""
+    """Pre-warm ViT predictor only at boot (on Render free-tier — 512MB RAM).
+    Advisor is NOT warmed here to avoid OOM; it lazy-loads on first /api/advice call."""
     import time
-    time.sleep(2)  # allow server port to bind first
+    time.sleep(3)  # allow server port to bind + health check to pass first
     try:
-        print("[warmup] Initializing DiseasePredictor in background...")
+        print("[warmup] Pre-loading DiseasePredictor (ViT-B/16 quantized)...")
         get_predictor()
-        print("[warmup] DiseasePredictor is ready in memory!")
+        print("[warmup] DiseasePredictor ready in memory — first /api/predict will be fast!")
     except Exception as e:
-        print(f"[warmup] Predictor warmup error: {e}")
-
-    try:
-        print("[warmup] Initializing SmartAdvisor in background...")
-        get_advisor()
-        print("[warmup] SmartAdvisor is ready in memory!")
-    except Exception as e:
-        print(f"[warmup] Advisor warmup error: {e}")
+        print(f"[warmup] Predictor warmup error (non-fatal): {e}")
 
 import threading
-threading.Thread(target=_warmup_background, daemon=True).start()
+# Only run warmup on Render (avoids loading 88 MB model unnecessarily on local dev)
+if os.environ.get("RENDER") or os.environ.get("LOW_MEMORY_MODE") == "1":
+    threading.Thread(target=_warmup_background, daemon=True).start()
 
 # Pydantic schemas for requests
 class AdviceRequest(BaseModel):
