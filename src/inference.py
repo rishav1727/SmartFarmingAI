@@ -65,20 +65,21 @@ class DiseasePredictor:
                 os.path.join(MODEL_DIR, "model.pth")
             ])
             
+        is_cloud = os.environ.get("RENDER", "") != "" or os.environ.get("LOW_MEMORY_MODE", "1") == "1"
+        if is_cloud:
+            self.model = self.model.half()
+
         found_weights = False
         for weight_file in candidate_weights:
             if os.path.exists(weight_file):
                 try:
-                    try:
-                        # PyTorch >= 2.1 zero-copy mmap loading (keeps peak RAM well under Render 512MB limit)
-                        state_dict = torch.load(weight_file, map_location=self.device, mmap=True)
-                        self.model.load_state_dict(state_dict, assign=True)
-                    except Exception:
-                        state_dict = torch.load(weight_file, map_location=self.device)
-                        self.model.load_state_dict(state_dict)
+                    state_dict = torch.load(weight_file, map_location=self.device)
+                    if is_cloud:
+                        state_dict = {k: v.half() if v.is_floating_point() else v for k, v in state_dict.items()}
+                    self.model.load_state_dict(state_dict)
                     del state_dict
                     gc.collect()
-                    print(f"[inference] Successfully loaded pre-trained ViT-B/16 weights from {weight_file}")
+                    print(f"[inference] Successfully loaded ViT-B/16 weights from {weight_file} (fp16 mode: {is_cloud})")
                     self.weights_loaded = True
                     found_weights = True
                     break
@@ -88,16 +89,6 @@ class DiseasePredictor:
         if not found_weights:
             print("Notice: Running inference with base ViT-B/16 architecture.")
             self.weights_loaded = False
-            
-        is_cloud = os.environ.get("RENDER", "") != "" or os.environ.get("LOW_MEMORY_MODE", "1") == "1"
-        if is_cloud:
-            try:
-                print("[inference] Using in-place bfloat16 for Render 512MB RAM optimization (172MB footprint)...")
-                self.model = self.model.to(torch.bfloat16)
-                gc.collect()
-                print("[inference] In-place bfloat16 complete. Zero memory duplication.")
-            except Exception as b_err:
-                print(f"[inference] bfloat16 skipped: {b_err}")
 
         self.model.eval()
         
@@ -216,7 +207,7 @@ class DiseasePredictor:
             for view_name, transform in views.items():
                 img_tensor = transform(image).unsqueeze(0).to(self.device)
                 if is_cloud:
-                    img_tensor = img_tensor.to(torch.bfloat16)
+                    img_tensor = img_tensor.half()
                 outputs = self.model(img_tensor)
                 logits = outputs[0].float()
                 
