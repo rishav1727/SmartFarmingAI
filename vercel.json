@@ -5,6 +5,10 @@
   "cleanUrls": true,
   "rewrites": [
     {
+      "source": "/health",
+      "destination": "https://smartfarming-api-rishav-gpbwaqctfsakh2dm.uaenorth-01.azurewebsites.net/health"
+    },
+    {
       "source": "/api/:path*",
       "destination": "https://smartfarming-api-rishav-gpbwaqctfsakh2dm.uaenorth-01.azurewebsites.net/api/:path*"
     },
