@@ -313,9 +313,10 @@ class DiseasePredictor:
 
                     if is_ood:
                         if detected_object:
-                            prediction_label = f"Not A Specialized Plant (Safety Fallback: {detected_object})"
+                            prediction_label = f"Non-Plant Detected: {detected_object.title()} (Not a Crop Leaf)"
                         else:
-                            prediction_label = "Not A Specialized Plant (Non-Plant Image Detected)"
+                            prediction_label = "Non-Plant Detected (Not a Crop Leaf)"
+                        best_top3 = []
 
                     best_result = {
                         "disease": prediction_label,
