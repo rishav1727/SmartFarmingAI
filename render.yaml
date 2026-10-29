@@ -7,9 +7,7 @@ services:
     healthCheckPath: /api/model/info
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: smartfarming-db
-          property: connectionString
+        sync: false
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_KEY
@@ -33,8 +31,4 @@ services:
       - key: BASE_URL
         sync: false
 
-databases:
-  - name: smartfarming-db
-    databaseName: smartfarming
-    user: smartfarming
-    plan: free
+

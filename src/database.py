@@ -1,6 +1,9 @@
 import os
 import uuid
 from datetime import datetime
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from sqlalchemy import (
     create_engine, Column, String, Boolean,
