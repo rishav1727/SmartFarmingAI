@@ -108,6 +108,25 @@ def _warmup_background():
 if os.environ.get("RENDER") or os.environ.get("LOW_MEMORY_MODE") == "1":
     threading.Thread(target=_warmup_background, daemon=True).start()
 
+def _self_ping_loop():
+    """Ping own /health endpoint every 14 minutes to prevent Render free-tier spin-down.
+    Only runs on Render. This keeps the container alive 24/7 at zero cost."""
+    import time, urllib.request
+    base_url = os.environ.get("BASE_URL", "https://smartfarming-ai.onrender.com")
+    ping_url = f"{base_url}/health"
+    # Wait 2 minutes after boot before starting pings
+    time.sleep(120)
+    while True:
+        try:
+            urllib.request.urlopen(ping_url, timeout=10)
+            print(f"[keepalive] Pinged {ping_url} — container stays warm.")
+        except Exception as e:
+            print(f"[keepalive] Ping failed (non-fatal): {e}")
+        time.sleep(14 * 60)  # ping every 14 minutes
+
+if os.environ.get("RENDER"):
+    threading.Thread(target=_self_ping_loop, daemon=True).start()
+
 # ── Lightweight health check (used by Render for deploy health check) ──────────
 @app.get("/health")
 async def health():

@@ -30,6 +30,6 @@ services:
       - key: RENDER
         value: "true"
       - key: BASE_URL
-        sync: false
+        value: "https://smartfarming-ai.onrender.com"
 
 
