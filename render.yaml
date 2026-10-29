@@ -6,8 +6,7 @@ services:
     plan: free
     healthCheckPath: /api/model/info
     envVars:
-      - key: DATABASE_URL
-        sync: false
+      - fromGroup: DATABASE_URL
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_KEY
