@@ -6,15 +6,15 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://rishav0527-smartfarming-backend.hf.space/api/:path*"
+      "destination": "https://smartfarming-api-rishav-gpbwaqctfsakh2dm.uaenorth-01.azurewebsites.net/api/:path*"
     },
     {
       "source": "/uploads/:path*",
-      "destination": "https://rishav0527-smartfarming-backend.hf.space/uploads/:path*"
+      "destination": "https://smartfarming-api-rishav-gpbwaqctfsakh2dm.uaenorth-01.azurewebsites.net/uploads/:path*"
     },
     {
       "source": "/contributions/:path*",
-      "destination": "https://rishav0527-smartfarming-backend.hf.space/contributions/:path*"
+      "destination": "https://smartfarming-api-rishav-gpbwaqctfsakh2dm.uaenorth-01.azurewebsites.net/contributions/:path*"
     }
   ]
 }

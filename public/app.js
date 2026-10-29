@@ -1,6 +1,6 @@
 // SmartFarming.AI Dashboard Logic
 const API_BASE = (window.location.hostname.includes('vercel.app') || (window.location.hostname === 'localhost' && window.location.port !== '8000'))
-    ? 'https://rishav0527-smartfarming-backend.hf.space'
+    ? 'https://smartfarming-api-rishav-gpbwaqctfsakh2dm.uaenorth-01.azurewebsites.net'
     : '';
 
 function resolveUrl(url) {
