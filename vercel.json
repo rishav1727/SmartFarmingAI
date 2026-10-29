@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "outputDirectory": "public",
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://smartfarming-ai.onrender.com/api/:path*"
+    },
+    {
+      "source": "/uploads/:path*",
+      "destination": "https://smartfarming-ai.onrender.com/uploads/:path*"
+    },
+    {
+      "source": "/contributions/:path*",
+      "destination": "https://smartfarming-ai.onrender.com/contributions/:path*"
+    }
+  ]
+}

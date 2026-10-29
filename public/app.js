@@ -1,4 +1,14 @@
 // SmartFarming.AI Dashboard Logic
+const API_BASE = (window.location.hostname.includes('vercel.app') || (window.location.hostname === 'localhost' && window.location.port !== '8000'))
+    ? 'https://smartfarming-ai.onrender.com'
+    : '';
+
+function resolveUrl(url) {
+    if (!url) return url;
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    return API_BASE + url;
+}
+
 
 document.addEventListener("DOMContentLoaded", () => {
     // DOM Elements
@@ -317,7 +327,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         try {
             // Step 1: Detect & Explain (FastAPI endpoint runs inference & Grad-CAM)
-            const response = await fetch("/api/predict", {
+            const response = await fetch(`${API_BASE}/api/predict`, {
                 method: "POST",
                 body: formData
             });
@@ -367,9 +377,9 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             
             // Load images in visualizer
-            baseImage.src = result.image_url;
+            baseImage.src = resolveUrl(result.image_url);
             if (result.heatmap_url) {
-                heatmapImage.src = result.heatmap_url;
+                heatmapImage.src = resolveUrl(result.heatmap_url);
                 explainCard.classList.remove("hidden");
                 triggerHeatmapScanAnimation();
             } else {
@@ -422,7 +432,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         const language = langSelect.value;
         try {
-            const response = await fetch("/api/advice", {
+            const response = await fetch(`${API_BASE}/api/advice`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -1359,7 +1369,7 @@ function applyLanguageUI(selectedLang) {
         const tempBotMsg = chatMessages.lastElementChild;
 
         try {
-            const response = await fetch("/api/chat", {
+            const response = await fetch(`${API_BASE}/api/chat`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -1474,7 +1484,7 @@ function applyLanguageUI(selectedLang) {
 
             try {
                 setLoader(true, "Uploading community training sample to database...");
-                const response = await fetch("/api/contribute", {
+                const response = await fetch(`${API_BASE}/api/contribute`, {
                     method: "POST",
                     body: formData
                 });
