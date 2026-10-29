@@ -14,6 +14,7 @@ fastapi
 uvicorn[standard]
 python-multipart
 requests
+gradio
 
 # ── Database (SQLite local / PostgreSQL production) ───────────────────────────
 sqlalchemy
