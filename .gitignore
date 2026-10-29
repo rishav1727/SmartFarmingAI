@@ -20,6 +20,9 @@ data/*
 *.png
 *.webp
 *.mp4
+!public/samples/*.jpg
+!public/samples/*.jpeg
+!public/samples/*.png
 
 # IDEs and OS
 .vscode/
