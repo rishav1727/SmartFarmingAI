@@ -119,7 +119,7 @@ if os.environ.get("RENDER"):
 @app.get("/health")
 async def health():
     """Ultra-fast health check — no DB or model I/O. Used by Render to confirm app is up."""
-    return {"status": "ok"}
+    return {"status": "ok", "version": "v2.0-int8"}
 
 # Pydantic schemas for requests
 class AdviceRequest(BaseModel):

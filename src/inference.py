@@ -65,32 +65,27 @@ class DiseasePredictor:
                 os.path.join(MODEL_DIR, "model.pth")
             ])
 
+        is_cloud = os.environ.get("RENDER", "") != "" or os.environ.get("LOW_MEMORY_MODE", "1") == "1"
+        if is_cloud:
+            try:
+                self.model = torch.ao.quantization.quantize_dynamic(
+                    self.model, {torch.nn.Linear}, dtype=torch.qint8
+                )
+            except Exception as q_err:
+                print(f"[inference] Dynamic quantization notice: {q_err}")
+
         found_weights = False
         for weight_file in candidate_weights:
             if os.path.exists(weight_file):
                 try:
-                    # Stream weights via memory mapping to eliminate RAM spikes
+                    state_dict = torch.load(weight_file, map_location=self.device)
                     try:
-                        state_dict = torch.load(weight_file, map_location=self.device, mmap=True)
+                        self.model.load_state_dict(state_dict)
                     except Exception:
-                        state_dict = torch.load(weight_file, map_location=self.device)
-                    
-                    # In-place parameter copy directly into FP32 model:
-                    # 1. Keeps memory strictly under 330MB (zero duplicate state_dict in RAM)
-                    # 2. Preserves native CPU FP32 AVX2/oneDNN execution speed (0.38s vs 4.5s for FP16)
-                    with torch.no_grad():
-                        for name, param in self.model.named_parameters():
-                            if name in state_dict:
-                                val = state_dict[name]
-                                param.copy_(val.float() if val.is_floating_point() else val)
-                        for name, buf in self.model.named_buffers():
-                            if name in state_dict:
-                                val = state_dict[name]
-                                buf.copy_(val.float() if val.is_floating_point() else val)
-
+                        self.model.load_state_dict(state_dict, strict=False)
                     del state_dict
                     gc.collect()
-                    print(f"[inference] Successfully loaded ViT-B/16 weights in-place from {weight_file}")
+                    print(f"[inference] Successfully loaded ViT-B/16 weights from {weight_file}")
                     self.weights_loaded = True
                     found_weights = True
                     break
