@@ -1,6 +1,6 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # SmartFarmingAI — Cloud Optimized Dockerfile
-# Targets Render (Free Tier), Railway, and HuggingFace Spaces.
+# Targets Fly.io (port 8080), Render, Railway, and HuggingFace Spaces.
 # ─────────────────────────────────────────────────────────────────────────────
 FROM python:3.11-slim
 
@@ -33,7 +33,8 @@ RUN python -c "import urllib.request; print('Downloading ViT-B/16 weights...'); 
 RUN chown -R 1000:1000 /app
 USER 1000
 
-# HuggingFace Spaces uses port 7860, Render injects its own $PORT (e.g. 10000)
-EXPOSE 7860 10000 8000
+# Fly.io uses 8080, HuggingFace Spaces uses 7860, Render injects $PORT
+EXPOSE 8080 7860 10000 8000
 
-CMD ["sh", "-c", "python -m uvicorn src.app:app --host 0.0.0.0 --port ${PORT:-7860}"]
+# PORT env var: Fly.io injects 8080, HF Spaces uses 7860, fallback to 8000
+CMD ["sh", "-c", "python -m uvicorn src.app:app --host 0.0.0.0 --port ${PORT:-8000}"]

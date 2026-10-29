@@ -9,6 +9,10 @@ from src.model import get_model
 
 class DiseasePredictor:
     def __init__(self, model_weights_path=None):
+        import gc
+        if os.environ.get("RENDER") or os.environ.get("LOW_MEMORY_MODE", "1") == "1":
+            torch.set_num_threads(1)
+            
         self.device = DEVICE
         self.class_names = self._load_class_names()
         
@@ -65,7 +69,15 @@ class DiseasePredictor:
         for weight_file in candidate_weights:
             if os.path.exists(weight_file):
                 try:
-                    self.model.load_state_dict(torch.load(weight_file, map_location=self.device))
+                    try:
+                        # PyTorch >= 2.1 zero-copy mmap loading (keeps peak RAM well under Render 512MB limit)
+                        state_dict = torch.load(weight_file, map_location=self.device, mmap=True)
+                        self.model.load_state_dict(state_dict, assign=True)
+                    except Exception:
+                        state_dict = torch.load(weight_file, map_location=self.device)
+                        self.model.load_state_dict(state_dict)
+                    del state_dict
+                    gc.collect()
                     print(f"[inference] Successfully loaded pre-trained ViT-B/16 weights from {weight_file}")
                     self.weights_loaded = True
                     found_weights = True
@@ -143,12 +155,6 @@ class DiseasePredictor:
             views = {
                 "Standard": transforms.Compose([
                     transforms.Resize((IMAGE_SIZE, IMAGE_SIZE)),
-                    transforms.ToTensor(),
-                    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-                ]),
-                "Center-Zoom": transforms.Compose([
-                    transforms.Resize(256),
-                    transforms.CenterCrop(IMAGE_SIZE),
                     transforms.ToTensor(),
                     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
                 ])
@@ -333,6 +339,8 @@ class DiseasePredictor:
                 print(f"[inference] Grad-CAM generation skipped or failed ({cam_err}).")
                 best_result["heatmap_path"] = None
             
+        import gc
+        gc.collect()
         return best_result
 
 if __name__ == "__main__":
