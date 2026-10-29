@@ -23,6 +23,12 @@ if DATABASE_URL.startswith("postgres://"):
 elif DATABASE_URL.startswith("postgresql://") and not DATABASE_URL.startswith("postgresql+"):
     DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://", 1)
 
+if "neon.tech" in DATABASE_URL or "postgresql" in DATABASE_URL:
+    db_host = DATABASE_URL.split("@")[-1].split("/")[0] if "@" in DATABASE_URL else "PostgreSQL"
+    print(f"[Database] Active backend: Neon Cloud PostgreSQL ({db_host})")
+else:
+    print("[Database] Active backend: Local SQLite")
+
 _connect_args = {"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
 engine = create_engine(DATABASE_URL, connect_args=_connect_args)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

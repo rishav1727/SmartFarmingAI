@@ -81,6 +81,27 @@ def get_advisor():
         print("[lazy] SmartAdvisor ready.")
     return _advisor
 
+def _warmup_background():
+    """Pre-warm ML and Advisor engines in background so first user request responds in <1s."""
+    import time
+    time.sleep(2)  # allow server port to bind first
+    try:
+        print("[warmup] Initializing DiseasePredictor in background...")
+        get_predictor()
+        print("[warmup] DiseasePredictor is ready in memory!")
+    except Exception as e:
+        print(f"[warmup] Predictor warmup error: {e}")
+
+    try:
+        print("[warmup] Initializing SmartAdvisor in background...")
+        get_advisor()
+        print("[warmup] SmartAdvisor is ready in memory!")
+    except Exception as e:
+        print(f"[warmup] Advisor warmup error: {e}")
+
+import threading
+threading.Thread(target=_warmup_background, daemon=True).start()
+
 # Pydantic schemas for requests
 class AdviceRequest(BaseModel):
     disease: str
@@ -455,6 +476,10 @@ async def model_info(db: Session = Depends(get_db)):
     ).count()
 
     return {
+        "database": {
+            "type": "Neon PostgreSQL (Cloud)" if ("neon.tech" in DATABASE_URL or "postgresql" in DATABASE_URL) else "Local SQLite",
+            "connected": True
+        },
         "model": {
             "architecture":     "Vision Transformer (ViT-B/16)",
             "num_classes":      num_classes,
