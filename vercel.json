@@ -6,15 +6,15 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://smartfarming-ai.onrender.com/api/:path*"
+      "destination": "https://rishav0527-smartfarming-backend.hf.space/api/:path*"
     },
     {
       "source": "/uploads/:path*",
-      "destination": "https://smartfarming-ai.onrender.com/uploads/:path*"
+      "destination": "https://rishav0527-smartfarming-backend.hf.space/uploads/:path*"
     },
     {
       "source": "/contributions/:path*",
-      "destination": "https://smartfarming-ai.onrender.com/contributions/:path*"
+      "destination": "https://rishav0527-smartfarming-backend.hf.space/contributions/:path*"
     }
   ]
 }
