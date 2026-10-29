@@ -89,6 +89,17 @@ class DiseasePredictor:
             print("Notice: Running inference with base ViT-B/16 architecture.")
             self.weights_loaded = False
             
+        is_cloud = os.environ.get("RENDER", "") != "" or os.environ.get("LOW_MEMORY_MODE", "1") == "1"
+        if is_cloud:
+            try:
+                import torch.nn as nn
+                print("[inference] Applying dynamic 8-bit quantization for Render 512MB RAM optimization...")
+                self.model = torch.quantization.quantize_dynamic(self.model, {nn.Linear}, dtype=torch.qint8)
+                gc.collect()
+                print("[inference] Dynamic quantization complete. Model RAM ~88MB.")
+            except Exception as q_err:
+                print(f"[inference] Quantization skipped: {q_err}")
+
         self.model.eval()
         
         # Standard transformations for Vision Transformer (ViT-B/16)
