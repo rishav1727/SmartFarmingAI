@@ -59,33 +59,44 @@ init_db()
 # ── Lazy-loaded ML engine (defers PyTorch import to stay under 512 MB on free tier) ──
 _predictor = None
 _advisor = None
+_predictor_lock = None  # initialized after threading import below
+_advisor_lock = None
+
+import threading
+_predictor_lock = threading.Lock()
+_advisor_lock = threading.Lock()
 
 def get_predictor():
-    """Lazy-load the ViT disease predictor only when first prediction is requested."""
+    """Thread-safe lazy-load of the ViT disease predictor.
+    Lock prevents double-load race condition between warmup thread and first request."""
     global _predictor
     if _predictor is None:
-        print("[lazy] Loading DiseasePredictor (PyTorch + ViT-B/16)...")
-        from src.inference import DiseasePredictor
-        _predictor = DiseasePredictor()
-        print("[lazy] DiseasePredictor ready.")
+        with _predictor_lock:
+            if _predictor is None:  # double-checked locking
+                print("[lazy] Loading DiseasePredictor (PyTorch + ViT-B/16)...")
+                from src.inference import DiseasePredictor
+                _predictor = DiseasePredictor()
+                print("[lazy] DiseasePredictor ready.")
     return _predictor
 
 def get_advisor():
-    """Lazy-load the Smart Advisor and RAG engine only when first advice is requested."""
+    """Thread-safe lazy-load of the Smart Advisor and RAG engine."""
     global _advisor
     if _advisor is None:
-        print("[lazy] Loading SmartAdvisor & RAG engine...")
-        from src.advisor import SmartAdvisor
-        _advisor = SmartAdvisor()
-        _advisor.index_documents()
-        print("[lazy] SmartAdvisor ready.")
+        with _advisor_lock:
+            if _advisor is None:  # double-checked locking
+                print("[lazy] Loading SmartAdvisor & RAG engine...")
+                from src.advisor import SmartAdvisor
+                _advisor = SmartAdvisor()
+                _advisor.index_documents()
+                print("[lazy] SmartAdvisor ready.")
     return _advisor
 
 def _warmup_background():
     """Pre-warm ViT predictor only at boot (on Render free-tier — 512MB RAM).
     Advisor is NOT warmed here to avoid OOM; it lazy-loads on first /api/advice call."""
     import time
-    time.sleep(3)  # allow server port to bind + health check to pass first
+    time.sleep(5)  # allow server port to bind + health check to pass first
     try:
         print("[warmup] Pre-loading DiseasePredictor (ViT-B/16 quantized)...")
         get_predictor()
@@ -93,10 +104,15 @@ def _warmup_background():
     except Exception as e:
         print(f"[warmup] Predictor warmup error (non-fatal): {e}")
 
-import threading
 # Only run warmup on Render (avoids loading 88 MB model unnecessarily on local dev)
 if os.environ.get("RENDER") or os.environ.get("LOW_MEMORY_MODE") == "1":
     threading.Thread(target=_warmup_background, daemon=True).start()
+
+# ── Lightweight health check (used by Render for deploy health check) ──────────
+@app.get("/health")
+async def health():
+    """Ultra-fast health check — no DB or model I/O. Used by Render to confirm app is up."""
+    return {"status": "ok"}
 
 # Pydantic schemas for requests
 class AdviceRequest(BaseModel):
